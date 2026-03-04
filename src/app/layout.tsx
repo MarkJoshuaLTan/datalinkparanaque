@@ -1,17 +1,16 @@
-
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Panaque DataLink | Parañaque Land Data Processor',
+  title: 'Parañaque Data Link | Land Data Processor',
   description: 'Modern, professional real property data cleaner and converter for Parañaque City.',
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.Node;
 }>) {
   return (
     <html lang="en">

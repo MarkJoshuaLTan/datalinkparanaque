@@ -1,4 +1,3 @@
-
 export interface LandRecord {
   id?: string;
   date: string;
@@ -15,6 +14,7 @@ export interface LandRecord {
   barangay?: string;
   section?: string;
   unitValue?: number;
+  isDuplicate?: boolean;
 }
 
 export interface CalibrationRule {
@@ -36,10 +36,9 @@ export function extractArpNumeric(arp: string): number {
 
 export function matchesPinPattern(pin: string, pattern: string): boolean {
   if (!pin || !pattern) return false;
-  // Convert x to wildcard .* and escape other characters
   const escapedPattern = pattern
-    .replace(/[.+^${}()|[\]\\]/g, '\\$&') // Escape regex special chars
-    .replace(/x/g, '.*'); // Convert x to wildcard
+    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    .replace(/x/g, '.*');
   const regex = new RegExp(`^${escapedPattern}$`, 'i');
   return regex.test(pin);
 }
@@ -50,17 +49,13 @@ export function processRecords(
   options: {
     removeDuplicates: boolean;
     applyCalibration: boolean;
-    assessmentLevel: number;
   }
 ): {
   processed: LandRecord[];
+  allWithDuplicateMarkers: LandRecord[];
   duplicatesRemoved: number;
 } {
-  let result = [...records];
-  let duplicatesRemovedCount = 0;
-
-  // 1. Cleaning & Standardization
-  result = result.map(r => ({
+  let result = records.map(r => ({
     ...r,
     pin: r.pin?.trim() || '',
     arpNo: r.arpNo?.trim() || '',
@@ -72,46 +67,47 @@ export function processRecords(
     landArea: Number(r.landArea) || 0,
     marketValue: Number(r.marketValue) || 0,
     assessedValue: Number(r.assessedValue) || 0,
+    isDuplicate: false
   }));
 
-  // 2. Deduplication (by PIN, keep highest ARP No#)
-  if (options.removeDuplicates) {
-    const pinMap = new Map<string, LandRecord>();
-    const originalCount = result.length;
+  // Identify Duplicates (by PIN, keep highest ARP No#)
+  const pinToBestRecord = new Map<string, { index: number, arpVal: number }>();
+  
+  result.forEach((record, idx) => {
+    if (!record.pin) return;
+    const currentArpVal = extractArpNumeric(record.arpNo);
+    const existing = pinToBestRecord.get(record.pin);
     
-    result.forEach(record => {
-      if (!record.pin) return;
-      const existing = pinMap.get(record.pin);
-      if (!existing) {
-        pinMap.set(record.pin, record);
+    if (!existing) {
+      pinToBestRecord.set(record.pin, { index: idx, arpVal: currentArpVal });
+    } else {
+      if (currentArpVal > existing.arpVal) {
+        result[existing.index].isDuplicate = true;
+        pinToBestRecord.set(record.pin, { index: idx, arpVal: currentArpVal });
       } else {
-        const currentArp = extractArpNumeric(record.arpNo);
-        const existingArp = extractArpNumeric(existing.arpNo);
-        if (currentArp > existingArp) {
-          pinMap.set(record.pin, record);
-        }
+        record.isDuplicate = true;
       }
-    });
-    
-    result = Array.from(pinMap.values());
-    duplicatesRemovedCount = originalCount - result.length;
-  }
+    }
+  });
 
-  // 3. Calibration & Auto Computation
+  const duplicatesCount = result.filter(r => r.isDuplicate).length;
+
+  // Calibration & Auto Computation
   result = result.map(record => {
     let updated = { ...record };
     
     if (options.applyCalibration) {
-      // Find matching rules (first match wins)
       const matchingRule = rules.find(rule => matchesPinPattern(record.pin, rule.pinPattern));
       
       if (matchingRule) {
-        if (matchingRule.barangay && (matchingRule.overwrite || !updated.barangay)) {
-          updated.barangay = matchingRule.barangay;
+        if (matchingRule.overwrite || !updated.location || updated.location === "---") {
+          const brgy = matchingRule.barangay || "";
+          const sec = matchingRule.section || "";
+          if (brgy || sec) {
+            updated.location = `${brgy}${brgy && sec ? ', ' : ''}${sec}`.toUpperCase();
+          }
         }
-        if (matchingRule.section && (matchingRule.overwrite || !updated.section)) {
-          updated.section = matchingRule.section;
-        }
+        
         if (matchingRule.unitValue !== undefined && !isNaN(matchingRule.unitValue)) {
           updated.unitValue = matchingRule.unitValue;
           updated.marketValue = updated.landArea * matchingRule.unitValue;
@@ -120,16 +116,13 @@ export function processRecords(
         }
       }
     }
-
-    // Final Auto Computation for everyone
-    // If market value exists, recompute assessed value based on current assessment level
-    updated.assessedValue = updated.marketValue * options.assessmentLevel;
     
     return updated;
   });
 
   return {
-    processed: result,
-    duplicatesRemoved: duplicatesRemovedCount
+    processed: options.removeDuplicates ? result.filter(r => !r.isDuplicate) : result,
+    allWithDuplicateMarkers: result,
+    duplicatesRemoved: duplicatesCount
   };
 }

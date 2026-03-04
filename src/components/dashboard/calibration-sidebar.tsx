@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -7,16 +6,12 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import { CalibrationRule } from '@/lib/processor';
 
 interface CalibrationSidebarProps {
   rules: CalibrationRule[];
   setRules: (rules: CalibrationRule[]) => void;
-  assessmentLevel: number;
-  setAssessmentLevel: (val: number) => void;
   options: {
     removeDuplicates: boolean;
     applyCalibration: boolean;
@@ -27,8 +22,6 @@ interface CalibrationSidebarProps {
 export function CalibrationSidebar({
   rules,
   setRules,
-  assessmentLevel,
-  setAssessmentLevel,
   options,
   setOptions,
 }: CalibrationSidebarProps) {
@@ -39,7 +32,7 @@ export function CalibrationSidebar({
       barangay: '',
       section: '',
       unitValue: undefined,
-      overwrite: false,
+      overwrite: true,
     };
     setRules([...rules, newRule]);
   };
@@ -56,11 +49,11 @@ export function CalibrationSidebar({
     <Card className="h-full border-none shadow-none bg-transparent flex flex-col gap-6">
       <div className="space-y-4">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground px-1 flex items-center gap-2">
-          <Settings className="w-4 h-4" /> Calculation Settings
+          <Settings className="w-4 h-4" /> Processor Settings
         </h3>
         <Card className="p-4 space-y-4">
           <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="remove-duplicates" className="cursor-pointer font-medium">Auto-Filter Duplicates (PIN)</Label>
+            <Label htmlFor="remove-duplicates" className="cursor-pointer font-medium text-xs">Remove Duplicates (PIN)</Label>
             <Switch 
               id="remove-duplicates" 
               checked={options.removeDuplicates}
@@ -68,24 +61,12 @@ export function CalibrationSidebar({
             />
           </div>
           <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="apply-calibration" className="cursor-pointer font-medium">Apply PIN Patterns</Label>
+            <Label htmlFor="apply-calibration" className="cursor-pointer font-medium text-xs">Replace Location by PIN</Label>
             <Switch 
               id="apply-calibration" 
               checked={options.applyCalibration}
               onCheckedChange={(val) => setOptions({ ...options, applyCalibration: val })}
             />
-          </div>
-          <Separator />
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs">Assessment Level (%)</Label>
-              <Input 
-                type="number" 
-                value={Math.round(assessmentLevel * 100)} 
-                onChange={(e) => setAssessmentLevel(Number(e.target.value) / 100)}
-                className="w-16 h-8 text-xs text-right"
-              />
-            </div>
           </div>
         </Card>
       </div>
@@ -93,18 +74,17 @@ export function CalibrationSidebar({
       <div className="flex-1 flex flex-col gap-4 overflow-hidden">
         <div className="flex items-center justify-between px-1">
           <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-            Custom Rules
+            PIN Patterns
           </h3>
           <Button variant="outline" size="sm" className="h-8 gap-1" onClick={addRule}>
-            <Plus className="w-4 h-4" /> Add Rule
+            <Plus className="w-4 h-4" /> Add
           </Button>
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin">
           {rules.length === 0 && (
             <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-              <p className="text-xs">No patterns defined.</p>
-              <p className="text-[10px] mt-1">Data will be processed as-is.</p>
+              <p className="text-[10px] uppercase">No patterns defined.</p>
             </div>
           )}
           {rules.map((rule) => (
@@ -119,7 +99,7 @@ export function CalibrationSidebar({
               </Button>
               <div className="space-y-2">
                 <div className="space-y-1">
-                  <Label className="text-[10px] text-muted-foreground uppercase">PIN Pattern (x = wildcard)</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase">PIN Pattern</Label>
                   <Input 
                     placeholder="124-00-x..." 
                     className="h-8 text-xs font-mono"
@@ -131,7 +111,7 @@ export function CalibrationSidebar({
                   <div className="space-y-1">
                     <Label className="text-[10px] text-muted-foreground uppercase">Barangay</Label>
                     <Input 
-                      placeholder="B.F. Homes" 
+                      placeholder="e.g. BF Homes" 
                       className="h-8 text-xs"
                       value={rule.barangay}
                       onChange={(e) => updateRule(rule.id, { barangay: e.target.value })}
@@ -140,22 +120,12 @@ export function CalibrationSidebar({
                   <div className="space-y-1">
                     <Label className="text-[10px] text-muted-foreground uppercase">Section</Label>
                     <Input 
-                      placeholder="PH 3" 
+                      placeholder="e.g. Phase 2" 
                       className="h-8 text-xs"
                       value={rule.section}
                       onChange={(e) => updateRule(rule.id, { section: e.target.value })}
                     />
                   </div>
-                </div>
-                <div className="flex items-center gap-2 pt-1">
-                   <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`overwrite-${rule.id}`} 
-                        checked={rule.overwrite}
-                        onCheckedChange={(val) => updateRule(rule.id, { overwrite: !!val })}
-                      />
-                      <Label htmlFor={`overwrite-${rule.id}`} className="text-[10px] cursor-pointer">Overwrite existing values</Label>
-                   </div>
                 </div>
               </div>
             </Card>
