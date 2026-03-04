@@ -39,7 +39,7 @@ export function DataPreviewTable({ data, isProcessed = false }: DataPreviewTable
             <TableHead className="min-w-[60px] font-black uppercase text-center">Upd</TableHead>
             <TableHead className="min-w-[140px] font-black uppercase">AcctName</TableHead>
             <TableHead className="min-w-[180px] font-black uppercase">Address</TableHead>
-            <TableHead className="min-w-[180px] font-black uppercase bg-blue-50/50">Location</TableHead>
+            <TableHead className="min-w-[180px] font-black uppercase bg-emerald-50/50">Location</TableHead>
             <TableHead className="min-w-[60px] font-black uppercase">Kind</TableHead>
             <TableHead className="min-w-[60px] font-black uppercase">AU</TableHead>
             <TableHead className="text-right w-[80px] font-black uppercase">Area</TableHead>
@@ -50,21 +50,21 @@ export function DataPreviewTable({ data, isProcessed = false }: DataPreviewTable
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.slice(0, 1500).map((row, i) => (
+          {data.slice(0, 5000).map((row, i) => (
             <TableRow 
               key={i} 
               className={cn(
                 "hover:bg-accent/30 transition-colors border-b",
-                (row.isDuplicate || row.isCleanup) && "bg-red-50/50 opacity-60"
+                (row.isDuplicate || row.isCleanup) && "bg-orange-50/30 opacity-70"
               )}
             >
               <TableCell className="text-center font-mono text-muted-foreground p-2 border-r">{i + 1}</TableCell>
               <TableCell className="whitespace-nowrap p-2">{row.date || '---'}</TableCell>
-              <TableCell className="font-mono text-blue-800 font-bold p-2">{row.arpNo || '---'}</TableCell>
+              <TableCell className="font-mono text-emerald-800 font-bold p-2">{row.arpNo || '---'}</TableCell>
               <TableCell className="font-mono p-2">{row.pin || '---'}</TableCell>
               <TableCell className="p-2 text-center">
                 {row.update ? (
-                  <span className="bg-muted px-2 py-0.5 rounded font-black text-blue-900 border border-muted-foreground/20">
+                  <span className="bg-muted px-2 py-0.5 rounded font-black text-emerald-900 border border-muted-foreground/20">
                     {row.update}
                   </span>
                 ) : (
@@ -75,7 +75,7 @@ export function DataPreviewTable({ data, isProcessed = false }: DataPreviewTable
               <TableCell className="max-w-[180px] truncate uppercase p-2 text-muted-foreground italic">
                 {row.address || '---'}
               </TableCell>
-              <TableCell className="max-w-[180px] truncate uppercase p-2 font-bold text-blue-900 bg-blue-50/30">
+              <TableCell className="max-w-[180px] truncate uppercase p-2 font-bold text-emerald-900 bg-emerald-50/30">
                 {row.location || '---'}
               </TableCell>
               <TableCell className="p-2 font-bold">{row.kind || '---'}</TableCell>
@@ -88,17 +88,17 @@ export function DataPreviewTable({ data, isProcessed = false }: DataPreviewTable
               <TableCell className="text-right font-mono p-2 font-bold text-green-600">
                 {row.unitValue ? `₱${row.unitValue.toLocaleString()}` : '---'}
               </TableCell>
-              <TableCell className="text-right font-mono font-black p-2 text-blue-700">₱{row.marketValue?.toLocaleString() || '0'}</TableCell>
-              <TableCell className="text-right font-mono font-black p-2 text-purple-700">₱{row.assessedValue?.toLocaleString() || '0'}</TableCell>
+              <TableCell className="text-right font-mono font-black p-2 text-emerald-700">₱{row.marketValue?.toLocaleString() || '0'}</TableCell>
+              <TableCell className="text-right font-mono font-black p-2 text-green-800">₱{row.assessedValue?.toLocaleString() || '0'}</TableCell>
               <TableCell className="text-center p-2">
                 {row.isCleanup ? (
-                  <Badge variant="outline" className="text-[8px] h-4 font-black uppercase tracking-tighter bg-amber-100 text-amber-700 border-amber-200">
+                  <Badge variant="outline" className="text-[8px] h-4 font-black uppercase tracking-tighter bg-orange-100 text-orange-700 border-orange-200">
                     {row.cleanupReason || 'CLEANUP'}
                   </Badge>
                 ) : row.isDuplicate ? (
                   <Badge variant="destructive" className="text-[8px] h-4 font-black uppercase tracking-tighter">DUPLICATE</Badge>
                 ) : (
-                  <Badge variant="secondary" className="text-[8px] h-4 font-black uppercase tracking-tighter bg-green-100 text-green-700 border-green-200">VALID</Badge>
+                  <Badge variant="secondary" className="text-[8px] h-4 font-black uppercase tracking-tighter bg-emerald-100 text-emerald-700 border-emerald-200">VALID</Badge>
                 )}
               </TableCell>
             </TableRow>

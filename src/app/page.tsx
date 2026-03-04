@@ -10,7 +10,8 @@ import {
   Archive,
   CheckCircle2,
   Trash2,
-  FileSearch
+  FileSearch,
+  Database
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -139,11 +140,9 @@ export default function Home() {
     let dataToExport: LandRecord[] = [];
     
     if (exportType === 'results') {
-      // Strictly exclude any record marked as cleanup OR duplicate from results export
       const currentList = processedData.length > 0 ? processedData : previewData;
       dataToExport = currentList.filter(r => !r.isCleanup && !r.isDuplicate);
     } else {
-      // Include duplicates and system cleanup (empty rows/totals) in archive export
       dataToExport = previewData.filter(r => r.isDuplicate || r.isCleanup);
     }
 
@@ -228,11 +227,11 @@ export default function Home() {
     <div className="min-h-screen bg-[#F7F9FB] flex flex-col font-body">
       <header className="bg-white border-b px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="bg-[#3179CD] p-2 rounded-lg">
-            <Calculator className="text-white w-6 h-6" />
+          <div className="bg-primary p-2 rounded-lg">
+            <Database className="text-white w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#3179CD]">Parañaque Data Link</h1>
+            <h1 className="text-xl font-bold text-primary">Parañaque Data Link</h1>
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">Land Data Processor</p>
           </div>
         </div>
@@ -258,25 +257,25 @@ export default function Home() {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <Card className="p-4 bg-white border-none shadow-sm flex flex-col justify-center border-l-4 border-l-blue-400">
+                <Card className="p-4 bg-white border-none shadow-sm flex flex-col justify-center border-l-4 border-l-slate-400">
                   <span className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1">
                     <FileSearch className="w-2.5 h-2.5" /> Total Rows in File
                   </span>
                   <span className="text-lg font-black text-slate-800">{stats.totalRawRows.toLocaleString()}</span>
                 </Card>
-                <Card className="p-4 bg-white border-none shadow-sm flex flex-col justify-center border-l-4 border-l-red-400">
+                <Card className="p-4 bg-white border-none shadow-sm flex flex-col justify-center border-l-4 border-l-orange-400">
                   <span className="text-[9px] font-bold text-muted-foreground uppercase">System Cleanup (Totals/Empty)</span>
-                  <span className="text-lg font-black text-red-600">{stats.systemCleanup.toLocaleString()}</span>
+                  <span className="text-lg font-black text-orange-600">{stats.systemCleanup.toLocaleString()}</span>
                 </Card>
-                <Card className="p-4 bg-blue-50 border-none shadow-sm flex flex-col justify-center">
+                <Card className="p-4 bg-emerald-50 border-none shadow-sm flex flex-col justify-center border-l-4 border-l-emerald-400">
                   <span className="text-[9px] font-bold text-muted-foreground uppercase">Final Processed Records</span>
-                  <span className="text-lg font-black text-blue-600">{stats.finalCount.toLocaleString()}</span>
+                  <span className="text-lg font-black text-emerald-700">{stats.finalCount.toLocaleString()}</span>
                 </Card>
-                <Card className="p-4 bg-orange-50 border-none shadow-sm flex flex-col justify-center">
+                <Card className="p-4 bg-amber-50 border-none shadow-sm flex flex-col justify-center border-l-4 border-l-amber-400">
                   <span className="text-[9px] font-bold text-muted-foreground uppercase">Duplicate PINs Removed</span>
-                  <span className="text-lg font-black text-orange-600">{stats.duplicatesRemoved.toLocaleString()}</span>
+                  <span className="text-lg font-black text-amber-700">{stats.duplicatesRemoved.toLocaleString()}</span>
                 </Card>
-                <Card className="p-4 bg-green-50 border-none shadow-sm flex flex-col justify-center">
+                <Card className="p-4 bg-green-50 border-none shadow-sm flex flex-col justify-center border-l-4 border-l-green-600">
                   <span className="text-[9px] font-bold text-muted-foreground uppercase">Total Market Value</span>
                   <span className="text-lg font-black text-green-700">₱{stats.totalMarket.toLocaleString()}</span>
                 </Card>
@@ -322,7 +321,7 @@ export default function Home() {
                 </div>
                 <Button 
                   size="lg" 
-                  className="bg-[#3179CD] hover:bg-[#1D5EAA] px-12 font-bold shadow-lg shadow-blue-500/20"
+                  className="bg-primary hover:bg-emerald-800 px-12 font-bold shadow-lg shadow-emerald-500/20"
                   disabled={isProcessing}
                   onClick={runProcess}
                 >

@@ -167,7 +167,7 @@ export function CalibrationSidebar({
           {rules.map((rule) => {
             const isDuplicate = duplicateKeys.has(rule.pinPattern.trim().toLowerCase());
             return (
-              <Card key={rule.id} className={`p-3 relative group shadow-sm transition-all duration-200 border-l-4 ${isDuplicate ? 'border-l-destructive border-destructive/20' : 'border-l-primary border-blue-50'}`}>
+              <Card key={rule.id} className={`p-3 relative group shadow-sm transition-all duration-200 border-l-4 ${isDuplicate ? 'border-l-destructive border-destructive/20' : 'border-l-primary border-emerald-50'}`}>
                 <div className="absolute top-1 right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {isDuplicate && (
                     <TooltipProvider>
@@ -193,10 +193,10 @@ export function CalibrationSidebar({
 
                 <div className="space-y-3 pt-2">
                   <div className="space-y-1">
-                    <Label className="text-[9px] font-black text-blue-700 uppercase">Target PIN Pattern (Key)</Label>
+                    <Label className="text-[9px] font-black text-emerald-700 uppercase">Target PIN Pattern (Key)</Label>
                     <Input 
                       placeholder="e.g., 124-00-x..." 
-                      className={`h-8 text-xs font-mono transition-colors ${isDuplicate ? 'bg-destructive/5 border-destructive focus-visible:ring-destructive' : 'bg-white border-blue-100'}`}
+                      className={`h-8 text-xs font-mono transition-colors ${isDuplicate ? 'bg-destructive/5 border-destructive focus-visible:ring-destructive' : 'bg-white border-emerald-100'}`}
                       value={rule.pinPattern}
                       onChange={(e) => updateRule(rule.id, { pinPattern: e.target.value })}
                     />
@@ -206,7 +206,7 @@ export function CalibrationSidebar({
                     <div className="space-y-1">
                       <Label className="text-[9px] font-bold uppercase">Barangay (Value)</Label>
                       <Input 
-                        className="h-8 text-xs border-blue-50"
+                        className="h-8 text-xs border-emerald-50"
                         value={rule.barangay}
                         placeholder="BF HOMES"
                         onChange={(e) => updateRule(rule.id, { barangay: e.target.value })}
@@ -215,7 +215,7 @@ export function CalibrationSidebar({
                     <div className="space-y-1">
                       <Label className="text-[9px] font-bold uppercase">Section (Value)</Label>
                       <Input 
-                        className="h-8 text-xs border-blue-50"
+                        className="h-8 text-xs border-emerald-50"
                         value={rule.section}
                         placeholder="Phase 2"
                         onChange={(e) => updateRule(rule.id, { section: e.target.value })}

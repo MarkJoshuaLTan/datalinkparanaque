@@ -99,7 +99,6 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
         v.includes("TOTALS")
       );
       
-      // Strict empty check: Is the row just blank values or boilerplate?
       const allValuesEmpty = Object.values(norm).every(v => v === "" || v === "undefined" || v === "null" || v === "0");
 
       const hasMinimalData = (
@@ -171,14 +170,14 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
       <div className="bg-primary/10 p-5 rounded-full mb-6">
         <Upload className="w-10 h-10 text-primary" />
       </div>
-      <h3 className="text-2xl font-black mb-3 text-blue-900">Import Property Data</h3>
+      <h3 className="text-2xl font-black mb-3 text-emerald-900">Import Property Data</h3>
       <p className="text-muted-foreground mb-8 max-w-sm text-sm font-medium">
         Drag your Excel file here or click below. <br/>
-        <span className="text-[10px] uppercase opacity-50 tracking-widest text-blue-600 font-bold">Auto-filters GRAND TOTALS & Metadata rows</span>
+        <span className="text-[10px] uppercase opacity-50 tracking-widest text-emerald-600 font-bold">Auto-filters GRAND TOTALS & Metadata rows</span>
       </p>
       
       <div className="flex gap-4">
-        <Button size="lg" className="px-8 font-bold" onClick={() => fileInputRef.current?.click()}>
+        <Button size="lg" className="px-8 font-bold bg-primary hover:bg-emerald-800" onClick={() => fileInputRef.current?.click()}>
           <FileSpreadsheet className="mr-2 h-4 w-4" /> Choose Excel
         </Button>
       </div>
