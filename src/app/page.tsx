@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -86,13 +85,13 @@ export default function Home() {
       totalImported: imported.length, 
       duplicatesRemoved, 
       finalCount: imported.length - duplicatesRemoved,
-      totalMarket: allWithDuplicateMarkers.reduce((sum, r) => sum + (r.marketValue || 0), 0),
-      totalAssessed: allWithDuplicateMarkers.reduce((sum, r) => sum + (r.assessedValue || 0), 0)
+      totalMarket: allWithDuplicateMarkers.reduce((sum, r) => sum + (r.isDuplicate ? 0 : (r.marketValue || 0)), 0),
+      totalAssessed: allWithDuplicateMarkers.reduce((sum, r) => sum + (r.isDuplicate ? 0 : (r.assessedValue || 0)), 0)
     });
 
     toast({
       title: "Data Loaded",
-      description: `${imported.length} valid property records imported.`,
+      description: `${imported.length} property records imported.`,
     });
   };
 
@@ -113,7 +112,7 @@ export default function Home() {
       setIsProcessing(false);
       toast({
         title: "Process Complete",
-        description: `Calculated values for ${processed.length} records.`,
+        description: `Final count: ${processed.length} records.`,
       });
     }, 400);
   };
@@ -150,27 +149,27 @@ export default function Home() {
       return row;
     });
 
-    // Create Worksheet
     const ws = XLSX.utils.json_to_sheet([]);
     
-    // Add Summary Row at the top - this becomes our "Frozen Header"
+    // Summary Header
     XLSX.utils.sheet_add_aoa(ws, [
-      ["SUMMARY RESULTS"],
-      ["TOTAL MARKET VALUE:", totalMarket.toLocaleString()],
-      ["TOTAL ASSESSED VALUE:", totalAssessed.toLocaleString()],
-      [""] // Spacer row
+      ["PARAÑAQUE DATA LINK - SUMMARY RESULTS"],
+      ["TOTAL RECORDS:", dataToExport.length.toLocaleString()],
+      ["TOTAL MARKET VALUE:", `₱${totalMarket.toLocaleString()}`],
+      ["TOTAL ASSESSED VALUE:", `₱${totalAssessed.toLocaleString()}`],
+      [""] 
     ], { origin: "A1" });
 
-    // Add Main Data Headers and Rows starting from row 5
+    // Main Headers and Data
     const activeHeaders = Object.values(headerMapping).filter(h => exportColumns[h]);
-    XLSX.utils.sheet_add_aoa(ws, [activeHeaders], { origin: "A5" });
-    XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A6", skipHeader: true });
+    XLSX.utils.sheet_add_aoa(ws, [activeHeaders], { origin: "A6" });
+    XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A7", skipHeader: true });
     
-    // Freeze top rows (Summary Header rows 1-5)
-    ws['!freeze'] = { xSplit: 0, ySplit: 5 };
+    // Freeze Top Header
+    ws['!freeze'] = { xSplit: 0, ySplit: 6 };
 
-    // Basic column width adjustments
-    ws['!cols'] = activeHeaders.map(() => ({ wch: 18 }));
+    // Column Widths
+    ws['!cols'] = activeHeaders.map(() => ({ wch: 20 }));
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Processed Data");
@@ -198,7 +197,7 @@ export default function Home() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-[#3179CD]">Parañaque Data Link</h1>
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">Real Property Data Processor</p>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">Land Data Processor</p>
           </div>
         </div>
       </header>
@@ -224,8 +223,8 @@ export default function Home() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card className="p-4 bg-blue-50 border-none shadow-sm flex flex-col">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase">Records</span>
-                  <span className="text-xl font-black text-blue-600">{(processedData.length || stats.finalCount).toLocaleString()}</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase">Final Records</span>
+                  <span className="text-xl font-black text-blue-600">{stats.finalCount.toLocaleString()}</span>
                 </Card>
                 <Card className="p-4 bg-orange-50 border-none shadow-sm flex flex-col">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase">Duplicate PINs Removed</span>
@@ -246,11 +245,11 @@ export default function Home() {
                   <div className="flex items-center gap-3">
                     <LayoutDashboard className="w-4 h-4 text-primary" />
                     <span className="text-xs font-black text-muted-foreground uppercase tracking-widest">
-                      {processedData.length > 0 ? "Processed Result" : "Import Preview"}
+                      {processedData.length > 0 ? "Processed Result" : "Import Preview (Showing Duplicates)"}
                     </span>
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => { setRawData([]); setProcessedData([]); }}>
-                    <Eraser className="w-3.5 h-3.5 mr-2" /> Clear
+                    <Eraser className="w-3.5 h-3.5 mr-2" /> Clear All Data
                   </Button>
                 </div>
                 <div className="p-0 flex-1 overflow-hidden">

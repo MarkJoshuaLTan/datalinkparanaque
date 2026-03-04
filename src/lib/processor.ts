@@ -26,13 +26,16 @@ export interface CalibrationRule {
 
 export function extractArpNumeric(arp: string): number {
   if (!arp) return 0;
+  // Handle Parañaque ARP format like 124-00-001-010-002
   const parts = arp.split('-');
   const lastPart = parts[parts.length - 1];
+  // Extract only numbers from the last segment
   return parseInt(lastPart.replace(/\D/g, ''), 10) || 0;
 }
 
 export function matchesPinPattern(pin: string, pattern: string): boolean {
   if (!pin || !pattern) return false;
+  // Convert 'x' wildcards to regex equivalent
   const escapedPattern = pattern
     .replace(/[.+^${}()|[\]\\]/g, '\\$&')
     .replace(/x/g, '.*');
@@ -45,11 +48,11 @@ export function calculateAssessedValue(marketValue: number, au: string): number 
   let level = 0;
   
   // Standard Parañaque Assessment Levels:
-  // COMM = 50%
-  // RESI = 20%
+  // COMM (Commercial) = 50%
+  // RESI (Residential) = 20%
   if (auUpper.includes('COMM')) level = 0.50;
   else if (auUpper.includes('RESI')) level = 0.20;
-  else level = 0.20; // Default to Residential 20% as a fallback if not explicitly Commercial
+  else level = 0.20; // Default to Residential 20% fallback
   
   return marketValue * level;
 }
@@ -66,21 +69,21 @@ export function processRecords(
   allWithDuplicateMarkers: LandRecord[];
   duplicatesRemoved: number;
 } {
+  // 1. Initial Mapping and Rounding
   let result = records.map(r => {
     const landArea = Number(r.landArea) || 0;
     let marketValue = Number(r.marketValue) || 0;
     let unitValue = Number(r.unitValue) || 0;
     
-    // Auto-fill and Rounding Logic:
-    // 1. If we have Market and Area but no Unit Value, calculate it
+    // Auto-fill Unit Value if missing but Market Value exists
     if (unitValue === 0 && marketValue > 0 && landArea > 0) {
       unitValue = Math.round(marketValue / landArea);
     } else {
-      // Otherwise, round the imported unit value to nearest integer
+      // Round existing Unit Value to nearest whole number
       unitValue = Math.round(unitValue);
     }
 
-    // Always recalculate Market Value based on the rounded Unit Value for consistency
+    // Always recalculate Market Value based on rounded Unit Value for consistency
     if (unitValue > 0 && landArea > 0) {
       marketValue = unitValue * landArea;
     }
@@ -104,16 +107,22 @@ export function processRecords(
     };
   });
 
+  // 2. Exact PIN Duplicate Detection
+  // We only treat PINs as duplicates if the entire string is identical.
+  // We keep the one with the highest ARP numeric value.
   const pinToBestRecord = new Map<string, { index: number, arpVal: number }>();
   
   result.forEach((record, idx) => {
-    if (!record.pin) return;
+    // Skip duplicate logic for empty PINs (don't filter them)
+    if (!record.pin || record.pin === '') return;
+
     const currentArpVal = extractArpNumeric(record.arpNo);
     const existing = pinToBestRecord.get(record.pin);
     
     if (!existing) {
       pinToBestRecord.set(record.pin, { index: idx, arpVal: currentArpVal });
     } else {
+      // If same PIN found, keep the one with higher ARP, mark other as duplicate
       if (currentArpVal > existing.arpVal) {
         result[existing.index].isDuplicate = true;
         pinToBestRecord.set(record.pin, { index: idx, arpVal: currentArpVal });
@@ -125,6 +134,7 @@ export function processRecords(
 
   const duplicatesCount = result.filter(r => r.isDuplicate).length;
 
+  // 3. Apply Calibration Rules (Overwrites)
   result = result.map(record => {
     let updated = { ...record };
     
@@ -134,12 +144,14 @@ export function processRecords(
       if (matchingRule) {
         const brgy = (matchingRule.barangay || "").trim();
         const sec = (matchingRule.section || "").trim();
+        
+        // Combine Barangay and Section into Location
         if (brgy || sec) {
           updated.location = `${brgy}${brgy && sec ? ', ' : ''}${sec}`.toUpperCase();
         }
         
+        // Apply Unit Value override if specified
         if (matchingRule.unitValue !== undefined && !isNaN(matchingRule.unitValue) && matchingRule.unitValue > 0) {
-          // Rule values should also be rounded for consistency
           updated.unitValue = Math.round(matchingRule.unitValue);
           updated.marketValue = updated.landArea * updated.unitValue;
           updated.assessedValue = calculateAssessedValue(updated.marketValue, updated.au);
