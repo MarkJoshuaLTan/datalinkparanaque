@@ -33,17 +33,23 @@ function lotMatchesPattern(lot: string, pattern: string): boolean {
   const lotNum = parseInt(lot, 10);
   if (isNaN(lotNum)) return false;
 
-  const patternCleaned = pattern.replace(/[{()}]/g, '');
+  // Normalize separators: replace commas with slashes for consistent splitting
+  const normalizedPattern = pattern.replace(/,/g, '/');
+  const patternCleaned = normalizedPattern.replace(/[{()}]/g, '');
   const parts = patternCleaned.split('/');
 
   for (const part of parts) {
-    if (part.includes(' TO ')) {
-      const [start, end] = part.split(' TO ').map(s => parseInt(s.trim(), 10));
+    const trimmedPart = part.trim();
+    if (trimmedPart.includes(' TO ') || trimmedPart.includes('-')) {
+      const rangeTokens = trimmedPart.includes(' TO ') ? ' TO ' : '-';
+      const [startStr, endStr] = trimmedPart.split(rangeTokens);
+      const start = parseInt(startStr, 10);
+      const end = parseInt(endStr, 10);
       if (!isNaN(start) && !isNaN(end) && lotNum >= start && lotNum <= end) {
         return true;
       }
     } else {
-      const singleLot = parseInt(part.trim(), 10);
+      const singleLot = parseInt(trimmedPart, 10);
       if (!isNaN(singleLot) && lotNum === singleLot) {
         return true;
       }
