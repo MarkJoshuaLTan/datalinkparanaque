@@ -91,8 +91,7 @@ export default function Home() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // Use a fresh key for the new corrected data to avoid stale cache issues
-    const saved = localStorage.getItem('paranaque_datalink_v20_redesign');
+    const saved = localStorage.getItem('paranaque_datalink_v21_redesign');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.rules) setRules(parsed.rules);
@@ -117,7 +116,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isClient) {
-      localStorage.setItem('paranaque_datalink_v20_redesign', JSON.stringify({ rules, exportColumns, locationSettings }));
+      localStorage.setItem('paranaque_datalink_v21_redesign', JSON.stringify({ rules, exportColumns, locationSettings }));
     }
   }, [rules, exportColumns, locationSettings, isClient]);
 
@@ -283,13 +282,8 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-2">
           {deferredPrompt && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleInstallClick}
-              className="hidden sm:flex bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 font-bold"
-            >
-              <Download className="w-4 h-4 mr-2" /> Install App
+            <Button variant="ghost" size="icon" onClick={handleInstallClick} title="Install App">
+              <Download className="w-5 h-5" />
             </Button>
           )}
           <ModeToggle />
