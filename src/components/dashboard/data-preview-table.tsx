@@ -75,7 +75,7 @@ export function DataPreviewTable({ data, isProcessed = false }: DataPreviewTable
               <TableRow 
                 key={i} 
                 className={cn(
-                  "hover:bg-accent/30 transition-colors border-b",
+                  "border-b transition-all duration-200 ease-in-out hover:scale-[1.015] hover:shadow-2xl hover:relative hover:z-20 hover:!bg-card/90 hover:backdrop-blur-sm",
                   (row.isDuplicate || row.isCleanup) && "bg-orange-50/30 dark:bg-orange-950/50 opacity-70"
                 )}
               >

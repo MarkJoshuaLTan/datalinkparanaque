@@ -71,7 +71,7 @@ export default function Home() {
 
   useEffect(() => {
     setIsClient(true);
-    const saved = localStorage.getItem('panaque_session_v18_cyber');
+    const saved = localStorage.getItem('panaque_session_v18_cyber_formal');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.rules) setRules(parsed.rules);
@@ -107,7 +107,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isClient) {
-      localStorage.setItem('panaque_session_v18_cyber', JSON.stringify({ rules, exportColumns, locationSettings }));
+      localStorage.setItem('panaque_session_v18_cyber_formal', JSON.stringify({ rules, exportColumns, locationSettings }));
     }
   }, [rules, exportColumns, locationSettings, isClient]);
 
@@ -259,7 +259,7 @@ export default function Home() {
             <Database className="text-white w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-primary">Parañaque Data Link</h1>
+            <h1 className="text-xl font-bold text-gradient">Parañaque Data Link</h1>
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">Land Data Processor</p>
           </div>
         </div>
@@ -296,7 +296,7 @@ export default function Home() {
                     <span className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1">
                       <FileSearch className="w-2.5 h-2.5" /> Total Rows
                     </span>
-                    <span className="text-lg font-black text-slate-800 dark:text-slate-200">{stats.totalRawRows.toLocaleString()}</span>
+                    <span className="text-lg font-black text-gradient">{stats.totalRawRows.toLocaleString()}</span>
                   </Card>
                   <Card className="p-4 border-l-4 border-l-orange-400">
                     <span className="text-[9px] font-bold text-muted-foreground uppercase">System Cleanup</span>
@@ -304,7 +304,7 @@ export default function Home() {
                   </Card>
                   <Card className="p-4 bg-primary/10 border-l-4 border-l-primary">
                     <span className="text-[9px] font-bold text-muted-foreground uppercase">Final Records</span>
-                    <span className="text-lg font-black text-primary">{stats.finalCount.toLocaleString()}</span>
+                    <span className="text-lg font-black text-gradient">{stats.finalCount.toLocaleString()}</span>
                   </Card>
                   <Card className="p-4 bg-amber-500/10 border-l-4 border-l-amber-400">
                     <span className="text-[9px] font-bold text-muted-foreground uppercase">Duplicates</span>
@@ -312,7 +312,7 @@ export default function Home() {
                   </Card>
                   <Card className="p-4 bg-green-500/10 border-l-4 border-l-green-600">
                     <span className="text-[9px] font-bold text-muted-foreground uppercase">Market Value</span>
-                    <span className="text-lg font-black text-green-500">₱{stats.totalMarket.toLocaleString()}</span>
+                    <span className="text-lg font-black text-gradient">₱{stats.totalMarket.toLocaleString()}</span>
                   </Card>
                 </div>
 

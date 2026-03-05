@@ -58,6 +58,16 @@
   }
 }
 
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent;
+  }
+  .dark .text-gradient {
+    @apply from-green-400 to-green-200;
+  }
+}
+
+
 /* Custom prominent horizontal scrollbar for data tables */
 .scrollbar-custom::-webkit-scrollbar {
   height: 16px; /* Increased for better "grab" feel */

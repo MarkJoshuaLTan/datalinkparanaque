@@ -11,8 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"Share Tech Mono"', 'monospace'],
-        headline: ['"Share Tech Mono"', 'monospace'],
+        body: ['"Nunito Sans"', 'sans-serif'],
+        headline: ['"Nunito Sans"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
