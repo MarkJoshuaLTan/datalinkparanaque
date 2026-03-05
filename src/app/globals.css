@@ -38,26 +38,23 @@
 
 /* Custom prominent horizontal scrollbar for data tables */
 .scrollbar-custom::-webkit-scrollbar {
-  height: 12px; /* Thicker for better "grab" feel */
-  width: 8px;
+  height: 16px; /* Increased for better "grab" feel */
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.5);
-  border-radius: 6px;
+  background: hsl(var(--muted) / 0.8);
+  border-radius: 8px;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.3);
-  border-radius: 6px;
-  border: 3px solid transparent;
+  background: hsl(var(--primary));
+  border-radius: 8px;
+  border: 3px solid hsl(var(--muted) / 0.8);
   background-clip: content-box;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary));
-  border: 2px solid transparent;
-  background-clip: content-box;
+  background: hsl(var(--accent));
 }
 
 /* Ensure spreadsheet-like rendering */

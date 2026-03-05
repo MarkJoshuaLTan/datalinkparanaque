@@ -23,36 +23,32 @@ interface DataPreviewTableProps {
 export function DataPreviewTable({ data, isProcessed = false }: DataPreviewTableProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
   const [displayLimit, setDisplayLimit] = useState(350);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollContainerRef.current) return;
     setIsDragging(true);
-    // Calculate start position relative to the container
-    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
-    setScrollLeft(scrollContainerRef.current.scrollLeft);
-  };
-
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
+    // Use the container's relative X coordinate
+    startX.current = e.pageX - scrollContainerRef.current.offsetLeft;
+    scrollLeft.current = scrollContainerRef.current.scrollLeft;
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || !scrollContainerRef.current) return;
     e.preventDefault();
     const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 2; // Sensitivity multiplier
-    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+    const walk = (x - startX.current) * 1.5; // Drag sensitivity
+    scrollContainerRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
+  const stopDragging = () => {
+    setIsDragging(false);
   };
 
   useEffect(() => {
-    const handleGlobalMouseUp = () => setIsDragging(false);
+    const handleGlobalMouseUp = () => stopDragging();
     window.addEventListener('mouseup', handleGlobalMouseUp);
     return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
   }, []);
@@ -73,20 +69,20 @@ export function DataPreviewTable({ data, isProcessed = false }: DataPreviewTable
   const hasMore = data.length > displayLimit;
 
   return (
-    <div className="relative flex flex-col h-[calc(100vh-320px)]">
+    <div className="relative flex flex-col h-[calc(100vh-320px)] bg-white">
       {/* Scrollable Container */}
       <div 
         ref={scrollContainerRef}
         onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeave}
-        onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
+        onMouseLeave={stopDragging}
+        onMouseUp={stopDragging}
         className={cn(
-          "flex-1 overflow-auto border rounded-t-md scrollbar-custom select-none",
+          "flex-1 overflow-x-auto overflow-y-auto border rounded-t-md scrollbar-custom select-none touch-none",
           isDragging ? "cursor-grabbing" : "cursor-grab"
         )}
       >
-        <Table className="text-[10px] min-w-[2000px] pointer-events-none select-none border-separate border-spacing-0">
+        <Table className="text-[10px] min-w-[2200px] pointer-events-none select-none border-separate border-spacing-0">
           <TableHeader className="bg-white sticky top-0 z-20 shadow-sm">
             <TableRow className="hover:bg-transparent border-b-2">
               <TableHead className="w-12 text-center font-black bg-white border-r">#</TableHead>
@@ -165,10 +161,10 @@ export function DataPreviewTable({ data, isProcessed = false }: DataPreviewTable
       </div>
 
       {/* Footer / Control Section */}
-      <div className="p-2 bg-muted/20 border-x border-b rounded-b-md flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2">
-          <MoveHorizontal className="w-3 h-3 text-primary" />
-          Click and drag table to scroll horizontally
+      <div className="p-2 bg-muted/30 border-x border-b rounded-b-md flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2 text-[10px] font-black text-emerald-800 uppercase tracking-widest px-3 py-1 bg-emerald-50 rounded-full border border-emerald-100 shadow-sm">
+          <MoveHorizontal className="w-3.5 h-3.5 text-primary animate-pulse" />
+          Click & Drag or use Emerald Scrollbar below
         </div>
         
         {hasMore && (
@@ -176,14 +172,14 @@ export function DataPreviewTable({ data, isProcessed = false }: DataPreviewTable
             variant="outline" 
             size="sm" 
             onClick={handleLoadMore}
-            className="text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 h-7"
+            className="text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white border-emerald-700 hover:bg-emerald-800 h-8 shadow-md"
           >
-            <Plus className="w-3 h-3 mr-2" /> Load More ({data.length - displayLimit} left)
+            <Plus className="w-3 h-3 mr-2" /> Load More ({data.length - displayLimit} records)
           </Button>
         )}
 
-        <div className="text-[9px] font-bold text-muted-foreground px-2">
-          SHOWING {visibleData.length.toLocaleString()} OF {data.length.toLocaleString()} RECORDS
+        <div className="text-[10px] font-black text-muted-foreground px-4 uppercase tracking-tighter">
+          SHOWING {visibleData.length.toLocaleString()} / {data.length.toLocaleString()} TOTAL ROWS
         </div>
       </div>
     </div>
