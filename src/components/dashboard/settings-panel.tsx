@@ -76,7 +76,7 @@ export function SettingsPanel({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[650px] sm:max-w-[650px] flex flex-col">
+      <SheetContent className="w-[800px] sm:max-w-[800px] flex flex-col">
         <SheetHeader>
           <SheetTitle>Location & Unit Value Settings</SheetTitle>
           <SheetDescription>
@@ -108,7 +108,7 @@ export function SettingsPanel({
             <div className="relative px-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
-                    placeholder="Search section code or location name..."
+                    placeholder="Search section, lot filter, or location name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-9"
@@ -118,48 +118,61 @@ export function SettingsPanel({
               <div className="sticky top-0 bg-muted/80 backdrop-blur-sm p-4 border-b z-10">
                   <div className="grid grid-cols-12 gap-2 items-center">
                       <div className="col-span-2 text-xs font-bold uppercase text-muted-foreground">Section</div>
-                      <div className="col-span-7 text-xs font-bold uppercase text-muted-foreground">Location Name</div>
-                      <div className="col-span-3 text-xs font-bold uppercase text-muted-foreground">Unit Value</div>
+                      <div className="col-span-3 text-xs font-bold uppercase text-muted-foreground">Lot Filter</div>
+                      <div className="col-span-5 text-xs font-bold uppercase text-muted-foreground">Location Name</div>
+                      <div className="col-span-2 text-xs font-bold uppercase text-muted-foreground">Unit Value</div>
                   </div>
               </div>
               <div className="overflow-y-auto scrollbar-vertical-custom flex-1">
                 <div className="p-4 space-y-4">
-                {filteredSections.map((section) => (
-                    <div key={section.section} className="grid grid-cols-12 gap-2 items-center">
-                        <div className="col-span-2 font-mono font-bold truncate" title={section.section}>
-                            {section.section}
-                        </div>
-                        <Input
-                            className="col-span-7"
-                            value={section.location}
-                            onChange={(e) =>
-                            handleSectionChange(
-                                selectedBarangay,
-                                section.section,
-                                'location',
-                                e.target.value
-                            )
-                            }
-                        />
-                        <div className="col-span-3 relative">
-                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">₱</span>
+                {filteredSections.map((section) => {
+                    const sectionParts = section.section.split(/-(.+)/s);
+                    const baseSection = sectionParts[0];
+                    const lotPattern = sectionParts.length > 1 ? sectionParts[1] : null;
+
+                    return (
+                        <div key={section.section} className="grid grid-cols-12 gap-2 items-center">
+                            <div className="col-span-2 font-mono font-bold truncate" title={baseSection}>
+                                {baseSection}
+                            </div>
+                            <div 
+                              className="col-span-3 text-[10px] font-mono text-muted-foreground truncate bg-slate-50 p-2 h-10 flex items-center rounded-md border" 
+                              title={lotPattern || 'Applies to all lots in this section'}
+                            >
+                                {lotPattern ? lotPattern.replace(/[{()}]/g, '') : <span className="opacity-50">ALL LOTS</span>}
+                            </div>
                             <Input
-                                type="number"
-                                className="pl-5"
-                                value={section.unitValue || ''}
-                                placeholder="Unit Value"
+                                className="col-span-5"
+                                value={section.location}
                                 onChange={(e) =>
                                 handleSectionChange(
                                     selectedBarangay,
                                     section.section,
-                                    'unitValue',
+                                    'location',
                                     e.target.value
                                 )
                                 }
                             />
+                            <div className="col-span-2 relative">
+                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">₱</span>
+                                <Input
+                                    type="number"
+                                    className="pl-5"
+                                    value={section.unitValue || ''}
+                                    placeholder="Unit Value"
+                                    onChange={(e) =>
+                                    handleSectionChange(
+                                        selectedBarangay,
+                                        section.section,
+                                        'unitValue',
+                                        e.target.value
+                                    )
+                                    }
+                                />
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 </div>
               </div>
             </div>
