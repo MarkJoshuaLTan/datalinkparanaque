@@ -70,28 +70,50 @@ export default function Home() {
 
   useEffect(() => {
     setIsClient(true);
-    const saved = localStorage.getItem('panaque_session_v7');
+    const saved = localStorage.getItem('panaque_session_v13'); // Force cache reset
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.rules) setRules(parsed.rules);
       if (parsed.exportColumns) {
         setExportColumns({ ...defaultExportColumns, ...parsed.exportColumns });
       }
+      
       if (parsed.locationSettings) {
         const savedSettings: BarangayConfig[] = parsed.locationSettings;
         const savedSettingsMap = new Map(savedSettings.map(s => [s.name, s]));
         
-        const mergedSettings = defaultLocationSettings.map(defaultBrgy => 
-          savedSettingsMap.get(defaultBrgy.name) || defaultBrgy
-        );
+        const mergedSettings = defaultLocationSettings.map(defaultBrgy => {
+          const savedBrgy = savedSettingsMap.get(defaultBrgy.name);
+          // If we have saved data for this barangay...
+          if (savedBrgy) {
+            const savedSectionsMap = new Map(savedBrgy.sections.map(s => [s.section, s]));
+            // ...go through the default sections and apply any saved values.
+            const mergedSections = defaultBrgy.sections.map(defaultSection => {
+              const savedSection = savedSectionsMap.get(defaultSection.section);
+              // If a matching section is found in saved data, use it to preserve edits.
+              // Otherwise, use the fresh default section.
+              return savedSection || defaultSection;
+            });
+            return { ...defaultBrgy, sections: mergedSections };
+          }
+          // If no saved data for this barangay, use the default.
+          return defaultBrgy;
+        });
         setLocationSettings(mergedSettings);
+
+      } else {
+        // If there are no saved location settings, use the defaults.
+        setLocationSettings(defaultLocationSettings);
       }
+    } else {
+      // If there's no saved session at all, use the defaults.
+      setLocationSettings(defaultLocationSettings);
     }
   }, []);
 
   useEffect(() => {
     if (isClient) {
-      localStorage.setItem('panaque_session_v7', JSON.stringify({ rules, exportColumns, locationSettings }));
+      localStorage.setItem('panaque_session_v13', JSON.stringify({ rules, exportColumns, locationSettings }));
     }
   }, [rules, exportColumns, locationSettings, isClient]);
 
