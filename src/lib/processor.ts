@@ -1,3 +1,4 @@
+
 import { BarangayConfig } from './locations';
 
 export interface LandRecord {
@@ -275,3 +276,5 @@ export function processRecords(
     cleanupCount
   };
 }
+
+    

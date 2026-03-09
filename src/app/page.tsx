@@ -23,10 +23,10 @@ import { LandRecord, CalibrationRule, processRecords } from '@/lib/processor';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import * as XLSX from 'xlsx';
 import { SettingsPanel } from '@/components/dashboard/settings-panel';
-import { allBarangays, BarangayConfig, SectionConfig } from '@/lib/locations';
+import { BarangayConfig, initialLocationSettings } from '@/lib/locations';
 import { ModeToggle } from '@/components/mode-toggle';
-import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+
+const LOCAL_STORAGE_KEY = 'paranaque_datalink_v23_local';
 
 export default function Home() {
   const { toast } = useToast();
@@ -40,68 +40,43 @@ export default function Home() {
   const [viewMode, setViewMode] = useState<'results' | 'archive'>('results');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  // App settings state
   const [options, setOptions] = useState({
     removeDuplicates: true,
     applyCalibration: true
   });
   
   const defaultExportColumns = {
-    "DATE": true,
-    "ARP NO#": true,
-    "PIN": true,
-    "UPDATE": true,
-    "ACCTNAME": true,
-    "ADDRESS": true,
-    "LOCATION": true,
-    "KIND": true,
-    "AU": true,
-    "LAND AREA": true,
-    "UNIT VALUE": true,
-    "MARKET VALUE": true,
-    "ASSESSED VALUE": true,
-    "YEARLY TAX": true,
+    "DATE": true, "ARP NO#": true, "PIN": true, "UPDATE": true,
+    "ACCTNAME": true, "ADDRESS": true, "LOCATION": true, "KIND": true,
+    "AU": true, "LAND AREA": true, "UNIT VALUE": true, "MARKET VALUE": true,
+    "ASSESSED VALUE": true, "YEARLY TAX": true,
   };
-
   const [exportColumns, setExportColumns] = useState<Record<string, boolean>>(defaultExportColumns);
+  const [locationSettings, setLocationSettings] = useState<BarangayConfig[]>(initialLocationSettings);
 
   const [stats, setStats] = useState({
-    totalRawRows: 0,
-    systemCleanup: 0,
-    totalImported: 0,
-    duplicatesRemoved: 0,
-    finalCount: 0,
-    totalMarket: 0,
-    totalAssessed: 0
+    totalRawRows: 0, systemCleanup: 0, totalImported: 0, duplicatesRemoved: 0,
+    finalCount: 0, totalMarket: 0, totalAssessed: 0
   });
 
+  // Effect to set client-side rendering and load from localStorage
   useEffect(() => {
     setIsClient(true);
     
-    // Listen for PWA install prompt
-    const handleBeforeInstallPrompt = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-
-    const handleAppInstalled = () => {
-      setDeferredPrompt(null);
-      toast({
-        title: "Installation Successful",
-        description: "Parañaque Data Link is now available on your device.",
-      });
-    };
-
+    const handleBeforeInstallPrompt = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
+    const handleAppInstalled = () => { setDeferredPrompt(null); toast({ title: "Installation Successful", description: "Parañaque Data Link is now available on your device." }); };
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // Simplified localStorage for rules and export columns, location settings are now in Firestore
-    const saved = localStorage.getItem('paranaque_datalink_v22_firestore');
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.rules) setRules(parsed.rules);
-      if (parsed.exportColumns) {
-        setExportColumns({ ...defaultExportColumns, ...parsed.exportColumns });
-      }
+      if (parsed.exportColumns) setExportColumns({ ...defaultExportColumns, ...parsed.exportColumns });
+      if (parsed.locationSettings) setLocationSettings(parsed.locationSettings);
+      if (parsed.options) setOptions(parsed.options);
     }
 
     return () => {
@@ -110,19 +85,18 @@ export default function Home() {
     };
   }, []);
 
+  // Effect to save to localStorage whenever settings change
   useEffect(() => {
     if (isClient) {
-      localStorage.setItem('paranaque_datalink_v22_firestore', JSON.stringify({ rules, exportColumns }));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ rules, exportColumns, locationSettings, options }));
     }
-  }, [rules, exportColumns, isClient]);
+  }, [rules, exportColumns, locationSettings, options, isClient]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null);
-    }
+    if (outcome === 'accepted') setDeferredPrompt(null);
   };
 
   const handleDataImported = (imported: LandRecord[], fileName: string, rawCount: number) => {
@@ -131,7 +105,6 @@ export default function Home() {
     setProcessedData([]);
     setViewMode('results');
     
-    // Preview is run without any calibration to give a raw import summary
     const { allWithDuplicateMarkers, duplicatesRemoved, cleanupCount } = processRecords(imported, [], [], {
       removeDuplicates: true,
       applyCalibration: false
@@ -158,63 +131,25 @@ export default function Home() {
     if (rawData.length === 0) return;
 
     setIsProcessing(true);
-    try {
-      // 1. Get unique barangay codes from raw data to fetch only necessary settings
-      const uniqueBarangayCodes = [...new Set(rawData.map(r => r.pin?.split('-')[2]).filter(Boolean))];
-      
-      // 2. Fetch all location settings for those barangays from Firestore
-      const settingsPromises = uniqueBarangayCodes.map(async (code) => {
-        const barangayInfo = allBarangays.find(b => b.barangayCode === code);
-        if (!barangayInfo) return null;
-
-        const locationsSnap = await getDocs(collection(db, "barangays", code, "locations"));
-        const sections: SectionConfig[] = locationsSnap.docs.map(docSnap => {
-          const data = docSnap.data();
-          // Adapt Firestore structure to the one processRecords expects
-          return {
-            section: data.lotFilter ? `${data.section}-${data.lotFilter}` : data.section,
-            location: data.locationName,
-            unitValue: Number(data.unitValue) || 0,
-          };
-        });
-
-        return {
-          name: barangayInfo.name,
-          barangayCode: code,
-          sections: sections,
-        };
-      });
-
-      const fetchedSettings = (await Promise.all(settingsPromises)).filter(Boolean) as BarangayConfig[];
-
-      // 3. Now call the synchronous processor with the live settings from Firestore
-      const { processed, allWithDuplicateMarkers, duplicatesRemoved, cleanupCount } = processRecords(rawData, rules, fetchedSettings, options);
-      
-      setProcessedData(processed);
-      setPreviewData(allWithDuplicateMarkers);
-      setStats(prev => ({
-        ...prev,
-        systemCleanup: cleanupCount,
-        duplicatesRemoved,
-        finalCount: processed.length,
-        totalMarket: processed.reduce((sum, r) => sum + (r.marketValue || 0), 0),
-        totalAssessed: processed.reduce((sum, r) => sum + (r.assessedValue || 0), 0)
-      }));
-      
-      toast({
-        title: "Process Complete",
-        description: `Final count: ${processed.length} records.`,
-      });
-    } catch (error) {
-      console.error("Error processing records:", error);
-      toast({
-        variant: "destructive",
-        title: "Processing Error",
-        description: "Failed to fetch settings from database. Please check your connection and try again.",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+    // The processor now uses the locationSettings from state, which are loaded from and saved to localStorage.
+    const { processed, allWithDuplicateMarkers, duplicatesRemoved, cleanupCount } = processRecords(rawData, rules, locationSettings, options);
+    
+    setProcessedData(processed);
+    setPreviewData(allWithDuplicateMarkers);
+    setStats(prev => ({
+      ...prev,
+      systemCleanup: cleanupCount,
+      duplicatesRemoved,
+      finalCount: processed.length,
+      totalMarket: processed.reduce((sum, r) => sum + (r.marketValue || 0), 0),
+      totalAssessed: processed.reduce((sum, r) => sum + (r.assessedValue || 0), 0)
+    }));
+    
+    toast({
+      title: "Process Complete",
+      description: `Final count: ${processed.length} records.`,
+    });
+    setIsProcessing(false);
   };
 
   const handleExport = (exportType: 'results' | 'archive' = 'results') => {
@@ -240,20 +175,10 @@ export default function Home() {
     const totalAssessed = dataToExport.reduce((sum, r) => sum + (r.assessedValue || 0), 0);
 
     const headerMapping: Record<string, string> = {
-      date: "DATE",
-      arpNo: "ARP NO#",
-      pin: "PIN",
-      update: "UPDATE",
-      acctName: "ACCTNAME",
-      address: "ADDRESS",
-      location: "LOCATION",
-      kind: "KIND",
-      au: "AU",
-      landArea: "LAND AREA",
-      unitValue: "UNIT VALUE",
-      marketValue: "MARKET VALUE",
-      assessedValue: "ASSESSED VALUE",
-      yearlyTax: "YEARLY TAX"
+      date: "DATE", arpNo: "ARP NO#", pin: "PIN", update: "UPDATE",
+      acctName: "ACCTNAME", address: "ADDRESS", location: "LOCATION",
+      kind: "KIND", au: "AU", landArea: "LAND AREA", unitValue: "UNIT VALUE",
+      marketValue: "MARKET VALUE", assessedValue: "ASSESSED VALUE", yearlyTax: "YEARLY TAX"
     };
 
     const formattedExport = dataToExport.map(record => {
@@ -448,6 +373,8 @@ export default function Home() {
       <SettingsPanel 
         open={isSettingsOpen}
         onOpenChange={setIsSettingsOpen}
+        locationSettings={locationSettings}
+        onSettingsChange={setLocationSettings}
       />
     </div>
   );
