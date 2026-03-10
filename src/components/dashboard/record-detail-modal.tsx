@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -58,6 +57,16 @@ export function RecordDetailModal({ record, open, onOpenChange }: RecordDetailMo
     );
   };
 
+  const ClassificationItem = ({ label, value }: { label: string; value?: string }) => {
+    if (!value) return null;
+    return (
+      <div>
+        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{label}</p>
+        <p className="text-sm font-semibold">{value}</p>
+      </div>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl bg-card/90 backdrop-blur-xl border-white/10">
@@ -93,17 +102,20 @@ export function RecordDetailModal({ record, open, onOpenChange }: RecordDetailMo
 
              <div className="p-4 rounded-lg bg-muted/40 border">
                 <h4 className="text-xs font-bold uppercase text-muted-foreground mb-4">Record Status & Classification</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                    <DetailItem label="Record Status" value={getStatusBadge()} isBadge />
-                    <div className="grid grid-cols-3 gap-2 col-span-1">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider col-span-1">CLASS</p>
-                        <div className="flex gap-2 col-span-2">
-                            <DetailItem label="Update" value={record.update} />
-                            <DetailItem label="Kind" value={record.kind} />
-                            <DetailItem label="AU" value={record.au} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4 items-start">
+                    <div>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Record Status</p>
+                        <div className="mt-1">{getStatusBadge()}</div>
+                    </div>
+                    <div className="md:col-span-2">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Class</p>
+                        <div className="mt-1 flex gap-8">
+                            <ClassificationItem label="Update" value={record.update} />
+                            <ClassificationItem label="Kind" value={record.kind} />
+                            <ClassificationItem label="AU" value={record.au} />
                         </div>
                     </div>
-                 </div>
+                </div>
             </div>
         </div>
       </DialogContent>
