@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -267,25 +266,20 @@ export default function Home() {
       const ws = workbook.Sheets[sheetName];
 
       // Exact layout based on image provided
-      // Row 1: Title
       const title = exportType === 'results' ? "PARAÑAQUE DATA LINK - SUMMARY RESULTS" : "PARAÑAQUE DATA LINK - ARCHIVE";
       XLSX.utils.sheet_add_aoa(ws, [[title]], { origin: "A1" });
       
-      // Rows 2-4: Summary Statistics Dashboard
       XLSX.utils.sheet_add_aoa(ws, [
         ["TOTAL RECORDS:", dataToExport.length.toLocaleString()],
         ["TOTAL MARKET VALUE:", `₱${totalMarketValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
         ["TOTAL ASSESSED VALUE:", `₱${totalAssessedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`]
       ], { origin: "A2" });
 
-      // Row 5: Column Headers
       const activeHeaders = Object.values(headerMapping).filter(h => exportColumns[h]);
       XLSX.utils.sheet_add_aoa(ws, [activeHeaders], { origin: "A5" });
       
-      // Row 6+: Property Data
       XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A6", skipHeader: true });
       
-      // Apply Freeze Pane to the first 5 rows (Summary + Headers)
       if (!ws['!views']) ws['!views'] = [];
       ws['!views'][0] = { 
         state: 'frozen', 
@@ -294,7 +288,6 @@ export default function Home() {
         activePane: 'bottomLeft' 
       };
       
-      // Auto-set widths for clarity
       ws['!cols'] = activeHeaders.map(() => ({ wch: 22 }));
 
       const baseName = importedFileName.replace(/\.[^/.]+$/, "") || "LandRecords";
@@ -387,6 +380,27 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-body">
+      {/* SVG Filters for "3D" Shadow and Gradients */}
+      <svg width="0" height="0" className="absolute invisible">
+        <defs>
+          <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+            <feOffset dx="2" dy="4" result="offsetblur" />
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="0.3" />
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={1} />
+            <stop offset="100%" stopColor="#15803d" stopOpacity={1} />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <header className="bg-card/80 backdrop-blur-lg border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="bg-primary p-2 rounded-lg">
@@ -431,31 +445,31 @@ export default function Home() {
             ) : (
               <div className="flex flex-col gap-6 h-full">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                   <Card className="p-4 border-l-4 border-l-slate-400 flex flex-col">
+                   <Card className="p-4 border-l-4 border-l-slate-400 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
                       <FileSearch className="w-2.5 h-2.5" /> Total Rows
                     </div>
                     <div className="text-lg font-black text-gradient leading-tight">{stats.totalRawRows.toLocaleString()}</div>
                   </Card>
-                  <Card className="p-4 border-l-4 border-l-orange-400 flex flex-col">
+                  <Card className="p-4 border-l-4 border-l-orange-400 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
                       <Eraser className="w-2.5 h-2.5" /> System Cleanup
                     </div>
                     <div className="text-lg font-black text-orange-600 dark:text-orange-400 leading-tight">{stats.systemCleanup.toLocaleString()}</div>
                   </Card>
-                  <Card className="p-4 bg-primary/10 border-l-4 border-l-primary flex flex-col">
+                  <Card className="p-4 bg-primary/5 border-l-4 border-l-primary flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
                       <CheckCircle2 className="w-2.5 h-2.5" /> Final Records
                     </div>
                     <div className="text-lg font-black text-gradient leading-tight">{stats.finalCount.toLocaleString()}</div>
                   </Card>
-                  <Card className="p-4 bg-amber-500/10 border-l-4 border-l-amber-400 flex flex-col">
+                  <Card className="p-4 bg-amber-500/5 border-l-4 border-l-amber-400 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
                       <Archive className="w-2.5 h-2.5" /> Duplicates
                     </div>
                     <div className="text-lg font-black text-amber-500 leading-tight">{stats.duplicatesRemoved.toLocaleString()}</div>
                   </Card>
-                  <Card className="p-4 bg-green-500/10 border-l-4 border-l-green-600 flex flex-col">
+                  <Card className="p-4 bg-green-500/5 border-l-4 border-l-green-600 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
                       <Database className="w-2.5 h-2.5" /> Market Value
                     </div>
@@ -463,7 +477,7 @@ export default function Home() {
                   </Card>
                 </div>
 
-                <Card className="flex-1 overflow-hidden flex flex-col min-h-0">
+                <Card className="flex-1 overflow-hidden flex flex-col min-h-0 shadow-xl border-white/5">
                   <div className="p-4 bg-muted/30 border-b flex flex-col xl:flex-row items-center justify-between gap-4">
                     <TabsList className="bg-background border">
                       <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-white">
@@ -544,71 +558,73 @@ export default function Home() {
                         onRowClick={handleRowClick}
                       />
                     </TabsContent>
-                    <TabsContent value="analytics" className="m-0 h-full p-6 overflow-y-auto">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10">
-                        <Card className="p-6">
-                          <h4 className="text-sm font-bold uppercase mb-6 flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-primary" /> Property Usage Distribution (AU)
+                    <TabsContent value="analytics" className="m-0 h-full p-6 overflow-y-auto scrollbar-vertical-custom bg-muted/5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10 max-w-7xl mx-auto">
+                        <Card className="p-6 border-white/5 bg-card shadow-2xl overflow-hidden group">
+                          <h4 className="text-sm font-black uppercase mb-8 flex items-center gap-2 tracking-widest text-muted-foreground">
+                            <CheckCircle2 className="w-4 h-4 text-primary" /> Property Usage Distribution
                           </h4>
-                          <div className="h-[300px] w-full">
-                            <ChartContainer 
-                              config={{ 
-                                value: { label: "Count", color: "hsl(var(--primary))" } 
-                              }}
-                              className="aspect-auto h-full w-full"
-                            >
-                              <ResponsiveContainer width="100%" height="100%">
-                                <BarChart 
-                                  data={analyticsData.auChart}
-                                  margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
+                          <div className="h-[350px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart 
+                                data={analyticsData.auChart}
+                                margin={{ top: 20, right: 20, left: 10, bottom: 40 }}
+                              >
+                                <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.05} />
+                                <XAxis 
+                                  dataKey="name" 
+                                  fontSize={9} 
+                                  tickLine={false}
+                                  axisLine={false}
+                                  angle={-45}
+                                  textAnchor="end"
+                                  interval={0}
+                                  tick={{ fill: 'hsl(var(--muted-foreground))', fontWeight: 'bold' }} 
+                                />
+                                <YAxis 
+                                  fontSize={10} 
+                                  tickLine={false}
+                                  axisLine={false}
+                                  tick={{ fill: 'hsl(var(--muted-foreground))' }} 
+                                />
+                                <ChartTooltip content={<ChartTooltipContent />} />
+                                <Bar 
+                                  dataKey="value" 
+                                  radius={[6, 6, 0, 0]} 
+                                  filter="url(#softShadow)"
                                 >
-                                  <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.1} />
-                                  <XAxis 
-                                    dataKey="name" 
-                                    fontSize={10} 
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tick={{ fill: 'hsl(var(--muted-foreground))' }} 
-                                  />
-                                  <YAxis 
-                                    fontSize={10} 
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tick={{ fill: 'hsl(var(--muted-foreground))' }} 
-                                  />
-                                  <ChartTooltip content={<ChartTooltipContent />} />
-                                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]}>
-                                    {analyticsData.auChart.map((entry, index) => (
-                                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                  </Bar>
-                                </BarChart>
-                              </ResponsiveContainer>
-                            </ChartContainer>
+                                  {analyticsData.auChart.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                  ))}
+                                </Bar>
+                              </BarChart>
+                            </ResponsiveContainer>
                           </div>
                         </Card>
 
                         <Card 
-                          className="p-6 cursor-pointer hover:bg-muted/10 transition-all group relative" 
+                          className="p-6 border-white/5 bg-card shadow-2xl cursor-pointer hover:bg-muted/5 transition-all group relative overflow-hidden" 
                           onClick={() => setIsMarketDetailOpen(true)}
                         >
-                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Maximize2 className="w-4 h-4 text-muted-foreground" />
+                          <div className="absolute top-4 right-4 bg-primary/10 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Maximize2 className="w-4 h-4 text-primary" />
                           </div>
-                          <h4 className="text-sm font-bold uppercase mb-6 flex items-center gap-2">
-                            <Database className="w-4 h-4 text-primary" /> Market Value Breakdown by Usage
+                          <h4 className="text-sm font-black uppercase mb-8 flex items-center gap-2 tracking-widest text-muted-foreground">
+                            <Database className="w-4 h-4 text-primary" /> Market Value Breakdown
                           </h4>
-                          <div className="h-[300px] w-full">
+                          <div className="h-[350px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                               <PieChart>
                                 <Pie
                                   data={analyticsData.marketChart}
                                   cx="50%"
                                   cy="50%"
-                                  innerRadius={60}
-                                  outerRadius={80}
-                                  paddingAngle={5}
+                                  innerRadius={80}
+                                  outerRadius={110}
+                                  paddingAngle={8}
                                   dataKey="value"
+                                  stroke="none"
+                                  filter="url(#softShadow)"
                                   label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                                 >
                                   {analyticsData.marketChart.map((entry, index) => (
@@ -616,7 +632,7 @@ export default function Home() {
                                   ))}
                                 </Pie>
                                 <ChartTooltip />
-                                <Legend verticalAlign="bottom" height={36}/>
+                                <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '10px', fontWeight: 'bold' }}/>
                               </PieChart>
                             </ResponsiveContainer>
                           </div>
@@ -626,13 +642,13 @@ export default function Home() {
                   </div>
                 </Card>
 
-                <div className="flex items-center justify-between bg-card p-4 rounded-xl shadow-md border border-white/10 shrink-0">
-                  <div className="flex gap-2">
+                <div className="flex items-center justify-between bg-card p-4 rounded-xl shadow-2xl border border-white/10 shrink-0">
+                  <div className="flex gap-3">
                     <Button 
                       variant="outline" 
                       onClick={() => handleExport('results')} 
                       size="lg" 
-                      className="font-bold border-primary text-primary hover:bg-primary/5"
+                      className="font-black uppercase text-[10px] tracking-widest border-primary/30 text-primary hover:bg-primary hover:text-white transition-all shadow-lg"
                       disabled={isExporting}
                     >
                       <FileDown className="w-4 h-4 mr-2" /> {isExporting ? "Exporting..." : "Export Results"}
@@ -641,7 +657,7 @@ export default function Home() {
                       variant="outline" 
                       onClick={() => handleExport('archive')} 
                       size="lg" 
-                      className="font-bold border-orange-500 text-orange-600 hover:bg-orange-500/10"
+                      className="font-black uppercase text-[10px] tracking-widest border-orange-500/30 text-orange-600 hover:bg-orange-600 hover:text-white transition-all shadow-lg"
                       disabled={isExporting}
                     >
                       <Archive className="w-4 h-4 mr-2" /> {isExporting ? "Exporting..." : "Export Archive"}
@@ -649,7 +665,7 @@ export default function Home() {
                   </div>
                   <Button 
                     size="lg" 
-                    className="bg-primary hover:bg-green-700 px-12 font-bold shadow-lg"
+                    className="bg-primary hover:bg-green-700 px-16 font-black uppercase tracking-widest text-[11px] shadow-2xl transition-all active:scale-95"
                     disabled={isProcessing}
                     onClick={runProcess}
                   >
@@ -676,28 +692,30 @@ export default function Home() {
       />
       
       <Dialog open={isMarketDetailOpen} onOpenChange={setIsMarketDetailOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col bg-card/95 backdrop-blur-xl border-white/10 p-5">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col bg-card/95 backdrop-blur-3xl border-white/10 p-5 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
           <DialogHeader className="mb-2 shrink-0">
-            <DialogTitle className="text-xl font-black text-gradient uppercase flex items-center gap-2 leading-none">
-              <Database className="w-5 h-5 text-primary" /> Market Value Breakdown
+            <DialogTitle className="text-xl font-black text-gradient uppercase flex items-center gap-2 leading-none tracking-tight">
+              <Database className="w-5 h-5 text-primary" /> Market Value Analysis
             </DialogTitle>
-            <DialogDescription className="font-medium text-xs">
-              Complete distribution by property usage.
+            <DialogDescription className="font-medium text-xs text-muted-foreground/60">
+              In-depth financial distribution by property usage category.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0">
-            <div className="lg:col-span-6 bg-muted/10 rounded-xl border border-white/5 flex items-center justify-center p-2">
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
+            <div className="lg:col-span-5 bg-muted/5 rounded-2xl border border-white/5 flex items-center justify-center p-4 shadow-inner">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={analyticsData.marketChart}
                     cx="50%"
                     cy="50%"
-                    innerRadius={65}
-                    outerRadius={100}
-                    paddingAngle={2}
+                    innerRadius={90}
+                    outerRadius={120}
+                    paddingAngle={10}
                     dataKey="value"
+                    stroke="none"
+                    filter="url(#softShadow)"
                     label={({ name, percent }) => `${name} (${(percent * 100).toFixed(1)}%)`}
                     labelLine={true}
                   >
@@ -710,27 +728,27 @@ export default function Home() {
               </ResponsiveContainer>
             </div>
             
-            <div className="lg:col-span-6 flex flex-col gap-3 min-h-0">
+            <div className="lg:col-span-7 flex flex-col gap-4 min-h-0">
               <div className="flex items-center justify-between px-3">
-                <h5 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Usage Categories</h5>
-                <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Market Value</span>
+                <h5 className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] opacity-50">Usage Categories</h5>
+                <span className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] opacity-50">Market Value</span>
               </div>
               
-              <div className="flex-1 overflow-y-auto pr-2 scrollbar-vertical-custom space-y-1.5">
+              <div className="flex-1 overflow-y-auto pr-3 scrollbar-vertical-custom space-y-2">
                 {analyticsData.marketChart.map((item, index) => {
                   const total = analyticsData.marketChart.reduce((sum, curr) => sum + curr.value, 0);
                   const percentage = ((item.value / total) * 100).toFixed(1);
                   return (
-                    <div key={item.name} className="flex flex-col gap-1 p-2 px-3 rounded-lg bg-muted/30 border border-white/5 hover:bg-muted/50 transition-colors">
+                    <div key={item.name} className="flex flex-col gap-1.5 p-3 rounded-xl bg-muted/20 border border-white/5 hover:bg-muted/40 transition-all hover:scale-[1.01] shadow-sm">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                          <span className="text-xs font-black uppercase tracking-tight">{item.name}</span>
-                          <span className="text-[9px] font-black text-primary/70 px-1 rounded bg-primary/5 leading-none">{percentage}%</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-2.5 h-2.5 rounded-full shadow-lg" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                          <span className="text-[11px] font-black uppercase tracking-tight text-foreground/90">{item.name}</span>
+                          <span className="text-[9px] font-black text-primary px-1.5 py-0.5 rounded-full bg-primary/10 leading-none">{percentage}%</span>
                         </div>
-                        <span className="text-xs font-mono font-bold">₱{item.value.toLocaleString()}</span>
+                        <span className="text-xs font-mono font-bold tabular-nums">₱{item.value.toLocaleString()}</span>
                       </div>
-                      <div className="w-full h-1 bg-background/50 rounded-full overflow-hidden mt-0.5">
+                      <div className="w-full h-1 bg-background/50 rounded-full overflow-hidden mt-0.5 shadow-inner">
                         <div className="h-full transition-all duration-1000 ease-out" style={{ width: `${percentage}%`, backgroundColor: COLORS[index % COLORS.length] }} />
                       </div>
                     </div>
@@ -738,10 +756,10 @@ export default function Home() {
                 })}
               </div>
               
-              <div className="mt-auto pt-3 border-t border-white/10 shrink-0">
-                <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
-                  <span className="text-[10px] font-black uppercase text-primary tracking-widest">Grand Total</span>
-                  <span className="text-sm font-black text-gradient">₱{analyticsData.marketChart.reduce((sum, curr) => sum + curr.value, 0).toLocaleString()}</span>
+              <div className="mt-auto pt-4 border-t border-white/10 shrink-0">
+                <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/20 shadow-lg">
+                  <span className="text-[10px] font-black uppercase text-primary tracking-[0.3em]">Grand Total</span>
+                  <span className="text-lg font-black text-gradient">₱{analyticsData.marketChart.reduce((sum, curr) => sum + curr.value, 0).toLocaleString()}</span>
                 </div>
               </div>
             </div>
