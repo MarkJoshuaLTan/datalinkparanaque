@@ -258,19 +258,23 @@ export default function Home() {
 
     const ws = XLSX.utils.json_to_sheet([]);
     
+    // Header summary area - Horizontal layout for professional frozen pane feel
     XLSX.utils.sheet_add_aoa(ws, [
       [exportType === 'results' ? "PARAÑAQUE DATA LINK - SUMMARY RESULTS" : "PARAÑAQUE DATA LINK - ARCHIVE (DUPLICATES & CLEANUP)"],
-      ["TOTAL RECORDS:", dataToExport.length.toLocaleString()],
-      ["TOTAL MARKET VALUE:", `₱${totalMarket.toLocaleString()}`],
-      ["TOTAL ASSESSED VALUE:", `₱${totalAssessed.toLocaleString()}`],
-      [""] 
+      [
+        "TOTAL RECORDS:", dataToExport.length.toLocaleString(), 
+        "TOTAL MARKET VALUE:", `₱${totalMarket.toLocaleString()}`, 
+        "TOTAL ASSESSED VALUE:", `₱${totalAssessed.toLocaleString()}`
+      ],
+      [""] // Empty row for spacing
     ], { origin: "A1" });
 
     const activeHeaders = Object.values(headerMapping).filter(h => exportColumns[h]);
-    XLSX.utils.sheet_add_aoa(ws, [activeHeaders], { origin: "A6" });
-    XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A7", skipHeader: true });
+    XLSX.utils.sheet_add_aoa(ws, [activeHeaders], { origin: "A4" });
+    XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A5", skipHeader: true });
     
-    ws['!freeze'] = { xSplit: 0, ySplit: 6 };
+    // Freeze the summary and column headers (Rows 1 to 4)
+    ws['!freeze'] = { xSplit: 0, ySplit: 4 };
     ws['!cols'] = activeHeaders.map(() => ({ wch: 20 }));
 
     const wb = XLSX.utils.book_new();
