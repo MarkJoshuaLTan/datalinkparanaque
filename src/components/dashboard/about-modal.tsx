@@ -29,15 +29,15 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
         <div className="p-8 pb-4 shrink-0">
           <DialogHeader className="text-left">
             <div className="flex items-center gap-3 mb-2">
-              <div className="bg-primary/20 p-2 rounded-lg">
+              <div className="bg-primary/20 p-2 rounded-xl">
                 <Info className="text-primary w-6 h-6" />
               </div>
-              <DialogTitle className="text-2xl font-black bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent uppercase tracking-tight">
-                About Data Link Parañaque
+              <DialogTitle className="text-2xl font-black bg-gradient-to-br from-blue-600 to-emerald-500 bg-clip-text text-transparent uppercase tracking-tight">
+                About DataLink Parañaque
               </DialogTitle>
             </div>
             <DialogDescription className="text-base font-medium text-muted-foreground leading-relaxed">
-              Data Link Parañaque is a specialized data processing tool designed to automate the cleaning, calibration, and standardization of Real Property Land Records. It transforms messy raw spreadsheets into structured, audit-ready data for the City of Parañaque.
+              DataLink Parañaque is a specialized data processing tool designed to automate the cleaning, calibration, and standardization of Real Property Land Records. It transforms messy raw spreadsheets into structured, audit-ready data for the City of Parañaque.
             </DialogDescription>
           </DialogHeader>
         </div>

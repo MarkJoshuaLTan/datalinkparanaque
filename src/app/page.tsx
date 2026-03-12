@@ -123,7 +123,7 @@ export default function Home() {
     setIsClient(true);
     
     const handleBeforeInstallPrompt = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
-    const handleAppInstalled = () => { setDeferredPrompt(null); toast({ title: "Installation Successful", description: "Data Link Parañaque is now available on your device." }); };
+    const handleAppInstalled = () => { setDeferredPrompt(null); toast({ title: "Installation Successful", description: "DataLink Parañaque is now available on your device." }); };
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
@@ -272,7 +272,7 @@ export default function Home() {
       const sheetName = workbook.SheetNames[0];
       const ws = workbook.Sheets[sheetName];
 
-      const title = exportType === 'results' ? "DATA LINK PARAÑAQUE - SUMMARY RESULTS" : "DATA LINK PARAÑAQUE - ARCHIVE";
+      const title = exportType === 'results' ? "DATALINK PARAÑAQUE - SUMMARY RESULTS" : "DATALINK PARAÑAQUE - ARCHIVE";
       XLSX.utils.sheet_add_aoa(ws, [[title]], { origin: "A1" });
       
       XLSX.utils.sheet_add_aoa(ws, [
@@ -388,15 +388,15 @@ export default function Home() {
     <div className="min-h-screen bg-background flex flex-col font-body" suppressHydrationWarning>
       <header className="bg-card/80 backdrop-blur-lg border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-50">
         <div className="flex items-center gap-4">
-          <div className="bg-primary/20 p-2 rounded-xl shadow-inner border border-primary/20">
+          <div className="bg-primary/20 p-2 rounded-2xl shadow-inner border border-primary/20">
             <Database className="text-primary w-6 h-6" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-xl font-black tracking-tighter leading-none flex items-center gap-2">
-              <span className="bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent drop-shadow-sm">DATA LINK</span>
-              <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full font-black uppercase tracking-widest shadow-md">Parañaque</span>
+            <h1 className="text-2xl font-black tracking-tight leading-none flex items-center gap-1.5">
+              <span className="bg-gradient-to-br from-blue-600 via-emerald-500 to-green-400 bg-clip-text text-transparent drop-shadow-sm">DataLink</span>
+              <span className="text-[11px] bg-primary/10 text-primary border border-primary/30 px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider shadow-sm ml-1">Parañaque</span>
             </h1>
-            <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em] mt-1.5 ml-0.5 opacity-60">Land Data Processor</p>
+            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1 ml-0.5 opacity-60">Land Data Processor</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
