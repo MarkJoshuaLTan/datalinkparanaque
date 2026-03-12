@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -75,6 +76,7 @@ export default function Home() {
   const [previewData, setPreviewData] = useState<LandRecord[]>([]);
   const [processedData, setProcessedData] = useState<LandRecord[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [importedFileName, setImportedFileName] = useState<string>("");
   const [rules, setRules] = useState<CalibrationRule[]>([]);
   const [viewMode, setViewMode] = useState<'results' | 'archive' | 'analytics'>('results');
@@ -217,7 +219,7 @@ export default function Home() {
     setIsProcessing(false);
   };
 
-  const handleExport = (exportType: 'results' | 'archive' = 'results') => {
+  const handleExport = async (exportType: 'results' | 'archive' = 'results') => {
     let dataToExport: LandRecord[] = [];
     
     if (exportType === 'results') {
@@ -236,6 +238,7 @@ export default function Home() {
       return;
     }
 
+    setIsExporting(true);
     const totalMarket = dataToExport.reduce((sum, r) => sum + (r.marketValue || 0), 0);
     const totalAssessed = dataToExport.reduce((sum, r) => sum + (r.assessedValue || 0), 0);
 
@@ -256,46 +259,63 @@ export default function Home() {
       return row;
     });
 
-    const ws = XLSX.utils.json_to_sheet([]);
-    
-    // Header summary area - Row 1 to 4 will be frozen
-    XLSX.utils.sheet_add_aoa(ws, [
-      [exportType === 'results' ? "PARAÑAQUE DATA LINK - SUMMARY RESULTS" : "PARAÑAQUE DATA LINK - ARCHIVE (DUPLICATES & CLEANUP)"],
-      [
-        "TOTAL RECORDS:", dataToExport.length.toLocaleString(), 
-        "TOTAL MARKET VALUE:", `₱${totalMarket.toLocaleString()}`, 
-        "TOTAL ASSESSED VALUE:", `₱${totalAssessed.toLocaleString()}`
-      ],
-      ["EXPORT DATE:", new Date().toLocaleDateString()] // Row 3
-    ], { origin: "A1" });
+    try {
+      // Fetch the user provided template
+      const response = await fetch('/export_template.xlsx');
+      if (!response.ok) throw new Error("Template not found in public folder.");
+      
+      const arrayBuffer = await response.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: 'array', cellStyles: true });
+      const sheetName = workbook.SheetNames[0];
+      const ws = workbook.Sheets[sheetName];
 
-    // Row 4: Column Headers
-    const activeHeaders = Object.values(headerMapping).filter(h => exportColumns[h]);
-    XLSX.utils.sheet_add_aoa(ws, [activeHeaders], { origin: "A4" });
-    
-    // Row 5 onwards: Data
-    XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A5", skipHeader: true });
-    
-    // Freeze the top 4 rows (Title, Summary, Date, and Column Headers)
-    ws['!freeze'] = { xSplit: 0, ySplit: 4 };
-    
-    // Standard visual column adjustment
-    ws['!cols'] = activeHeaders.map(() => ({ wch: 22 }));
+      // Insert Summary Data (Dashboard Row 1-3)
+      XLSX.utils.sheet_add_aoa(ws, [
+        [exportType === 'results' ? "PARAÑAQUE DATA LINK - SUMMARY RESULTS" : "PARAÑAQUE DATA LINK - ARCHIVE"],
+        [
+          "TOTAL RECORDS:", dataToExport.length.toLocaleString(), 
+          "", // Spacer
+          "TOTAL MARKET VALUE:", `₱${totalMarket.toLocaleString()}`, 
+          "", // Spacer
+          "TOTAL ASSESSED VALUE:", `₱${totalAssessed.toLocaleString()}`
+        ],
+        ["EXPORT DATE:", new Date().toLocaleDateString()]
+      ], { origin: "A1" });
 
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, exportType === 'results' ? "Processed Data" : "Archive");
-    
-    const baseName = importedFileName.replace(/\.[^/.]+$/, "");
-    const dateStr = new Date().toISOString().split('T')[0];
-    const typeLabel = exportType === 'results' ? 'Filtered' : 'Archive';
-    const finalFileName = `${baseName}-${typeLabel}-${dateStr}.xlsx`;
-    
-    XLSX.writeFile(wb, finalFileName);
-    
-    toast({
-      title: `${exportType === 'results' ? 'Results' : 'Archive'} Export Successful`,
-      description: `Saved as ${finalFileName}`,
-    });
+      // Update Column Headers (Row 4) based on current sidebar configuration
+      const activeHeaders = Object.values(headerMapping).filter(h => exportColumns[h]);
+      XLSX.utils.sheet_add_aoa(ws, [activeHeaders], { origin: "A4" });
+      
+      // Add Records starting at Row 5
+      XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A5", skipHeader: true });
+      
+      // Ensure the top 4 rows are frozen for sticky dashboard effect
+      ws['!freeze'] = { xSplit: 0, ySplit: 4 };
+      
+      // Set column widths for better readability
+      ws['!cols'] = activeHeaders.map(() => ({ wch: 22 }));
+
+      const baseName = importedFileName.replace(/\.[^/.]+$/, "") || "LandRecords";
+      const dateStr = new Date().toISOString().split('T')[0];
+      const typeLabel = exportType === 'results' ? 'Filtered' : 'Archive';
+      const finalFileName = `${baseName}-${typeLabel}-${dateStr}.xlsx`;
+      
+      XLSX.writeFile(workbook, finalFileName);
+      
+      toast({
+        title: `${exportType === 'results' ? 'Results' : 'Archive'} Export Successful`,
+        description: `Saved as ${finalFileName} using custom template.`,
+      });
+    } catch (error: any) {
+      console.error("Export template error:", error);
+      toast({
+        variant: "destructive",
+        title: "Template Export Failed",
+        description: error.message || "Ensure 'export_template.xlsx' exists in the public folder.",
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleRowClick = (record: LandRecord) => {
@@ -616,16 +636,18 @@ export default function Home() {
                       onClick={() => handleExport('results')} 
                       size="lg" 
                       className="font-bold border-primary text-primary hover:bg-primary/5 hover:text-primary"
+                      disabled={isExporting}
                     >
-                      <FileDown className="w-4 h-4 mr-2" /> Export Results
+                      <FileDown className="w-4 h-4 mr-2" /> {isExporting ? "Exporting..." : "Export Results"}
                     </Button>
                     <Button 
                       variant="outline" 
                       onClick={() => handleExport('archive')} 
                       size="lg" 
                       className="font-bold border-orange-500 text-orange-600 hover:bg-orange-500/10 hover:text-orange-600"
+                      disabled={isExporting}
                     >
-                      <Archive className="w-4 h-4 mr-2" /> Export Archive
+                      <Archive className="w-4 h-4 mr-2" /> {isExporting ? "Exporting..." : "Export Archive"}
                     </Button>
                   </div>
                   <Button 
