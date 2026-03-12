@@ -13,7 +13,8 @@ import {
   Search,
   Filter,
   BarChart3,
-  Table as TableIcon
+  Table as TableIcon,
+  Maximize2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -41,6 +42,13 @@ import {
   ChartTooltip, 
   ChartTooltipContent 
 } from '@/components/ui/chart';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription 
+} from '@/components/ui/dialog';
 import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer, Cell, Pie, PieChart, Legend, CartesianGrid } from 'recharts';
 
 // Bumped to v3 to force reload of default location settings for Merville
@@ -59,6 +67,7 @@ export default function Home() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [selectedRecord, setSelectedRecord] = useState<LandRecord | null>(null);
+  const [isMarketDetailOpen, setIsMarketDetailOpen] = useState(false);
 
   // Search and Filter State
   const [searchQuery, setSearchQuery] = useState("");
@@ -326,7 +335,7 @@ export default function Home() {
     return { auChart, marketChart };
   }, [processedData, previewData]);
 
-  const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
+  const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
 
   if (!isClient) return null;
 
@@ -533,7 +542,13 @@ export default function Home() {
                           </div>
                         </Card>
 
-                        <Card className="p-6">
+                        <Card 
+                          className="p-6 cursor-pointer hover:bg-muted/10 transition-all group relative" 
+                          onClick={() => setIsMarketDetailOpen(true)}
+                        >
+                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Maximize2 className="w-4 h-4 text-muted-foreground" />
+                          </div>
                           <h4 className="text-sm font-bold uppercase mb-6 flex items-center gap-2">
                             <Database className="w-4 h-4 text-primary" /> Market Value Breakdown by Usage
                           </h4>
@@ -558,6 +573,9 @@ export default function Home() {
                                 <Legend verticalAlign="bottom" height={36}/>
                               </PieChart>
                             </ResponsiveContainer>
+                          </div>
+                          <div className="mt-4 text-center text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+                            Click to View Full Breakdown
                           </div>
                         </Card>
                       </div>
@@ -613,6 +631,92 @@ export default function Home() {
           }
         }}
       />
+      
+      {/* Expanded Market Value Detail Modal */}
+      <Dialog open={isMarketDetailOpen} onOpenChange={setIsMarketDetailOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-card/95 backdrop-blur-xl border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black text-gradient uppercase flex items-center gap-2">
+              <Database className="w-5 h-5 text-primary" /> Market Value Detailed Breakdown
+            </DialogTitle>
+            <DialogDescription className="font-medium">
+              A comprehensive view of total market value distribution by property usage (Actual Use).
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-6">
+            <div className="lg:col-span-3 h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={analyticsData.marketChart}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={80}
+                    outerRadius={120}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(1)}%)`}
+                  >
+                    {analyticsData.marketChart.map((entry, index) => (
+                      <Cell key={`cell-expanded-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            
+            <div className="lg:col-span-2 space-y-4">
+              <h5 className="text-xs font-black uppercase text-muted-foreground tracking-widest border-b pb-2">
+                Detailed Categories
+              </h5>
+              <div className="space-y-3">
+                {analyticsData.marketChart.map((item, index) => {
+                  const total = analyticsData.marketChart.reduce((sum, curr) => sum + curr.value, 0);
+                  const percentage = ((item.value / total) * 100).toFixed(1);
+                  
+                  return (
+                    <div key={item.name} className="flex flex-col gap-1 p-3 rounded-lg bg-muted/30 border border-white/5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                          <span className="text-sm font-black uppercase">{item.name}</span>
+                        </div>
+                        <span className="text-xs font-black text-primary bg-primary/10 px-2 py-0.5 rounded">
+                          {percentage}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-end mt-1">
+                        <span className="text-[10px] text-muted-foreground font-bold uppercase">Market Value</span>
+                        <span className="text-sm font-mono font-bold">₱{item.value.toLocaleString()}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-background rounded-full mt-2 overflow-hidden">
+                        <div 
+                          className="h-full transition-all duration-1000" 
+                          style={{ 
+                            width: `${percentage}%`, 
+                            backgroundColor: COLORS[index % COLORS.length] 
+                          }} 
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className="pt-4 border-t mt-6">
+                <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl border border-primary/20">
+                  <span className="text-xs font-black uppercase text-primary">Grand Total Market Value</span>
+                  <span className="text-lg font-black text-gradient">
+                    ₱{analyticsData.marketChart.reduce((sum, curr) => sum + curr.value, 0).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
