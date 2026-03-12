@@ -11,7 +11,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Parañaque Data Link | Land Data Processor',
+  title: 'Data Link Parañaque | Land Data Processor',
   description: 'Modern, professional real property data cleaner and converter for Parañaque City.',
   manifest: '/manifest.json',
   icons: {
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'PQ DataLink',
+    title: 'Data Link PQ',
   },
   formatDetection: {
     telephone: false,

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -124,7 +123,7 @@ export default function Home() {
     setIsClient(true);
     
     const handleBeforeInstallPrompt = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
-    const handleAppInstalled = () => { setDeferredPrompt(null); toast({ title: "Installation Successful", description: "Parañaque Data Link is now available on your device." }); };
+    const handleAppInstalled = () => { setDeferredPrompt(null); toast({ title: "Installation Successful", description: "Data Link Parañaque is now available on your device." }); };
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
@@ -273,7 +272,7 @@ export default function Home() {
       const sheetName = workbook.SheetNames[0];
       const ws = workbook.Sheets[sheetName];
 
-      const title = exportType === 'results' ? "PARAÑAQUE DATA LINK - SUMMARY RESULTS" : "PARAÑAQUE DATA LINK - ARCHIVE";
+      const title = exportType === 'results' ? "DATA LINK PARAÑAQUE - SUMMARY RESULTS" : "DATA LINK PARAÑAQUE - ARCHIVE";
       XLSX.utils.sheet_add_aoa(ws, [[title]], { origin: "A1" });
       
       XLSX.utils.sheet_add_aoa(ws, [
@@ -388,13 +387,16 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col font-body" suppressHydrationWarning>
       <header className="bg-card/80 backdrop-blur-lg border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <div className="bg-primary p-2 rounded-lg">
-            <Database className="text-white w-6 h-6" />
+        <div className="flex items-center gap-4">
+          <div className="bg-primary/20 p-2 rounded-xl shadow-inner border border-primary/20">
+            <Database className="text-primary w-6 h-6" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-gradient">Parañaque Data Link</h1>
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">Land Data Processor</p>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-black tracking-tighter leading-none flex items-center gap-2">
+              <span className="bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent drop-shadow-sm">DATA LINK</span>
+              <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full font-black uppercase tracking-widest shadow-md">Parañaque</span>
+            </h1>
+            <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em] mt-1.5 ml-0.5 opacity-60">Land Data Processor</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -438,7 +440,7 @@ export default function Home() {
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
                       <FileSearch className="w-2.5 h-2.5" /> Total Rows
                     </div>
-                    <div className="text-lg font-black text-gradient leading-tight">{stats.totalRawRows.toLocaleString()}</div>
+                    <div className="text-lg font-black text-foreground leading-tight">{stats.totalRawRows.toLocaleString()}</div>
                   </Card>
                   <Card className="p-4 border-l-4 border-l-orange-400 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
@@ -450,7 +452,7 @@ export default function Home() {
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
                       <CheckCircle2 className="w-2.5 h-2.5" /> Final Records
                     </div>
-                    <div className="text-lg font-black text-gradient leading-tight">{stats.finalCount.toLocaleString()}</div>
+                    <div className="text-lg font-black text-primary leading-tight">{stats.finalCount.toLocaleString()}</div>
                   </Card>
                   <Card className="p-4 bg-amber-500/5 border-l-4 border-l-amber-400 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
@@ -462,7 +464,7 @@ export default function Home() {
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
                       <Database className="w-2.5 h-2.5" /> Market Value
                     </div>
-                    <div className="text-lg font-black text-gradient leading-tight">₱{stats.totalMarket.toLocaleString()}</div>
+                    <div className="text-lg font-black text-green-600 leading-tight">₱{stats.totalMarket.toLocaleString()}</div>
                   </Card>
                   <Card className="p-4 bg-blue-500/5 border-l-4 border-l-blue-600 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
@@ -565,6 +567,19 @@ export default function Home() {
                                 data={analyticsData.auChart}
                                 margin={{ top: 20, right: 20, left: 10, bottom: 40 }}
                               >
+                                <defs>
+                                  <filter id="softShadow" height="130%">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                                    <feOffset dx="2" dy="2" result="offsetblur"/>
+                                    <feComponentTransfer>
+                                      <feFuncA type="linear" slope="0.3"/>
+                                    </feComponentTransfer>
+                                    <feMerge> 
+                                      <feMergeNode/>
+                                      <feMergeNode in="SourceGraphic"/> 
+                                    </feMerge>
+                                  </filter>
+                                </defs>
                                 <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.05} />
                                 <XAxis 
                                   dataKey="name" 
@@ -586,6 +601,7 @@ export default function Home() {
                                 <Bar 
                                   dataKey="value" 
                                   radius={[6, 6, 0, 0]} 
+                                  filter="url(#softShadow)"
                                 >
                                   {analyticsData.auChart.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -621,7 +637,7 @@ export default function Home() {
                                   label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                                 >
                                   {analyticsData.marketChart.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} filter="url(#softShadow)" />
                                   ))}
                                 </Pie>
                                 <ChartTooltip content={<ChartTooltipContent />} />
@@ -691,7 +707,7 @@ export default function Home() {
       <Dialog open={isMarketDetailOpen} onOpenChange={setIsMarketDetailOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col bg-card/95 backdrop-blur-3xl border-white/10 p-5 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
           <DialogHeader className="mb-2 shrink-0">
-            <DialogTitle className="text-xl font-black text-gradient uppercase flex items-center gap-2 leading-none tracking-tight">
+            <DialogTitle className="text-xl font-black bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent uppercase flex items-center gap-2 leading-none tracking-tight">
               <Database className="w-5 h-5 text-primary" /> Market Value Analysis
             </DialogTitle>
             <DialogDescription className="font-medium text-xs text-muted-foreground/60">
@@ -716,7 +732,7 @@ export default function Home() {
                     labelLine={true}
                   >
                     {analyticsData.marketChart.map((entry, index) => (
-                      <Cell key={`cell-expanded-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={`cell-expanded-${index}`} fill={COLORS[index % COLORS.length]} filter="url(#softShadow)" />
                     ))}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
@@ -755,7 +771,7 @@ export default function Home() {
               <div className="mt-auto pt-4 border-t border-white/10 shrink-0">
                 <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/20 shadow-lg">
                   <span className="text-[10px] font-black uppercase text-primary tracking-[0.3em]">Grand Total</span>
-                  <span className="text-lg font-black text-gradient">₱{analyticsData.marketChart.reduce((sum, curr) => sum + curr.value, 0).toLocaleString()}</span>
+                  <span className="text-lg font-black bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">₱{analyticsData.marketChart.reduce((sum, curr) => sum + curr.value, 0).toLocaleString()}</span>
                 </div>
               </div>
             </div>

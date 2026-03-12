@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -33,12 +32,12 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
               <div className="bg-primary/20 p-2 rounded-lg">
                 <Info className="text-primary w-6 h-6" />
               </div>
-              <DialogTitle className="text-2xl font-black text-gradient uppercase tracking-tight">
-                About Parañaque Data Link
+              <DialogTitle className="text-2xl font-black bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent uppercase tracking-tight">
+                About Data Link Parañaque
               </DialogTitle>
             </div>
             <DialogDescription className="text-base font-medium text-muted-foreground leading-relaxed">
-              Parañaque Data Link is a specialized data processing tool designed to automate the cleaning, calibration, and standardization of Real Property Land Records. It transforms messy raw spreadsheets into structured, audit-ready data for the City of Parañaque.
+              Data Link Parañaque is a specialized data processing tool designed to automate the cleaning, calibration, and standardization of Real Property Land Records. It transforms messy raw spreadsheets into structured, audit-ready data for the City of Parañaque.
             </DialogDescription>
           </DialogHeader>
         </div>

@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Parañaque Data Link',
-    short_name: 'PQ DataLink',
+    name: 'Data Link Parañaque',
+    short_name: 'Data Link PQ',
     description: 'Professional Real Property Land Data Processor for Parañaque City.',
     start_url: '/',
     display: 'standalone',
