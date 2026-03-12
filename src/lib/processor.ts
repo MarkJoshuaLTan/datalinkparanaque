@@ -1,5 +1,12 @@
 import { BarangayConfig } from './locations';
 
+export interface TaxRateConfig {
+  assessmentLevel: number; // e.g., 0.20 for 20%
+  taxRate: number;         // e.g., 0.02 for 2%
+}
+
+export type TaxRateMap = Record<string, TaxRateConfig>;
+
 export interface LandRecord {
   id?: string;
   date: string;
@@ -78,40 +85,43 @@ export function matchesPinPattern(pin: string, pattern: string): boolean {
   return regex.test(pin);
 }
 
-export function calculateAssessedValue(marketValue: number, au: string): number {
-  const auUpper = (au || '').toUpperCase();
-  let level = 0;
+export function calculateAssessedValue(marketValue: number, au: string, taxRates: TaxRateMap): number {
+  const auUpper = (au || '').toUpperCase().trim();
   
-  // Standard Parañaque Assessment Levels:
-  // COMM (Commercial) = 50%
-  // RESI (Residential) = 20%
-  if (auUpper.includes('COMM')) level = 0.50;
-  else if (auUpper.includes('RESI')) level = 0.20;
-  else level = 0.20; // Default to Residential 20% fallback
+  // Find matching rate config
+  let config = taxRates[auUpper];
   
+  // Fallback for partial matches (e.g. "RESI-1" matches "RESI")
+  if (!config) {
+    const baseKey = Object.keys(taxRates).find(key => auUpper.includes(key));
+    if (baseKey) config = taxRates[baseKey];
+  }
+
+  const level = config ? config.assessmentLevel : 0.20; // Default to 20%
   return marketValue * level;
 }
 
-export function calculateYearlyTax(assessedValue: number, au: string): number {
-  const auUpper = (au || '').toUpperCase();
-  let taxRate = 0;
-
-  // Tax Rates: COMM = 3%, RES = 2%
-  if (auUpper.includes('COMM')) {
-    taxRate = 0.03;
-  } else if (auUpper.includes('RESI')) {
-    taxRate = 0.02;
-  } else {
-    taxRate = 0.02; // Default to Residential 2% fallback
+export function calculateYearlyTax(assessedValue: number, au: string, taxRates: TaxRateMap): number {
+  const auUpper = (au || '').toUpperCase().trim();
+  
+  // Find matching rate config
+  let config = taxRates[auUpper];
+  
+  // Fallback for partial matches
+  if (!config) {
+    const baseKey = Object.keys(taxRates).find(key => auUpper.includes(key));
+    if (baseKey) config = taxRates[baseKey];
   }
 
-  return assessedValue * taxRate;
+  const rate = config ? config.taxRate : 0.02; // Default to 2%
+  return assessedValue * rate;
 }
 
 export function processRecords(
   records: LandRecord[],
   rules: CalibrationRule[],
   locationSettings: BarangayConfig[],
+  taxRates: TaxRateMap,
   options: {
     removeDuplicates: boolean;
     applyCalibration: boolean;
@@ -172,8 +182,8 @@ export function processRecords(
       marketValue = unitValue * landArea;
     }
 
-    const assessedValue = calculateAssessedValue(marketValue, r.au || '');
-    const yearlyTax = calculateYearlyTax(assessedValue, r.au || '');
+    const assessedValue = calculateAssessedValue(marketValue, r.au || '', taxRates);
+    const yearlyTax = calculateYearlyTax(assessedValue, r.au || '', taxRates);
 
     return {
       ...r,
@@ -290,11 +300,11 @@ export function processRecords(
       // Always recalculate market and assessed values if unit value is present and valid
       if (updated.unitValue && updated.unitValue > 0 && updated.landArea > 0) {
           updated.marketValue = updated.landArea * updated.unitValue;
-          updated.assessedValue = calculateAssessedValue(updated.marketValue, updated.au);
+          updated.assessedValue = calculateAssessedValue(updated.marketValue, updated.au, taxRates);
       }
       
       // Recalculate yearly tax based on final assessed value
-      updated.yearlyTax = calculateYearlyTax(updated.assessedValue, updated.au);
+      updated.yearlyTax = calculateYearlyTax(updated.assessedValue, updated.au, taxRates);
       
       return updated;
     });

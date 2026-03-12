@@ -22,7 +22,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ImportZone } from '@/components/dashboard/import-zone';
 import { CalibrationSidebar } from '@/components/dashboard/calibration-sidebar';
 import { DataPreviewTable } from '@/components/dashboard/data-preview-table';
-import { LandRecord, CalibrationRule, processRecords } from '@/lib/processor';
+import { LandRecord, CalibrationRule, processRecords, TaxRateMap } from '@/lib/processor';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import * as XLSX from 'xlsx';
 import { SettingsPanel } from '@/components/dashboard/settings-panel';
@@ -51,8 +51,22 @@ import {
 } from '@/components/ui/dialog';
 import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer, Cell, Pie, PieChart, Legend, CartesianGrid } from 'recharts';
 
-// Bumped to v3 to force reload of default location settings for Merville
-const LOCAL_STORAGE_KEY = 'paranaque_datalink_v24_local_v3';
+// Bumped version for tax rate addition
+const LOCAL_STORAGE_KEY = 'paranaque_datalink_v26';
+
+const defaultTaxRates: TaxRateMap = {
+  "RESI": { assessmentLevel: 0.20, taxRate: 0.02 },
+  "COMM": { assessmentLevel: 0.50, taxRate: 0.03 },
+  "INDU": { assessmentLevel: 0.50, taxRate: 0.03 },
+  "AGRI": { assessmentLevel: 0.40, taxRate: 0.02 },
+  "GOV": { assessmentLevel: 0.00, taxRate: 0.00 },
+  "SPEC": { assessmentLevel: 0.15, taxRate: 0.02 },
+  "SPC1": { assessmentLevel: 0.15, taxRate: 0.02 },
+  "SPC2": { assessmentLevel: 0.15, taxRate: 0.02 },
+  "SPC3": { assessmentLevel: 0.15, taxRate: 0.02 },
+  "SPC4": { assessmentLevel: 0.15, taxRate: 0.02 },
+  "SPC5": { assessmentLevel: 0.15, taxRate: 0.02 },
+};
 
 export default function Home() {
   const { toast } = useToast();
@@ -89,6 +103,7 @@ export default function Home() {
   };
   const [exportColumns, setExportColumns] = useState<Record<string, boolean>>(defaultExportColumns);
   const [locationSettings, setLocationSettings] = useState<BarangayConfig[]>(initialLocationSettings);
+  const [taxRates, setTaxRates] = useState<TaxRateMap>(defaultTaxRates);
 
   const [stats, setStats] = useState({
     totalRawRows: 0, systemCleanup: 0, totalImported: 0, duplicatesRemoved: 0,
@@ -111,22 +126,22 @@ export default function Home() {
         if (parsed.rules) setRules(parsed.rules);
         if (parsed.exportColumns) setExportColumns({ ...defaultExportColumns, ...parsed.exportColumns });
         if (parsed.locationSettings) {
-          if (Array.isArray(parsed.locationSettings) && parsed.locationSettings[0]?.sections) {
-            setLocationSettings(parsed.locationSettings);
-          } else {
-            setLocationSettings(initialLocationSettings);
-          }
+          setLocationSettings(parsed.locationSettings);
         }
         if (parsed.options) setOptions({ ...options, ...parsed.options });
+        if (parsed.taxRates) setTaxRates(parsed.taxRates);
       } else {
-        setLocationSettings(initialLocationSettings);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ rules: [], exportColumns: defaultExportColumns, locationSettings: initialLocationSettings, options }));
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ 
+          rules: [], 
+          exportColumns: defaultExportColumns, 
+          locationSettings: initialLocationSettings, 
+          options,
+          taxRates: defaultTaxRates
+        }));
       }
     } catch (error) {
         console.error("Failed to parse localStorage, resetting to defaults:", error);
-        setLocationSettings(initialLocationSettings);
     }
-
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -137,9 +152,9 @@ export default function Home() {
   // Effect to save to localStorage whenever settings change
   useEffect(() => {
     if (isClient) {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ rules, exportColumns, locationSettings, options }));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ rules, exportColumns, locationSettings, options, taxRates }));
     }
-  }, [rules, exportColumns, locationSettings, options, isClient]);
+  }, [rules, exportColumns, locationSettings, options, taxRates, isClient]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
@@ -154,8 +169,8 @@ export default function Home() {
     setProcessedData([]);
     setViewMode('results');
     
-    // Initial import ALWAYS shows data raw, ignoring all toggles for the preview stage
-    const { allWithDuplicateMarkers, duplicatesRemoved, cleanupCount } = processRecords(imported, [], [], {
+    // Initial import ALWAYS shows data raw
+    const { allWithDuplicateMarkers } = processRecords(imported, [], [], taxRates, {
       removeDuplicates: false,
       applyCalibration: false,
       systemCleanup: false
@@ -182,8 +197,7 @@ export default function Home() {
     if (rawData.length === 0) return;
 
     setIsProcessing(true);
-    // Explicitly process using the current user-selected options
-    const { processed, allWithDuplicateMarkers, duplicatesRemoved, cleanupCount } = processRecords(rawData, rules, locationSettings, options);
+    const { processed, allWithDuplicateMarkers, duplicatesRemoved, cleanupCount } = processRecords(rawData, rules, locationSettings, taxRates, options);
     
     setProcessedData(processed);
     setPreviewData(allWithDuplicateMarkers);
@@ -327,7 +341,6 @@ export default function Home() {
       marketValueSum[au] = (marketValueSum[au] || 0) + (r.marketValue || 0);
     });
 
-    // Filter out 0 values to prevent label overlap
     const auChart = Object.entries(auDistribution)
       .map(([name, value]) => ({ name, value }))
       .filter(item => item.value > 0);
@@ -625,6 +638,8 @@ export default function Home() {
         onOpenChange={setIsSettingsOpen}
         locationSettings={locationSettings}
         onSettingsChange={setLocationSettings}
+        taxRates={taxRates}
+        onTaxRatesChange={setTaxRates}
       />
       <RecordDetailModal
         record={selectedRecord}
