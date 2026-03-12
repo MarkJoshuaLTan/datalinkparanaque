@@ -448,7 +448,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="flex flex-col gap-6 h-full">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                    <Card className="p-4 border-l-4 border-l-slate-400 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
                       <FileSearch className="w-2.5 h-2.5" /> Total Rows
@@ -478,6 +478,12 @@ export default function Home() {
                       <Database className="w-2.5 h-2.5" /> Market Value
                     </div>
                     <div className="text-lg font-black text-gradient leading-tight">₱{stats.totalMarket.toLocaleString()}</div>
+                  </Card>
+                  <Card className="p-4 bg-blue-500/5 border-l-4 border-l-blue-600 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1">
+                      <BarChart3 className="w-2.5 h-2.5" /> Assessed Value
+                    </div>
+                    <div className="text-lg font-black text-blue-600 dark:text-blue-400 leading-tight">₱{stats.totalAssessed.toLocaleString()}</div>
                   </Card>
                 </div>
 
