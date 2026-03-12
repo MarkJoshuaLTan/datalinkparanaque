@@ -81,7 +81,6 @@ export function SettingsPanel({
   }, [open, selectedBarangay, locationSettings, taxRates]);
 
   const handleSaveChanges = () => {
-    // 1. Save Locations
     const sectionsToSave = currentSections.map(({ originalIndex, ...rest }) => rest);
     const newSettings = locationSettings.map(b => {
       if (selectedBarangay && b.barangayCode === selectedBarangay.barangayCode) {
@@ -138,7 +137,7 @@ export function SettingsPanel({
       ...prev,
       [usage]: {
         ...prev[usage],
-        [field]: value / 100 // Convert percentage to decimal
+        [field]: value / 100
       }
     }));
   };
@@ -152,15 +151,15 @@ export function SettingsPanel({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-[900px] sm:max-w-[900px] flex flex-col bg-card/95 backdrop-blur-xl border-white/10">
-        <SheetHeader>
+        <SheetHeader className="shrink-0">
           <SheetTitle className="text-2xl font-black text-gradient uppercase">Global Calibration Panel</SheetTitle>
           <SheetDescription className="font-medium">
             Manage your land data processing rules, location mappings, and financial tax rates.
           </SheetDescription>
         </SheetHeader>
 
-        <Tabs defaultValue="locations" className="flex-1 flex flex-col mt-4 overflow-hidden">
-          <TabsList className="grid w-full grid-cols-2 bg-muted/50 border mb-4">
+        <Tabs defaultValue="locations" className="flex-1 flex flex-col mt-4 min-h-0 overflow-hidden">
+          <TabsList className="grid w-full grid-cols-2 bg-muted/50 border shrink-0">
             <TabsTrigger value="locations" className="text-xs font-bold uppercase gap-2">
               <MapPin className="w-3 h-3" /> Location Settings
             </TabsTrigger>
@@ -169,38 +168,41 @@ export function SettingsPanel({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="locations" className="flex-1 flex flex-col gap-4 overflow-hidden outline-none m-0">
-            <div className="grid grid-cols-5 items-center gap-4 px-1">
-                <Label htmlFor="barangay-select" className="text-right col-span-1 text-xs font-black uppercase">
-                    Barangay
-                </Label>
-                <Select value={selectedBarangay?.name} onValueChange={(name) => setSelectedBarangay(allBarangays.find(b => b.name === name))}>
-                    <SelectTrigger className="col-span-3 h-9 text-xs" id="barangay-select">
-                        <SelectValue placeholder="Select a barangay" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {allBarangays.map(b => (
-                            <SelectItem key={b.name} value={b.name}>{b.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <Input 
-                    readOnly 
-                    value={selectedBarangay?.barangayCode || '---'} 
-                    className="h-9 bg-muted/50 text-center font-mono text-xs font-black"
-                />
+          <TabsContent value="locations" className="flex-1 flex flex-col gap-4 outline-none m-0 mt-2 min-h-0 overflow-hidden">
+            <div className="flex flex-col gap-4 px-1 shrink-0">
+                <div className="grid grid-cols-5 items-center gap-4">
+                    <Label htmlFor="barangay-select" className="text-right col-span-1 text-xs font-black uppercase">
+                        Barangay
+                    </Label>
+                    <Select value={selectedBarangay?.name} onValueChange={(name) => setSelectedBarangay(allBarangays.find(b => b.name === name))}>
+                        <SelectTrigger className="col-span-3 h-9 text-xs" id="barangay-select">
+                            <SelectValue placeholder="Select a barangay" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {allBarangays.map(b => (
+                                <SelectItem key={b.name} value={b.name}>{b.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Input 
+                        readOnly 
+                        value={selectedBarangay?.barangayCode || '---'} 
+                        className="h-9 bg-muted/50 text-center font-mono text-xs font-black"
+                    />
+                </div>
+                <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                        placeholder="Search section, filter, or location..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-9 h-9 text-xs"
+                    />
+                </div>
             </div>
-            <div className="relative px-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                    placeholder="Search section, filter, or location..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 h-9 text-xs"
-                />
-            </div>
-            <div className="flex-1 border rounded-md overflow-hidden flex flex-col bg-muted/20">
-              <div className="sticky top-0 bg-muted/80 backdrop-blur-sm p-4 border-b z-10">
+
+            <div className="flex-1 border rounded-md overflow-hidden flex flex-col bg-muted/20 min-h-0">
+              <div className="sticky top-0 bg-muted/80 backdrop-blur-sm p-4 border-b z-10 shrink-0">
                   <div className="grid grid-cols-12 gap-4 items-center">
                       <div className="col-span-2 text-[10px] font-black uppercase text-muted-foreground">Section</div>
                       <div className="col-span-3 text-[10px] font-black uppercase text-muted-foreground">Lot Filter</div>
@@ -246,15 +248,17 @@ export function SettingsPanel({
             </div>
           </TabsContent>
 
-          <TabsContent value="rates" className="flex-1 flex flex-col gap-4 outline-none m-0 overflow-hidden">
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 mb-2">
-              <p className="text-[11px] font-medium leading-relaxed text-muted-foreground">
-                <span className="font-black text-primary uppercase">Note:</span> These rates are applied globally across all records based on their <span className="font-bold">Actual Use (AU)</span> code. Assessment Levels determine what portion of Market Value is taxable.
-              </p>
+          <TabsContent value="rates" className="flex-1 flex flex-col gap-4 outline-none m-0 mt-2 min-h-0 overflow-hidden">
+            <div className="px-1 shrink-0">
+              <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+                <p className="text-[11px] font-medium leading-relaxed text-muted-foreground">
+                  <span className="font-black text-primary uppercase">Note:</span> These rates are applied globally across all records based on their <span className="font-bold">Actual Use (AU)</span> code. Assessment Levels determine what portion of Market Value is taxable.
+                </p>
+              </div>
             </div>
             
-            <div className="flex-1 border rounded-md overflow-hidden flex flex-col bg-muted/20">
-              <div className="sticky top-0 bg-muted/80 backdrop-blur-sm p-4 border-b z-10">
+            <div className="flex-1 border rounded-md overflow-hidden flex flex-col bg-muted/20 min-h-0">
+              <div className="sticky top-0 bg-muted/80 backdrop-blur-sm p-4 border-b z-10 shrink-0">
                   <div className="grid grid-cols-12 gap-6 items-center">
                       <div className="col-span-3 text-[10px] font-black uppercase text-muted-foreground">Usage Code (AU)</div>
                       <div className="col-span-4 text-[10px] font-black uppercase text-muted-foreground">Assessment Level (%)</div>
@@ -293,7 +297,7 @@ export function SettingsPanel({
           </TabsContent>
         </Tabs>
 
-        <SheetFooter className="pt-6 border-t mt-4">
+        <SheetFooter className="pt-6 border-t mt-4 shrink-0">
           <Button variant="outline" className="font-bold uppercase text-[10px]" onClick={() => onOpenChange(false)}>Discard Changes</Button>
           <Button className="font-black uppercase text-[10px] bg-primary hover:bg-emerald-800" onClick={handleSaveChanges}>
             Update Global Settings
