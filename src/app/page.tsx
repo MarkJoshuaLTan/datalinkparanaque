@@ -429,7 +429,7 @@ export default function Home() {
   return (
     <div className="h-screen bg-background flex flex-col font-body overflow-hidden" suppressHydrationWarning>
       <Dialog open={!userMode} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-2xl bg-card/95 backdrop-blur-3xl border-white/10 p-10 shadow-[0_0_100px_rgba(0,0,0,0.2)]">
+        <DialogContent hideClose className="sm:max-w-2xl bg-card/95 backdrop-blur-3xl border-white/10 p-10 shadow-[0_0_100px_rgba(0,0,0,0.2)]">
           <div className="flex flex-col items-center text-center gap-8">
              <div className="bg-primary/20 p-5 rounded-3xl shadow-inner border border-primary/20 animate-pulse">
                 <Layers className="text-primary w-12 h-12" />
