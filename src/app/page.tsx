@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -20,7 +21,8 @@ import {
   Layers,
   Zap,
   Cpu,
-  AlertTriangle
+  AlertTriangle,
+  ShieldCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -28,7 +30,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ImportZone } from '@/components/dashboard/import-zone';
 import { CalibrationSidebar } from '@/components/dashboard/calibration-sidebar';
 import { DataPreviewTable } from '@/components/dashboard/data-preview-table';
-import { LandRecord, CalibrationRule, processRecords, TaxRateMap } from '@/lib/processor';
+import { LandRecord, CalibrationRule, processRecords, TaxRateMap, ProcessingReport } from '@/lib/processor';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import * as XLSX from 'xlsx';
 import { SettingsPanel } from '@/components/dashboard/settings-panel';
@@ -36,6 +38,7 @@ import { BarangayConfig, initialLocationSettings } from '@/lib/locations';
 import { ModeToggle } from '@/components/mode-toggle';
 import { RecordDetailModal } from '@/components/dashboard/record-detail-modal';
 import { AboutModal } from '@/components/dashboard/about-modal';
+import { ProcessingReportModal } from '@/components/dashboard/processing-report-modal';
 import { Input } from '@/components/ui/input';
 import { 
   Select, 
@@ -59,6 +62,12 @@ import {
 } from '@/components/ui/dialog';
 import { Bar, BarChart, XAxis, YAxis, Cell, Pie, PieChart, Legend, CartesianGrid } from 'recharts';
 import { cn } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const LOCAL_STORAGE_KEY = 'paranaque_datalink_v31';
 
@@ -98,6 +107,8 @@ export default function Home() {
   const [viewMode, setViewMode] = useState<'results' | 'archive' | 'analytics'>('results');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [latestReport, setLatestReport] = useState<ProcessingReport | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [selectedRecord, setSelectedRecord] = useState<LandRecord | null>(null);
   const [isMarketDetailOpen, setIsMarketDetailOpen] = useState(false);
@@ -181,16 +192,17 @@ export default function Home() {
     setRawData(imported);
     setImportedFileName(fileName);
     setProcessedData([]);
+    setLatestReport(null);
     setViewMode('results');
     
     if (userMode === 'basic') {
-      runProcessWithData(imported, rawCount);
+      runProcessWithData(imported, rawCount, fileName);
     } else {
-      const { allWithDuplicateMarkers } = processRecords(imported, [], [], taxRates, {
+      const { allWithDuplicateMarkers, report } = processRecords(imported, [], [], taxRates, {
         removeDuplicates: false,
         applyCalibration: false,
         systemCleanup: false
-      });
+      }, fileName);
       setPreviewData(allWithDuplicateMarkers);
       updateStats(allWithDuplicateMarkers, rawCount);
       toast({
@@ -216,34 +228,36 @@ export default function Home() {
     });
   };
 
-  const runProcessWithData = async (data: LandRecord[], rawCount: number) => {
+  const runProcessWithData = async (data: LandRecord[], rawCount: number, fileName: string) => {
     setIsProcessing(true);
     const processOptions = userMode === 'basic' ? { removeDuplicates: true, applyCalibration: true, systemCleanup: true } : options;
-    const { processed, allWithDuplicateMarkers, duplicatesRemoved, cleanupCount } = processRecords(data, rules, locationSettings, taxRates, processOptions);
+    const { processed, allWithDuplicateMarkers, report } = processRecords(data, rules, locationSettings, taxRates, processOptions, fileName);
     setProcessedData(processed);
     setPreviewData(allWithDuplicateMarkers);
+    setLatestReport(report);
     updateStats(allWithDuplicateMarkers, rawCount);
     toast({
       title: "Processing Complete",
-      description: `Finalized ${processed.length} records. Found ${allWithDuplicateMarkers.filter(r => !r.isValid && !r.isCleanup && !r.isDuplicate).length} records with errors.`,
+      description: `Finalized ${processed.length} records. Found ${report.errorCount} records with errors.`,
     });
     setIsProcessing(false);
+    setTimeout(() => setIsReportOpen(true), 1200);
   };
 
   const runProcess = async () => {
     if (rawData.length === 0) return;
-    runProcessWithData(rawData, rawData.length);
+    runProcessWithData(rawData, rawData.length, importedFileName);
   };
 
   const handleSaveRecord = (updatedRecord: LandRecord) => {
     const newRawData = rawData.map(r => r.id === updatedRecord.id ? updatedRecord : r);
     setRawData(newRawData);
     if (userMode === 'basic' || processedData.length > 0) {
-      runProcessWithData(newRawData, newRawData.length);
+      runProcessWithData(newRawData, newRawData.length, importedFileName);
     } else {
       const { allWithDuplicateMarkers } = processRecords(newRawData, [], [], taxRates, {
         removeDuplicates: false, applyCalibration: false, systemCleanup: false
-      });
+      }, importedFileName);
       setPreviewData(allWithDuplicateMarkers);
       updateStats(allWithDuplicateMarkers, newRawData.length);
     }
@@ -400,16 +414,24 @@ export default function Home() {
       </Dialog>
 
       <header className="bg-card/80 backdrop-blur-lg border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-lg shrink-0 z-50">
-        <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-all active:scale-95 group" onClick={() => window.location.reload()}>
-          <div className="bg-primary/20 p-2 rounded-2xl shadow-inner border border-primary/20 group-hover:bg-primary/30 transition-colors"><Database className="text-primary w-6 h-6" /></div>
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-black tracking-tight leading-none flex items-center gap-1.5">
-              <span className="bg-gradient-to-br from-blue-600 via-emerald-500 to-green-400 bg-clip-text text-transparent drop-shadow-sm">DataLink</span>
-              <span className="text-[12px] bg-primary/10 text-primary border border-primary/30 px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm ml-1">Parañaque</span>
-            </h1>
-            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1.5 ml-0.5 opacity-60">Land Data Processor</p>
-          </div>
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-all active:scale-95 group" onClick={() => window.location.reload()}>
+                <div className="bg-primary/20 p-2 rounded-2xl shadow-inner border border-primary/20 group-hover:bg-primary/30 transition-colors"><Database className="text-primary w-6 h-6" /></div>
+                <div className="flex flex-col">
+                  <h1 className="text-2xl font-black tracking-tight leading-none flex items-center gap-1.5">
+                    <span className="bg-gradient-to-br from-blue-600 via-emerald-500 to-green-400 bg-clip-text text-transparent drop-shadow-sm">DataLink</span>
+                    <span className="text-[12px] bg-primary/10 text-primary border border-primary/30 px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm ml-1">Parañaque</span>
+                  </h1>
+                  <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1.5 ml-0.5 opacity-60">Land Data Processor</p>
+                </div>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Click to refresh and change mode</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
         <div className="flex items-center gap-1.5">
           {deferredPrompt && <Button variant="ghost" size="icon" onClick={handleInstallClick}><Download className="w-5 h-5" /></Button>}
           <Button variant="ghost" size="icon" onClick={toggleFullScreen}>{isFullScreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}</Button>
@@ -504,7 +526,7 @@ export default function Home() {
                             </SelectContent>
                           </Select>
                         )}
-                        <Button variant="ghost" size="sm" className="h-9 text-xs font-bold uppercase px-3" onClick={() => { setRawData([]); setProcessedData([]); setPreviewData([]); setSearchQuery(""); }}><Eraser className="w-3.5 h-3.5 mr-1" /> Clear</Button>
+                        <Button variant="ghost" size="sm" className="h-9 text-xs font-bold uppercase px-3" onClick={() => { setRawData([]); setProcessedData([]); setPreviewData([]); setSearchQuery(""); setLatestReport(null); }}><Eraser className="w-3.5 h-3.5 mr-1" /> Clear</Button>
                       </div>
                     )}
                   </div>
@@ -556,6 +578,11 @@ export default function Home() {
                   <div className="flex gap-2">
                     <Button variant="outline" onClick={() => handleExport('results')} size="sm" className="font-black uppercase text-xs tracking-widest border-primary/30 text-primary hover:bg-primary hover:text-white transition-all h-10 px-6" disabled={isExporting}><FileDown className="w-4 h-4 mr-2" /> {isExporting ? "..." : "Export Results"}</Button>
                     <Button variant="outline" onClick={() => handleExport('archive')} size="sm" className="font-black uppercase text-xs tracking-widest border-orange-500/30 text-orange-600 hover:bg-orange-600 hover:text-white transition-all h-10 px-6" disabled={isExporting}><Archive className="w-4 h-4 mr-2" /> {isExporting ? "..." : "Export Archive"}</Button>
+                    {latestReport && (
+                      <Button variant="outline" onClick={() => setIsReportOpen(true)} size="sm" className="font-black uppercase text-xs tracking-widest border-emerald-600/30 text-emerald-700 hover:bg-emerald-600 hover:text-white transition-all h-10 px-6">
+                        <ShieldCheck className="w-4 h-4 mr-2" /> Processing Report
+                      </Button>
+                    )}
                   </div>
                   {userMode === 'advanced' && (
                     <Button size="lg" className="bg-primary hover:bg-green-700 px-12 font-black uppercase tracking-widest text-xs shadow-2xl transition-all active:scale-95 h-10" disabled={isProcessing} onClick={runProcess}>{isProcessing ? "Processing..." : "Run Processor"}</Button>
@@ -579,6 +606,7 @@ export default function Home() {
 
       <SettingsPanel open={isSettingsOpen} onOpenChange={setIsSettingsOpen} locationSettings={locationSettings} onSettingsChange={setLocationSettings} taxRates={taxRates} onTaxRatesChange={setTaxRates} />
       <AboutModal open={isAboutOpen} onOpenChange={setIsAboutOpen} />
+      <ProcessingReportModal report={latestReport} open={isReportOpen} onOpenChange={setIsReportOpen} />
       <RecordDetailModal record={selectedRecord} open={!!selectedRecord} onOpenChange={(isOpen) => !isOpen && setSelectedRecord(null)} onSave={handleSaveRecord} />
       
       <Dialog open={isMarketDetailOpen} onOpenChange={setIsMarketDetailOpen}>

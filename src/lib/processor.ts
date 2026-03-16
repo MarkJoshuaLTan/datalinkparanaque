@@ -1,3 +1,4 @@
+
 import { BarangayConfig } from './locations';
 
 export interface TaxRateConfig {
@@ -42,6 +43,19 @@ export interface CalibrationRule {
   section?: string;
   unitValue?: number;
   overwrite: boolean;
+}
+
+export interface ProcessingReport {
+  timestamp: string;
+  fileName: string;
+  totalImported: number;
+  cleanupCount: number;
+  duplicatesDetected: number;
+  calibratedCount: number;
+  errorCount: number;
+  validCount: number;
+  totalMarketValue: number;
+  totalAssessedValue: number;
 }
 
 function lotMatchesPattern(lot: string, pattern: string): boolean {
@@ -159,12 +173,14 @@ export function processRecords(
     removeDuplicates: boolean;
     applyCalibration: boolean;
     systemCleanup: boolean;
-  }
+  },
+  fileName: string = "Unknown"
 ): {
   processed: LandRecord[];
   allWithDuplicateMarkers: LandRecord[];
   duplicatesRemoved: number;
   cleanupCount: number;
+  report: ProcessingReport;
 } {
   const arpCounts = new Map<string, number>();
   records.forEach(r => {
@@ -172,6 +188,8 @@ export function processRecords(
       arpCounts.set(r.arpNo, (arpCounts.get(r.arpNo) || 0) + 1);
     }
   });
+
+  let calibratedCount = 0;
 
   let result = records.map(r => {
     let isCleanup = false;
@@ -282,14 +300,18 @@ export function processRecords(
       let updated = { ...record };
       const matchingRule = rules.find(rule => matchesPinPattern(record.pin, rule.pinPattern));
       
+      let wasCalibrated = false;
+
       if (matchingRule) {
         const brgy = (matchingRule.barangay || "").trim();
         const sec = (matchingRule.section || "").trim();
         if (brgy || sec) {
           updated.location = `${brgy}${brgy && sec ? ', ' : ''}${sec}`.toUpperCase();
+          wasCalibrated = true;
         }
         if (matchingRule.unitValue !== undefined && !isNaN(matchingRule.unitValue) && matchingRule.unitValue > 0) {
           updated.unitValue = Math.round(matchingRule.unitValue);
+          wasCalibrated = true;
         }
       }
 
@@ -319,6 +341,7 @@ export function processRecords(
                   }
                   if (sectionSetting) {
                       updated.location = sectionSetting.location.toUpperCase();
+                      wasCalibrated = true;
                       if (sectionSetting.unitValue && sectionSetting.unitValue > 0) {
                           updated.unitValue = sectionSetting.unitValue;
                       }
@@ -327,6 +350,8 @@ export function processRecords(
           }
       }
       
+      if (wasCalibrated) calibratedCount++;
+
       if (updated.unitValue && updated.unitValue > 0 && updated.landArea > 0) {
           updated.marketValue = updated.landArea * updated.unitValue;
           updated.assessedValue = calculateAssessedValue(updated.marketValue, updated.au, taxRates);
@@ -336,10 +361,31 @@ export function processRecords(
     });
   }
 
+  const finalProcessed = result.filter(r => !r.isDuplicate && !r.isCleanup);
+  const errorCount = finalProcessed.filter(r => !r.isValid).length;
+  const validCount = finalProcessed.filter(r => r.isValid).length;
+
+  const totalMarket = finalProcessed.reduce((sum, r) => sum + (r.marketValue || 0), 0);
+  const totalAssessed = finalProcessed.reduce((sum, r) => sum + (r.assessedValue || 0), 0);
+
+  const report: ProcessingReport = {
+    timestamp: new Date().toLocaleString(),
+    fileName: fileName,
+    totalImported: records.length,
+    cleanupCount: cleanupCount,
+    duplicatesDetected: duplicatesCount,
+    calibratedCount: calibratedCount,
+    errorCount: errorCount,
+    validCount: validCount,
+    totalMarketValue: totalMarket,
+    totalAssessedValue: totalAssessed,
+  };
+
   return {
-    processed: result.filter(r => !r.isDuplicate && !r.isCleanup),
+    processed: finalProcessed,
     allWithDuplicateMarkers: result,
     duplicatesRemoved: duplicatesCount,
-    cleanupCount
+    cleanupCount,
+    report
   };
 }
