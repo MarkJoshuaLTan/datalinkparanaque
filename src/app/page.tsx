@@ -22,7 +22,8 @@ import {
   Zap,
   Cpu,
   AlertTriangle,
-  ShieldCheck
+  ShieldCheck,
+  FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -39,6 +40,7 @@ import { ModeToggle } from '@/components/mode-toggle';
 import { RecordDetailModal } from '@/components/dashboard/record-detail-modal';
 import { AboutModal } from '@/components/dashboard/about-modal';
 import { ProcessingReportModal } from '@/components/dashboard/processing-report-modal';
+import { AuditLogTab } from '@/components/dashboard/audit-log-tab';
 import { Input } from '@/components/ui/input';
 import { 
   Select, 
@@ -104,11 +106,11 @@ export default function Home() {
   const [exportSuccess, setExportSuccess] = useState(false);
   const [importedFileName, setImportedFileName] = useState<string>("");
   const [rules, setRules] = useState<CalibrationRule[]>([]);
-  const [viewMode, setViewMode] = useState<'results' | 'archive' | 'analytics'>('results');
+  const [viewMode, setViewMode] = useState<'results' | 'archive' | 'analytics' | 'audit'>('results');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
-  const [latestReport, setLatestReport] = useState<ProcessingReport | null>(null);
+  const [processingReports, setProcessingReports] = useState<ProcessingReport[]>([]);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [selectedRecord, setSelectedRecord] = useState<LandRecord | null>(null);
   const [isMarketDetailOpen, setIsMarketDetailOpen] = useState(false);
@@ -138,6 +140,8 @@ export default function Home() {
     totalRawRows: 0, systemCleanup: 0, totalImported: 0, duplicatesRemoved: 0,
     finalCount: 0, totalMarket: 0, totalAssessed: 0, totalErrors: 0
   });
+
+  const latestReport = processingReports[0] || null;
 
   useEffect(() => {
     setIsClient(true);
@@ -192,7 +196,6 @@ export default function Home() {
     setRawData(imported);
     setImportedFileName(fileName);
     setProcessedData([]);
-    setLatestReport(null);
     setViewMode('results');
     
     if (userMode === 'basic') {
@@ -234,14 +237,13 @@ export default function Home() {
     const { processed, allWithDuplicateMarkers, report } = processRecords(data, rules, locationSettings, taxRates, processOptions, fileName);
     setProcessedData(processed);
     setPreviewData(allWithDuplicateMarkers);
-    setLatestReport(report);
+    setProcessingReports(prev => [report, ...prev]);
     updateStats(allWithDuplicateMarkers, rawCount);
     toast({
       title: "Processing Complete",
-      description: `Finalized ${processed.length} records. Found ${report.errorCount} records with errors.`,
+      description: `Finalized ${processed.length} records. Found ${report.errorCount} records with errors. Check Audit Log for details.`,
     });
     setIsProcessing(false);
-    setTimeout(() => setIsReportOpen(true), 1200);
   };
 
   const runProcess = async () => {
@@ -491,8 +493,11 @@ export default function Home() {
                       <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-white h-9 text-xs font-bold px-4"><TableIcon className="w-3.5 h-3.5 mr-2" /> Results</TabsTrigger>
                       <TabsTrigger value="archive" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Archive className="w-3.5 h-3.5 mr-2" /> Archive / Duplicates</TabsTrigger>
                       {userMode === 'advanced' && <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><BarChart3 className="w-3.5 h-3.5 mr-2" /> Analytics</TabsTrigger>}
+                      {processingReports.length > 0 && (
+                        <TabsTrigger value="audit" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><ShieldCheck className="w-3.5 h-3.5 mr-2" /> Audit Log</TabsTrigger>
+                      )}
                     </TabsList>
-                    {viewMode !== 'analytics' && (
+                    {viewMode !== 'analytics' && viewMode !== 'audit' && (
                       <div className="flex flex-1 items-center gap-2 w-full max-w-2xl">
                         <div className="flex items-center gap-2 flex-1">
                           {userMode === 'advanced' && (
@@ -526,7 +531,7 @@ export default function Home() {
                             </SelectContent>
                           </Select>
                         )}
-                        <Button variant="ghost" size="sm" className="h-9 text-xs font-bold uppercase px-3" onClick={() => { setRawData([]); setProcessedData([]); setPreviewData([]); setSearchQuery(""); setLatestReport(null); }}><Eraser className="w-3.5 h-3.5 mr-1" /> Clear</Button>
+                        <Button variant="ghost" size="sm" className="h-9 text-xs font-bold uppercase px-3" onClick={() => { setRawData([]); setProcessedData([]); setPreviewData([]); setSearchQuery(""); setProcessingReports([]); }}><Eraser className="w-3.5 h-3.5 mr-1" /> Clear</Button>
                       </div>
                     )}
                   </div>
@@ -572,6 +577,9 @@ export default function Home() {
                         </div>
                       </TabsContent>
                     )}
+                    <TabsContent value="audit" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col">
+                      <AuditLogTab reports={processingReports} />
+                    </TabsContent>
                   </div>
                 </Card>
                 <div className="flex items-center justify-between bg-card p-4 rounded-xl shadow-2xl border border-white/10 shrink-0">
