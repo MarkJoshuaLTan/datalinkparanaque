@@ -8,12 +8,64 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { LandRecord, validateRecord } from '@/lib/processor';
+import { LandRecord, validateRecord, ValidationError } from '@/lib/processor';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Save, Edit3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+interface EditableItemProps {
+  label: string;
+  field: keyof LandRecord;
+  value: any;
+  isMono?: boolean;
+  type?: string;
+  errors?: ValidationError[];
+  onChange: (field: keyof LandRecord, value: any) => void;
+}
+
+const EditableItem = ({ 
+  label, 
+  field, 
+  value, 
+  isMono = false, 
+  type = "text", 
+  errors, 
+  onChange 
+}: EditableItemProps) => {
+  const hasError = errors?.some(e => e.field === field);
+  return (
+    <div className="space-y-2">
+      <label className="text-[12px] font-black text-muted-foreground uppercase tracking-widest leading-none flex items-center gap-1.5">
+        {label}
+        {hasError && <AlertTriangle className="w-3 h-3 text-red-500" />}
+      </label>
+      <Input 
+        type={type}
+        value={value ?? ''}
+        onChange={(e) => onChange(field, e.target.value)}
+        className={cn(
+          "h-10 text-sm font-bold",
+          isMono && "font-mono",
+          hasError && "border-red-500 bg-red-500/5 focus-visible:ring-red-500"
+        )}
+      />
+      {hasError && (
+        <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">
+          {errors?.find(e => e.field === field)?.message}
+        </p>
+      )}
+    </div>
+  );
+};
+
+const StaticItem = ({ label, value, isMono = false }: { label: string; value: string; isMono?: boolean }) => (
+  <div className="space-y-1">
+    <p className="text-[12px] font-black text-muted-foreground uppercase tracking-widest">{label}</p>
+    <p className={cn("text-sm font-black truncate", isMono && "font-mono")}>{value}</p>
+  </div>
+);
 
 interface RecordDetailModalProps {
   record: LandRecord | null;
@@ -94,40 +146,6 @@ export function RecordDetailModal({ record, open, onOpenChange, onSave }: Record
     );
   };
 
-  const EditableItem = ({ label, field, value, isMono = false, type = "text" }: { label: string; field: keyof LandRecord; value: any; isMono?: boolean; type?: string }) => {
-    const hasError = editedRecord.errors?.some(e => e.field === field);
-    return (
-      <div className="space-y-2">
-        <label className="text-[12px] font-black text-muted-foreground uppercase tracking-widest leading-none flex items-center gap-1.5">
-          {label}
-          {hasError && <AlertTriangle className="w-3 h-3 text-red-500" />}
-        </label>
-        <Input 
-          type={type}
-          value={value ?? ''}
-          onChange={(e) => handleInputChange(field, e.target.value)}
-          className={cn(
-            "h-10 text-sm font-bold",
-            isMono && "font-mono",
-            hasError && "border-red-500 bg-red-500/5 focus-visible:ring-red-500"
-          )}
-        />
-        {hasError && (
-          <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">
-            {editedRecord.errors?.find(e => e.field === field)?.message}
-          </p>
-        )}
-      </div>
-    );
-  };
-
-  const StaticItem = ({ label, value, isMono = false }: { label: string; value: string; isMono?: boolean }) => (
-    <div className="space-y-1">
-      <p className="text-[12px] font-black text-muted-foreground uppercase tracking-widest">{label}</p>
-      <p className={cn("text-sm font-black truncate", isMono && "font-mono")}>{value}</p>
-    </div>
-  );
-
   const isZeroArea = editedRecord.landArea === 0 && editedRecord.pin && editedRecord.arpNo;
 
   return (
@@ -173,15 +191,15 @@ export function RecordDetailModal({ record, open, onOpenChange, onSave }: Record
                    <div className="w-1.5 h-3.5 bg-primary rounded-full" /> Primary Identity
                  </h4>
                  <div className="grid grid-cols-1 gap-4">
-                    <EditableItem label="Account Name" field="acctName" value={editedRecord.acctName} />
+                    <EditableItem label="Account Name" field="acctName" value={editedRecord.acctName} errors={editedRecord.errors} onChange={handleInputChange} />
                     <div className="grid grid-cols-2 gap-4">
-                      <EditableItem label="PIN Number" field="pin" value={editedRecord.pin} isMono />
-                      <EditableItem label="ARP No#" field="arpNo" value={editedRecord.arpNo} isMono />
+                      <EditableItem label="PIN Number" field="pin" value={editedRecord.pin} errors={editedRecord.errors} onChange={handleInputChange} isMono />
+                      <EditableItem label="ARP No#" field="arpNo" value={editedRecord.arpNo} errors={editedRecord.errors} onChange={handleInputChange} isMono />
                     </div>
-                    <EditableItem label="Address" field="address" value={editedRecord.address} />
+                    <EditableItem label="Address" field="address" value={editedRecord.address} errors={editedRecord.errors} onChange={handleInputChange} />
                     <div className="grid grid-cols-2 gap-4">
-                      <EditableItem label="Date" field="date" value={editedRecord.date} />
-                      <EditableItem label="Update Code" field="update" value={editedRecord.update} />
+                      <EditableItem label="Date" field="date" value={editedRecord.date} errors={editedRecord.errors} onChange={handleInputChange} />
+                      <EditableItem label="Update Code" field="update" value={editedRecord.update} errors={editedRecord.errors} onChange={handleInputChange} />
                     </div>
                  </div>
               </div>
@@ -193,9 +211,9 @@ export function RecordDetailModal({ record, open, onOpenChange, onSave }: Record
                 <div className="grid grid-cols-1 gap-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className={cn("rounded-xl transition-all", isZeroArea && "bg-red-500/5 p-2 ring-1 ring-red-500/30")}>
-                        <EditableItem label="Land Area (sqm)" field="landArea" value={editedRecord.landArea} isMono type="number" />
+                        <EditableItem label="Land Area (sqm)" field="landArea" value={editedRecord.landArea} errors={editedRecord.errors} onChange={handleInputChange} isMono type="number" />
                       </div>
-                      <EditableItem label="Unit Value (₱)" field="unitValue" value={editedRecord.unitValue} isMono type="number" />
+                      <EditableItem label="Unit Value (₱)" field="unitValue" value={editedRecord.unitValue} errors={editedRecord.errors} onChange={handleInputChange} isMono type="number" />
                     </div>
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                       <StaticItem label="Location" value={editedRecord.location || 'Pending Calibration'} />
