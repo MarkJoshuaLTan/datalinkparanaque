@@ -109,7 +109,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick }: Data
               const isZeroArea = row.landArea === 0 && row.pin && row.arpNo;
               return (
                 <TableRow 
-                  key={row.id || i}
+                  key={row.id}
                   onClick={() => onRowClick(row)}
                   className={cn(
                     "border-b transition-all duration-200 ease-in-out hover:scale-[1.01] hover:shadow-2xl hover:relative hover:z-20 hover:!bg-card/90 hover:backdrop-blur-sm cursor-pointer",

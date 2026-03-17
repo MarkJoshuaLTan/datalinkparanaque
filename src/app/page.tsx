@@ -283,17 +283,20 @@ export default function Home() {
 
   const runProcessWithData = async (data: LandRecord[], rawCount: number, fileName: string) => {
     setIsProcessing(true);
-    const processOptions = userMode === 'fast' ? { removeDuplicates: true, applyCalibration: true, systemCleanup: true } : options;
-    const { processed, allWithDuplicateMarkers, report } = processRecords(data, rules, locationSettings, taxRates, processOptions, fileName);
-    setProcessedData(processed);
-    setPreviewData(allWithDuplicateMarkers);
-    setProcessingReports(prev => [report, ...prev]);
-    updateStats(allWithDuplicateMarkers, rawCount);
     
-    setProcessSuccess(true);
-    setTimeout(() => setProcessSuccess(false), 2500);
-
-    setIsProcessing(false);
+    // Wrap heavy processing in a timeout to let UI update (show loader/isProcessing state)
+    setTimeout(() => {
+      const processOptions = userMode === 'fast' ? { removeDuplicates: true, applyCalibration: true, systemCleanup: true } : options;
+      const { processed, allWithDuplicateMarkers, report } = processRecords(data, rules, locationSettings, taxRates, processOptions, fileName);
+      setProcessedData(processed);
+      setPreviewData(allWithDuplicateMarkers);
+      setProcessingReports(prev => [report, ...prev]);
+      updateStats(allWithDuplicateMarkers, rawCount);
+      
+      setProcessSuccess(true);
+      setTimeout(() => setProcessSuccess(false), 2500);
+      setIsProcessing(false);
+    }, 10);
   };
 
   const runProcess = async () => {
@@ -304,33 +307,45 @@ export default function Home() {
   const handleSaveRecord = (updatedRecord: LandRecord) => {
     const newRawData = rawData.map(r => r.id === updatedRecord.id ? updatedRecord : r);
     setRawData(newRawData);
-    if (userMode === 'fast' || processedData.length > 0) {
-      runProcessWithData(newRawData, newRawData.length, importedFileName);
-    } else {
-      const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, {
-        removeDuplicates: false, applyCalibration: false, systemCleanup: false
-      }, importedFileName);
-      setPreviewData(allWithDuplicateMarkers);
-      updateStats(allWithDuplicateMarkers, newRawData.length);
-    }
+    
+    // Immediately close modal
     setSelectedRecord(null);
-    toast({ title: "Record Saved", description: "The property record has been updated and re-validated." });
+
+    // Defer processing to prevent UI hang
+    setTimeout(() => {
+      if (userMode === 'fast' || processedData.length > 0) {
+        runProcessWithData(newRawData, newRawData.length, importedFileName);
+      } else {
+        const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, {
+          removeDuplicates: false, applyCalibration: false, systemCleanup: false
+        }, importedFileName);
+        setPreviewData(allWithDuplicateMarkers);
+        updateStats(allWithDuplicateMarkers, newRawData.length);
+      }
+      toast({ title: "Record Saved", description: "The property record has been updated and re-validated." });
+    }, 50);
   };
 
   const handleDeleteRecord = (recordId: string) => {
     const newRawData = rawData.filter(r => r.id !== recordId);
     setRawData(newRawData);
-    if (userMode === 'fast' || processedData.length > 0) {
-      runProcessWithData(newRawData, newRawData.length, importedFileName);
-    } else {
-      const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, {
-        removeDuplicates: false, applyCalibration: false, systemCleanup: false
-      }, importedFileName);
-      setPreviewData(allWithDuplicateMarkers);
-      updateStats(allWithDuplicateMarkers, newRawData.length);
-    }
+    
+    // Immediately close modal
     setSelectedRecord(null);
-    toast({ variant: "destructive", title: "Record Deleted", description: "The property record has been permanently removed from the batch." });
+
+    // Defer heavy data processing to prevent the browser from hanging while modal is closing
+    setTimeout(() => {
+      if (userMode === 'fast' || processedData.length > 0) {
+        runProcessWithData(newRawData, newRawData.length, importedFileName);
+      } else {
+        const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, {
+          removeDuplicates: false, applyCalibration: false, systemCleanup: false
+        }, importedFileName);
+        setPreviewData(allWithDuplicateMarkers);
+        updateStats(allWithDuplicateMarkers, newRawData.length);
+      }
+      toast({ variant: "destructive", title: "Record Deleted", description: "The property record has been permanently removed from the batch." });
+    }, 50);
   };
 
   const handleArchiveRecord = (record: LandRecord) => {

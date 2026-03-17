@@ -173,8 +173,12 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
       const pin = String(norm['pin'] || '').trim();
       const arpNo = String(norm['arp no#'] || norm['arp no'] || norm['current'] || '').trim();
 
+      // Use a stable, truly unique ID instead of relying on array index
+      // This prevents React from re-rendering the whole list when one item is deleted
+      const uniqueId = `${fileName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
       return {
-        id: `${fileName}-${index}-${pin}-${arpNo}`,
+        id: uniqueId,
         date: String(norm['date'] || norm['effectivity'] || '').trim(),
         arpNo: arpNo,
         pin: pin,
