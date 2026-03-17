@@ -219,8 +219,8 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
         {isLoading && (
           <div className="absolute inset-0 z-50 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
             <Loader2 className="w-14 h-14 text-primary animate-spin mb-6" />
-            <h3 className="text-2xl font-black text-emerald-900 dark:text-emerald-400">Processing Batch...</h3>
-            <p className="text-base text-muted-foreground font-semibold">Consolidating your selected files.</p>
+            <h3 className="text-2xl font-black text-emerald-900 dark:text-emerald-400">Processing Data...</h3>
+            <p className="text-base text-muted-foreground font-semibold">Preparing your records for review.</p>
           </div>
         )}
 
@@ -243,9 +243,9 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
             <div className="bg-primary/10 p-6 rounded-full mb-8">
               <Upload className="w-12 h-12 text-primary" />
             </div>
-            <h3 className="text-3xl font-black mb-4 text-emerald-900 dark:text-emerald-400">Batch Import Data</h3>
+            <h3 className="text-3xl font-black mb-4 text-emerald-900 dark:text-emerald-400">Import Land Records</h3>
             <p className="text-muted-foreground mb-10 max-w-md text-base font-semibold leading-relaxed">
-              Drag multiple Excel files here or click below to select documents for review.
+              Drag and drop one or more Excel files here, or click below to select documents for review.
             </p>
             <Button 
               size="lg" 
@@ -253,7 +253,7 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading}
             >
-              <FileSpreadsheet className="mr-3 h-5 w-5" /> Select Files to Review
+              <FileSpreadsheet className="mr-3 h-5 w-5" /> Select Files to Import
             </Button>
           </>
         ) : (
@@ -265,7 +265,7 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
                   </div>
                   <div className="text-left">
                     <h4 className="text-xl font-black uppercase tracking-tight leading-none">Ready for Import</h4>
-                    <p className="text-xs font-bold text-muted-foreground mt-1.5 uppercase tracking-widest">{stagedFiles.length} Documents Selected</p>
+                    <p className="text-xs font-bold text-muted-foreground mt-1.5 uppercase tracking-widest">{stagedFiles.length} {stagedFiles.length === 1 ? 'Document' : 'Documents'} Selected</p>
                   </div>
                </div>
                <div className="flex gap-2">
@@ -301,7 +301,7 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
               onClick={handleStartImport}
               disabled={isLoading}
             >
-              <CheckCircle2 className="mr-3 h-6 w-6" /> Process {stagedFiles.length} Files Now
+              <CheckCircle2 className="mr-3 h-6 w-6" /> Process Selected Data
             </Button>
           </div>
         )}
@@ -309,10 +309,10 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
         <div className="w-full bg-muted/30 rounded-2xl p-8 border border-white/5 text-left mt-10">
           <div className="flex items-center gap-3 mb-5">
             <Info className="w-5 h-5 text-primary" />
-            <h4 className="text-sm font-black uppercase tracking-widest text-emerald-900 dark:text-emerald-400">Excel Header Mapping</h4>
+            <h4 className="text-sm font-black uppercase tracking-widest text-emerald-900 dark:text-emerald-400">Data Guidelines</h4>
           </div>
           <p className="text-sm text-muted-foreground font-semibold leading-relaxed">
-            Standard Parañaque Header format expected. Columns like PIN, ARP NO#, ACCTNAME, and LAND AREA will be mapped automatically across all files in the batch.
+            Standard Parañaque Header format expected. Key columns (PIN, ARP NO#, ACCTNAME) will be automatically extracted and validated. You can upload files individually or in batches.
           </p>
         </div>
       </Card>
