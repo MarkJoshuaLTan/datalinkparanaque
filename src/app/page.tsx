@@ -107,7 +107,7 @@ const analyticsChartConfig = {
 export default function Home() {
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const [userMode, setUserMode] = useState<'basic' | 'advanced' | null>(null);
+  const [userMode, setUserMode] = useState<'fast' | 'full' | null>(null);
   const [rawData, setRawData] = useState<LandRecord[]>([]);
   const [previewData, setPreviewData] = useState<LandRecord[]>([]);
   const [processedData, setProcessedData] = useState<LandRecord[]>([]);
@@ -244,7 +244,7 @@ export default function Home() {
     setBarangayFilter('all');
     setIsImportDialogOpen(false);
     
-    if (userMode === 'basic') {
+    if (userMode === 'fast') {
       runProcessWithData(newData, newCount, newFileName);
     } else {
       const { allWithDuplicateMarkers } = processRecords(newData, [], locationSettings, taxRates, {
@@ -281,7 +281,7 @@ export default function Home() {
 
   const runProcessWithData = async (data: LandRecord[], rawCount: number, fileName: string) => {
     setIsProcessing(true);
-    const processOptions = userMode === 'basic' ? { removeDuplicates: true, applyCalibration: true, systemCleanup: true } : options;
+    const processOptions = userMode === 'fast' ? { removeDuplicates: true, applyCalibration: true, systemCleanup: true } : options;
     const { processed, allWithDuplicateMarkers, report } = processRecords(data, rules, locationSettings, taxRates, processOptions, fileName);
     setProcessedData(processed);
     setPreviewData(allWithDuplicateMarkers);
@@ -302,7 +302,7 @@ export default function Home() {
   const handleSaveRecord = (updatedRecord: LandRecord) => {
     const newRawData = rawData.map(r => r.id === updatedRecord.id ? updatedRecord : r);
     setRawData(newRawData);
-    if (userMode === 'basic' || processedData.length > 0) {
+    if (userMode === 'fast' || processedData.length > 0) {
       runProcessWithData(newRawData, newRawData.length, importedFileName);
     } else {
       const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, {
@@ -379,16 +379,12 @@ export default function Home() {
   };
 
   const handleExportClick = (type: 'results' | 'archive') => {
-    // respect filters
     const currentList = filteredDisplayData;
-
     if (currentList.length === 0) {
       toast({ variant: "destructive", title: "Export Failed", description: "No records found to export." });
       return;
     }
-
     const uniqueSources = Array.from(new Set(currentList.map(r => r.sourceFile).filter(Boolean)));
-    
     if (uniqueSources.length > 1) {
       setCurrentExportType(type);
       setIsBatchExportDialogOpen(true);
@@ -400,10 +396,7 @@ export default function Home() {
   const executeExport = async (type: 'results' | 'archive', mode: 'merged' | 'separate', specificFile?: string) => {
     setIsExporting(true);
     if (!specificFile) setIsBatchExportDialogOpen(false);
-
-    // respect filters
     const currentList = filteredDisplayData;
-
     try {
       if (mode === 'merged') {
         await performExcelExport(currentList, type);
@@ -446,7 +439,7 @@ export default function Home() {
       const query = searchQuery.toLowerCase();
       let matchesSearch = true;
       if (query) {
-        if (searchField === 'all' || userMode === 'basic') {
+        if (searchField === 'all' || userMode === 'fast') {
           matchesSearch = record.acctName?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || record.arpNo?.toLowerCase().includes(query) || record.location?.toLowerCase().includes(query) || record.au?.toLowerCase().includes(query) || record.sourceFile?.toLowerCase().includes(query);
         } else {
           const value = record[searchField as keyof LandRecord];
@@ -465,7 +458,6 @@ export default function Home() {
 
   const analyticsData = useMemo(() => {
     const activeData = processedData.length > 0 ? processedData : previewData.filter(r => !r.isCleanup && !r.isDuplicate);
-    // Apply filters to analytics as well
     const filteredActiveData = activeData.filter(record => {
       if (sourceFileFilter !== 'all' && record.sourceFile !== sourceFileFilter) return false;
       if (barangayFilter !== 'all' && record.barangayName !== barangayFilter) return false;
@@ -582,24 +574,27 @@ export default function Home() {
              </div>
              <div className="space-y-3">
                <DialogTitle className="text-4xl font-black bg-gradient-to-br from-blue-600 via-emerald-500 to-green-400 bg-clip-text text-transparent uppercase tracking-tighter">Select Workflow Mode</DialogTitle>
-               <DialogDescription className="text-lg font-bold text-muted-foreground">Choose how you want to interact with Data Link Parañaque.</DialogDescription>
+               <DialogDescription className="text-lg font-bold text-muted-foreground">Choose your processing strategy for Parañaque City land records.</DialogDescription>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                <Card className="p-8 border-2 border-transparent hover:border-primary transition-all cursor-pointer group flex flex-col items-center text-center gap-6 shadow-xl" onClick={() => setUserMode('basic')}>
-                  <div className="bg-primary/10 p-5 rounded-2xl group-hover:scale-110 transition-transform"><Zap className="w-10 h-10 text-primary" /></div>
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-black uppercase tracking-tight">Basic Mode</h3>
-                    <p className="text-sm font-bold text-muted-foreground leading-relaxed">Instant batch processing. Just upload multiple files and export. Automates cleanup.</p>
+                <Card className="p-8 border-2 border-primary bg-primary/5 transition-all cursor-pointer group flex flex-col items-center text-center gap-6 shadow-xl ring-2 ring-primary/20" onClick={() => setUserMode('full')}>
+                  <div className="bg-primary/10 p-5 rounded-2xl group-hover:scale-110 transition-transform relative">
+                    <Cpu className="w-10 h-10 text-primary" />
+                    <Badge className="absolute -top-3 -right-3 bg-primary text-white font-black text-[9px] uppercase tracking-widest px-2 py-1 shadow-lg border-white">RECOMMENDED</Badge>
                   </div>
-                  <Button className="w-full h-12 font-black uppercase text-xs tracking-widest bg-primary hover:bg-emerald-800">Start Fast</Button>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-black uppercase tracking-tight text-primary">Full Control Mode</h3>
+                    <p className="text-xs font-bold text-muted-foreground leading-relaxed">Recommended for official audits. Manual calibration, deep reviews, and advanced settings.</p>
+                  </div>
+                  <Button className="w-full h-12 font-black uppercase text-xs tracking-widest bg-primary hover:bg-emerald-800 shadow-lg">Start Audit-Ready</Button>
                 </Card>
-                <Card className="p-8 border-2 border-transparent hover:border-blue-600 transition-all cursor-pointer group flex flex-col items-center text-center gap-6 shadow-xl" onClick={() => setUserMode('advanced')}>
-                  <div className="bg-blue-600/10 p-5 rounded-2xl group-hover:scale-110 transition-transform"><Cpu className="w-10 h-10 text-blue-600" /></div>
+                <Card className="p-8 border-2 border-transparent hover:border-slate-400 transition-all cursor-pointer group flex flex-col items-center text-center gap-6 shadow-md opacity-80 hover:opacity-100" onClick={() => setUserMode('fast')}>
+                  <div className="bg-slate-400/10 p-5 rounded-2xl group-hover:scale-110 transition-transform"><Zap className="w-10 h-10 text-slate-500" /></div>
                   <div className="space-y-2">
-                    <h3 className="text-xl font-black uppercase tracking-tight">Advanced Mode</h3>
-                    <p className="text-sm font-bold text-muted-foreground leading-relaxed">Full manual control. Adjust batch settings, review separate files, and custom calibrate.</p>
+                    <h3 className="text-xl font-black uppercase tracking-tight">Fast Mode</h3>
+                    <p className="text-xs font-bold text-muted-foreground leading-relaxed">Instant processing for quick cleanup and bulk exports without manual fine-tuning.</p>
                   </div>
-                  <Button variant="outline" className="w-full h-12 font-black uppercase text-xs tracking-widest border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">Full Control</Button>
+                  <Button variant="outline" className="w-full h-12 font-black uppercase text-xs tracking-widest border-slate-300 text-slate-600 hover:bg-slate-100">Quick Start</Button>
                 </Card>
              </div>
           </div>
@@ -630,12 +625,12 @@ export default function Home() {
           <Button variant="ghost" size="icon" onClick={toggleFullScreen}>{isFullScreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}</Button>
           <Button variant="ghost" size="icon" onClick={() => setIsAboutOpen(true)}><Info className="w-5 h-5" /></Button>
           <ModeToggle />
-          {userMode === 'advanced' && <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}><Settings className="w-5 h-5" /></Button>}
+          {userMode === 'full' && <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}><Settings className="w-5 h-5" /></Button>}
         </div>
       </header>
 
       <div className="flex-1 flex overflow-hidden">
-        {userMode === 'advanced' && (
+        {userMode === 'full' && (
           <aside className="w-[280px] border-r bg-card/80 backdrop-blur-lg border-white/10 p-6 overflow-y-auto hidden lg:block shadow-[1px_0_5px_rgba(0,0,0,0.02)]">
             <CalibrationSidebar rules={rules} setRules={setRules} options={options} setOptions={setOptions} exportColumns={exportColumns} setExportColumns={setExportColumns} />
           </aside>
@@ -652,34 +647,18 @@ export default function Home() {
                     {statDefinitions.map((stat, i) => (
                       <Popover key={i}>
                         <PopoverTrigger asChild>
-                          <Card 
-                            className={cn(
-                              "p-4 border-l-4 flex flex-col shadow-sm cursor-help transition-all hover:scale-[1.03] active:scale-95 hover:shadow-md",
-                              stat.color
-                            )}
-                          >
-                            <div className="text-[11px] font-bold text-muted-foreground uppercase flex items-center gap-1.5 mb-1.5 tracking-wide">
-                              <stat.icon className="w-3 h-3" /> {stat.label}
-                            </div>
-                            <div className={cn("font-black leading-tight", stat.textClass || "text-foreground", getDynamicFontSize(stat.value))}>
-                              {stat.value}
-                            </div>
+                          <Card className={cn("p-4 border-l-4 flex flex-col shadow-sm cursor-help transition-all hover:scale-[1.03] active:scale-95 hover:shadow-md", stat.color)}>
+                            <div className="text-[11px] font-bold text-muted-foreground uppercase flex items-center gap-1.5 mb-1.5 tracking-wide"><stat.icon className="w-3 h-3" /> {stat.label}</div>
+                            <div className={cn("font-black leading-tight", stat.textClass || "text-foreground", getDynamicFontSize(stat.value))}>{stat.value}</div>
                           </Card>
                         </PopoverTrigger>
                         <PopoverContent className="w-80 p-5 bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl rounded-2xl">
                           <div className="space-y-3">
                             <div className="flex items-center gap-2">
-                              <div className={cn("p-1.5 rounded-lg bg-primary/10", stat.textClass)}>
-                                <stat.icon className="w-4 h-4" />
-                              </div>
+                              <div className={cn("p-1.5 rounded-lg bg-primary/10", stat.textClass)}><stat.icon className="w-4 h-4" /></div>
                               <h4 className="font-black uppercase text-xs tracking-widest">{stat.label}</h4>
                             </div>
-                            <p className="text-sm font-bold text-muted-foreground leading-relaxed">
-                              {stat.definition}
-                            </p>
-                            <div className="flex items-center gap-1.5 pt-2 text-[10px] font-black text-primary uppercase tracking-tighter opacity-70">
-                              <HelpCircle className="w-3 h-3" /> Data Processor Logic
-                            </div>
+                            <p className="text-sm font-bold text-muted-foreground leading-relaxed">{stat.definition}</p>
                           </div>
                         </PopoverContent>
                       </Popover>
@@ -691,14 +670,14 @@ export default function Home() {
                   <div className="p-3 bg-muted/30 border-b flex flex-col xl:flex-row items-center justify-between gap-4 shrink-0">
                     <TabsList className="bg-background border">
                       <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-white h-9 text-xs font-bold px-4"><TableIcon className="w-3.5 h-3.5 mr-2" /> Results</TabsTrigger>
-                      <TabsTrigger value="archive" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Archive className="w-3.5 h-3.5 mr-2" /> Archive / Duplicates</TabsTrigger>
-                      {userMode === 'advanced' && <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><BarChart3 className="w-3.5 h-3.5 mr-2" /> Analytics</TabsTrigger>}
+                      <TabsTrigger value="archive" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Archive className="w-3.5 h-3.5 mr-2" /> Archive</TabsTrigger>
+                      {userMode === 'full' && <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><BarChart3 className="w-3.5 h-3.5 mr-2" /> Analytics</TabsTrigger>}
                       <TabsTrigger value="audit" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><ShieldCheck className="w-3.5 h-3.5 mr-2" /> Audit Log</TabsTrigger>
                     </TabsList>
                     {viewMode !== 'analytics' && viewMode !== 'audit' && (
                       <div className="flex flex-1 items-center gap-2 w-full max-w-[900px]">
                         <div className="flex items-center gap-2 flex-1">
-                          {userMode === 'advanced' && (
+                          {userMode === 'full' && (
                             <Select value={searchField} onValueChange={setSearchField}>
                               <SelectTrigger className="w-[120px] h-9 text-xs font-bold uppercase"><SelectValue placeholder="In" /></SelectTrigger>
                               <SelectContent>
@@ -707,13 +686,12 @@ export default function Home() {
                                 <SelectItem value="arpNo">ARP No#</SelectItem>
                                 <SelectItem value="pin">PIN</SelectItem>
                                 <SelectItem value="acctName">Account</SelectItem>
-                                <SelectItem value="sourceFile">Source File</SelectItem>
                               </SelectContent>
                             </Select>
                           )}
                           <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input placeholder={`Search property records or file names...`} className="pl-9 text-sm h-9" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                            <Input placeholder={`Search property records...`} className="pl-9 text-sm h-9" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                           </div>
                         </div>
                         {uniqueBarangays.length > 1 && (
@@ -738,15 +716,13 @@ export default function Home() {
                             </SelectContent>
                           </Select>
                         )}
-                        {userMode === 'advanced' && (
+                        {userMode === 'full' && (
                           <Select value={statusFilter} onValueChange={setStatusFilter}>
                             <SelectTrigger className="w-24 h-9 text-xs font-bold uppercase"><Filter className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="Status" /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="all">All</SelectItem>
                               <SelectItem value="valid">Valid</SelectItem>
                               <SelectItem value="error">Errors</SelectItem>
-                              <SelectItem value="duplicate">Duplicates</SelectItem>
-                              <SelectItem value="cleanup">Cleanup</SelectItem>
                             </SelectContent>
                           </Select>
                         )}
@@ -763,7 +739,7 @@ export default function Home() {
                     <TabsContent value="archive" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col">
                       <DataPreviewTable data={filteredDisplayData} isProcessed={true} onRowClick={handleRowClick} />
                     </TabsContent>
-                    {userMode === 'advanced' && (
+                    {userMode === 'full' && (
                       <TabsContent value="analytics" className="m-0 h-full p-6 overflow-y-auto scrollbar-vertical-custom bg-muted/5 data-[state=active]:flex data-[state=active]:flex-col">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10 max-w-7xl mx-auto w-full">
                           <Card className="p-6 border-white/5 bg-card shadow-2xl overflow-hidden group">
@@ -814,7 +790,7 @@ export default function Home() {
                     )}
                     <Button variant="ghost" size="sm" className="h-10 text-xs font-bold uppercase px-3" onClick={clearWorkspace}><Eraser className="w-3.5 h-3.5 mr-1" /> Clear Session</Button>
                   </div>
-                  {userMode === 'advanced' && viewMode !== 'audit' && (
+                  {userMode === 'full' && viewMode !== 'audit' && (
                     <Button size="lg" className="bg-primary hover:bg-green-700 px-12 font-black uppercase tracking-widest text-xs shadow-2xl transition-all active:scale-95 h-10" disabled={isProcessing} onClick={runProcess}>{isProcessing ? "Processing Batch..." : "Run Batch Processor"}</Button>
                   )}
                   {viewMode === 'audit' && (
@@ -854,42 +830,26 @@ export default function Home() {
           <div className="my-6 space-y-6">
             <div className="space-y-3">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Consolidated Export</h4>
-              <Button 
-                variant="outline" 
-                className="w-full h-auto flex items-center justify-between p-4 border-2 border-primary/20 hover:border-primary hover:bg-primary/5 group transition-all"
-                onClick={() => executeExport(currentExportType, 'merged')}
-              >
+              <Button variant="outline" className="w-full h-auto flex items-center justify-between p-4 border-2 border-primary/20 hover:border-primary hover:bg-primary/5 group transition-all" onClick={() => executeExport(currentExportType, 'merged')}>
                 <div className="flex flex-col items-start gap-1">
-                  <div className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-primary">
-                    <FileDown className="w-4 h-4" /> Single Master File
-                  </div>
+                  <div className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-primary"><FileDown className="w-4 h-4" /> Single Master File</div>
                   <span className="text-[10px] font-bold text-muted-foreground group-hover:text-primary/70">Combine filtered records into one master spreadsheet</span>
                 </div>
                 <Zap className="w-5 h-5 text-primary opacity-30 group-hover:opacity-100" />
               </Button>
             </div>
-
             <div className="space-y-3">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Export Individual Documents</h4>
               <div className="p-4 bg-muted/20 border rounded-xl space-y-2 max-h-[200px] overflow-y-auto scrollbar-vertical-custom">
                 {uniqueSourceFiles.map(file => (
-                  <Button
-                    key={file}
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-between h-10 px-3 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 group"
-                    onClick={() => executeExport(currentExportType, 'separate', file)}
-                  >
-                    <div className="flex items-center gap-2 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 truncate max-w-[85%]">
-                      <FileText className="w-3.5 h-3.5 opacity-60" /> {file}
-                    </div>
+                  <Button key={file} variant="ghost" size="sm" className="w-full justify-between h-10 px-3 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 group" onClick={() => executeExport(currentExportType, 'separate', file)}>
+                    <div className="flex items-center gap-2 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 truncate max-w-[85%]"><FileText className="w-3.5 h-3.5 opacity-60" /> {file}</div>
                     <Download className="w-3.5 h-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Button>
                 ))}
               </div>
             </div>
           </div>
-          
           <DialogFooter className="mt-4 pt-4 border-t">
             <Button variant="ghost" className="w-full font-black uppercase text-[11px] tracking-widest h-11" onClick={() => setIsBatchExportDialogOpen(false)}>Cancel and Review</Button>
           </DialogFooter>
