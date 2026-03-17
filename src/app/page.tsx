@@ -115,6 +115,7 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
+  const [processSuccess, setProcessSuccess] = useState(false);
   const [importedFileName, setImportedFileName] = useState<string>("");
   const [rules, setRules] = useState<CalibrationRule[]>([]);
   const [viewMode, setViewMode] = useState<'results' | 'archive' | 'analytics' | 'audit'>('results');
@@ -256,7 +257,7 @@ export default function Home() {
       setPreviewData(allWithDuplicateMarkers);
       updateStats(allWithDuplicateMarkers, newCount);
       toast({
-        title: isAppending ? "Data Appended" : "Batch Data Loaded",
+        title: isAppending ? "Data Appended" : "Data Loaded",
         description: isAppending 
             ? `${rawCount} more records added to the session.` 
             : `${rawCount} records from ${fileName} imported successfully.`,
@@ -288,10 +289,10 @@ export default function Home() {
     setPreviewData(allWithDuplicateMarkers);
     setProcessingReports(prev => [report, ...prev]);
     updateStats(allWithDuplicateMarkers, rawCount);
-    toast({
-      title: "Batch Processing Complete",
-      description: `Finalized ${processed.length} records. Check the Audit Log for details.`,
-    });
+    
+    setProcessSuccess(true);
+    setTimeout(() => setProcessSuccess(false), 2500);
+
     setIsProcessing(false);
   };
 
@@ -863,6 +864,16 @@ export default function Home() {
             <div className="bg-primary/20 p-6 rounded-full mb-6 animate-bounce"><CheckCircle2 className="w-16 h-16 text-primary" /></div>
             <h3 className="text-3xl font-black text-primary uppercase tracking-tighter">Export Successful</h3>
             <p className="text-muted-foreground font-bold mt-2">Your filtered land records have been saved locally.</p>
+          </div>
+        </div>
+      )}
+
+      {processSuccess && (
+        <div className="fixed inset-0 z-[100] bg-background/60 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in zoom-in duration-300">
+          <div className="bg-card p-12 rounded-3xl shadow-2xl border border-primary/20 flex flex-col items-center scale-110">
+            <div className="bg-primary/20 p-6 rounded-full mb-6 animate-bounce"><CheckCircle2 className="w-16 h-16 text-primary" /></div>
+            <h3 className="text-3xl font-black text-primary uppercase tracking-tighter">Processing Successful</h3>
+            <p className="text-muted-foreground font-bold mt-2">All records have been cleaned and calibrated.</p>
           </div>
         </div>
       )}
