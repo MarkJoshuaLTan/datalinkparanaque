@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useTransition, useCallback } from 'react';
 import { 
   FileDown, 
   Eraser, 
@@ -107,6 +107,7 @@ const analyticsChartConfig = {
 
 export default function Home() {
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
   const [isClient, setIsClient] = useState(false);
   const [userMode, setUserMode] = useState<'fast' | 'full' | null>(null);
   const [rawData, setRawData] = useState<LandRecord[]>([]);
@@ -284,18 +285,19 @@ export default function Home() {
   const runProcessWithData = async (data: LandRecord[], rawCount: number, fileName: string) => {
     setIsProcessing(true);
     
-    // Wrap heavy processing in a timeout to let UI update (show loader/isProcessing state)
     setTimeout(() => {
-      const processOptions = userMode === 'fast' ? { removeDuplicates: true, applyCalibration: true, systemCleanup: true } : options;
-      const { processed, allWithDuplicateMarkers, report } = processRecords(data, rules, locationSettings, taxRates, processOptions, fileName);
-      setProcessedData(processed);
-      setPreviewData(allWithDuplicateMarkers);
-      setProcessingReports(prev => [report, ...prev]);
-      updateStats(allWithDuplicateMarkers, rawCount);
-      
-      setProcessSuccess(true);
-      setTimeout(() => setProcessSuccess(false), 2500);
-      setIsProcessing(false);
+      startTransition(() => {
+        const processOptions = userMode === 'fast' ? { removeDuplicates: true, applyCalibration: true, systemCleanup: true } : options;
+        const { processed, allWithDuplicateMarkers, report } = processRecords(data, rules, locationSettings, taxRates, processOptions, fileName);
+        setProcessedData(processed);
+        setPreviewData(allWithDuplicateMarkers);
+        setProcessingReports(prev => [report, ...prev]);
+        updateStats(allWithDuplicateMarkers, rawCount);
+        
+        setProcessSuccess(true);
+        setTimeout(() => setProcessSuccess(false), 2500);
+        setIsProcessing(false);
+      });
     }, 10);
   };
 
@@ -304,54 +306,62 @@ export default function Home() {
     runProcessWithData(rawData, rawData.length, importedFileName);
   };
 
-  const handleSaveRecord = (updatedRecord: LandRecord) => {
-    const newRawData = rawData.map(r => r.id === updatedRecord.id ? updatedRecord : r);
-    setRawData(newRawData);
-    
-    // Immediately close modal
+  const handleSaveRecord = useCallback((updatedRecord: LandRecord) => {
+    // 1. Instantly close UI elements
     setSelectedRecord(null);
+    setIsProcessing(true);
 
-    // Defer processing to prevent UI hang
-    setTimeout(() => {
-      if (userMode === 'fast' || processedData.length > 0) {
-        runProcessWithData(newRawData, newRawData.length, importedFileName);
-      } else {
-        const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, {
-          removeDuplicates: false, applyCalibration: false, systemCleanup: false
-        }, importedFileName);
-        setPreviewData(allWithDuplicateMarkers);
-        updateStats(allWithDuplicateMarkers, newRawData.length);
-      }
-      toast({ title: "Record Saved", description: "The property record has been updated and re-validated." });
-    }, 50);
-  };
+    // 2. Perform data mutation in transition to keep UI responsive
+    startTransition(() => {
+      const newRawData = rawData.map(r => r.id === updatedRecord.id ? updatedRecord : r);
+      setRawData(newRawData);
+      
+      setTimeout(() => {
+        if (userMode === 'fast' || processedData.length > 0) {
+          runProcessWithData(newRawData, newRawData.length, importedFileName);
+        } else {
+          const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, {
+            removeDuplicates: false, applyCalibration: false, systemCleanup: false
+          }, importedFileName);
+          setPreviewData(allWithDuplicateMarkers);
+          updateStats(allWithDuplicateMarkers, newRawData.length);
+          setIsProcessing(false);
+        }
+        toast({ title: "Record Saved", description: "The property record has been updated and re-validated." });
+      }, 10);
+    });
+  }, [rawData, userMode, processedData.length, importedFileName, locationSettings, taxRates]);
 
-  const handleDeleteRecord = (recordId: string) => {
-    const newRawData = rawData.filter(r => r.id !== recordId);
-    setRawData(newRawData);
-    
-    // Immediately close modal
+  const handleDeleteRecord = useCallback((recordId: string) => {
+    // 1. Instantly close UI elements
     setSelectedRecord(null);
+    setIsProcessing(true);
 
-    // Defer heavy data processing to prevent the browser from hanging while modal is closing
-    setTimeout(() => {
-      if (userMode === 'fast' || processedData.length > 0) {
-        runProcessWithData(newRawData, newRawData.length, importedFileName);
-      } else {
-        const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, {
-          removeDuplicates: false, applyCalibration: false, systemCleanup: false
-        }, importedFileName);
-        setPreviewData(allWithDuplicateMarkers);
-        updateStats(allWithDuplicateMarkers, newRawData.length);
-      }
-      toast({ variant: "destructive", title: "Record Deleted", description: "The property record has been permanently removed from the batch." });
-    }, 50);
-  };
+    // 2. Defer heavy logic so the browser doesn't freeze during modal close
+    startTransition(() => {
+      const newRawData = rawData.filter(r => r.id !== recordId);
+      setRawData(newRawData);
+      
+      setTimeout(() => {
+        if (userMode === 'fast' || processedData.length > 0) {
+          runProcessWithData(newRawData, newRawData.length, importedFileName);
+        } else {
+          const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, {
+            removeDuplicates: false, applyCalibration: false, systemCleanup: false
+          }, importedFileName);
+          setPreviewData(allWithDuplicateMarkers);
+          updateStats(allWithDuplicateMarkers, newRawData.length);
+          setIsProcessing(false);
+        }
+        toast({ variant: "destructive", title: "Record Deleted", description: "The property record has been permanently removed from the batch." });
+      }, 10);
+    });
+  }, [rawData, userMode, processedData.length, importedFileName, locationSettings, taxRates]);
 
-  const handleArchiveRecord = (record: LandRecord) => {
+  const handleArchiveRecord = useCallback((record: LandRecord) => {
     handleSaveRecord({ ...record, isManualArchive: true });
     toast({ title: "Record Archived", description: "The record has been moved to the Archive tab." });
-  };
+  }, [handleSaveRecord]);
 
   const performExcelExport = async (dataToExport: LandRecord[], exportType: 'results' | 'archive', fileNameOverride?: string) => {
     if (dataToExport.length === 0) return;
@@ -463,7 +473,9 @@ export default function Home() {
     }
   };
 
-  const handleRowClick = (record: LandRecord) => { setSelectedRecord(record); };
+  const handleRowClick = useCallback((record: LandRecord) => { 
+    setSelectedRecord(record); 
+  }, []);
 
   const filteredDisplayData = useMemo(() => {
     const baseData = viewMode === 'archive' 
@@ -840,6 +852,15 @@ export default function Home() {
           </Tabs>
         </main>
       </div>
+
+      {(isProcessing || isPending) && (
+        <div className="fixed inset-0 z-[200] bg-background/40 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-200">
+           <div className="bg-card p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col items-center">
+              <Zap className="w-12 h-12 text-primary animate-pulse mb-4" />
+              <h3 className="text-xl font-black uppercase tracking-widest">Optimizing Data...</h3>
+           </div>
+        </div>
+      )}
 
       <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0 border-none shadow-none bg-transparent">

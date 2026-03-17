@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { 
   Table, 
   TableBody, 
@@ -31,6 +31,109 @@ interface DataPreviewTableProps {
   onRowClick: (record: LandRecord) => void;
 }
 
+const RecordRow = memo(({ 
+  row, 
+  index, 
+  onRowClick 
+}: { 
+  row: LandRecord; 
+  index: number; 
+  onRowClick: (record: LandRecord) => void 
+}) => {
+  const isZeroArea = row.landArea === 0 && row.pin && row.arpNo;
+  
+  return (
+    <TableRow 
+      onClick={() => onRowClick(row)}
+      className={cn(
+        "border-b transition-all duration-200 ease-in-out hover:scale-[1.01] hover:shadow-2xl hover:relative hover:z-20 hover:!bg-card/90 hover:backdrop-blur-sm cursor-pointer",
+        (row.isDuplicate || row.isCleanup) && "bg-orange-50/30 dark:bg-orange-950/50 opacity-70",
+        isZeroArea ? "bg-red-100/50 dark:bg-red-950/40 border-red-500/30" : (!row.isValid && "bg-red-500/5 hover:bg-red-500/10 border-red-500/20")
+      )}
+    >
+      <TableCell className="text-center font-mono text-muted-foreground p-3 border-r bg-muted/5">{index + 1}</TableCell>
+      <TableCell className="whitespace-nowrap p-3">{row.date || '---'}</TableCell>
+      <TableCell className={cn("font-mono font-bold p-3", !row.isValid && row.errors?.some(e => e.field === 'arpNo') ? "text-red-600 underline decoration-wavy" : "text-emerald-800 dark:text-emerald-300")}>
+        {row.arpNo || '---'}
+      </TableCell>
+      <TableCell className={cn("font-mono p-3", !row.isValid && row.errors?.some(e => e.field === 'pin') && "text-red-600 font-black")}>
+        {row.pin || '---'}
+      </TableCell>
+      <TableCell className="p-3 text-center">
+        {row.update ? (
+          <span className="bg-muted px-2.5 py-1 rounded font-black text-emerald-900 dark:text-emerald-200 border border-muted-foreground/20 text-[11px]">
+            {row.update}
+          </span>
+        ) : (
+          <span className="text-muted-foreground opacity-30">---</span>
+        )}
+      </TableCell>
+      <TableCell className="max-w-[200px] truncate uppercase font-bold p-3">{row.acctName || '---'}</TableCell>
+      <TableCell className="max-w-[250px] truncate uppercase p-3 text-muted-foreground italic font-medium">
+        {row.address || '---'}
+      </TableCell>
+      <TableCell className="max-w-[250px] truncate uppercase p-3 font-bold text-emerald-900 dark:text-emerald-200 bg-emerald-50/20 dark:bg-emerald-950/50 border-x border-emerald-100/50 dark:border-emerald-900/50">
+        {row.location || '---'}
+      </TableCell>
+      <TableCell className="p-3 font-bold">{row.kind || '---'}</TableCell>
+      <TableCell className="p-3">
+        <Badge variant="outline" className="text-[12px] font-black py-0.5 h-5 border-muted-foreground/30">
+          {row.au || '---'}
+        </Badge>
+      </TableCell>
+      <TableCell className={cn(
+        "text-right font-mono p-3 border-l", 
+        isZeroArea ? "bg-red-500/10 text-red-600 font-black" : (!row.isValid && row.errors?.some(e => e.field === 'landArea') && "text-red-600 font-black")
+      )}>
+        <div className="flex items-center justify-end gap-1.5">
+          {isZeroArea && <AlertTriangle className="w-3.5 h-3.5 text-red-600 animate-pulse" />}
+          {row.landArea?.toLocaleString() || '0'}
+        </div>
+      </TableCell>
+      <TableCell className="text-right font-mono p-3 font-bold text-green-600 dark:text-green-400">
+        {row.unitValue ? `₱${row.unitValue.toLocaleString()}` : '---'}
+      </TableCell>
+      <TableCell className="text-right font-mono font-black p-3 text-emerald-700 dark:text-emerald-300">₱{row.marketValue?.toLocaleString() || '0'}</TableCell>
+      <TableCell className="text-right font-mono font-black p-3 text-green-800 dark:text-green-300">₱{row.assessedValue?.toLocaleString() || '0'}</TableCell>
+      <TableCell className="text-right font-mono font-black p-3 text-primary border-l">₱{row.yearlyTax?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}</TableCell>
+      <TableCell className="text-center p-3">
+        {!row.isValid ? (
+          isZeroArea ? (
+            <Badge variant="destructive" className="text-[10px] h-5 font-black uppercase tracking-tighter flex items-center gap-1 justify-center bg-red-600 hover:bg-red-700">
+              <AlertTriangle className="w-2.5 h-2.5" /> ERROR
+            </Badge>
+          ) : (
+            <Badge variant="destructive" className="text-[10px] h-5 font-black uppercase tracking-tighter flex items-center gap-1 justify-center">
+              INVALID
+            </Badge>
+          )
+        ) : row.isCleanup ? (
+          <Badge variant="outline" className="text-[10px] h-5 font-black uppercase tracking-tighter bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800">
+            {row.cleanupReason || 'CLEANUP'}
+          </Badge>
+        ) : row.isDuplicate ? (
+          <Badge variant="destructive" className="text-[10px] h-5 font-black uppercase tracking-tighter">DUPLICATE</Badge>
+        ) : (
+          <Badge variant="secondary" className="text-[10px] h-5 font-black uppercase tracking-tighter bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">VALID</Badge>
+        )}
+      </TableCell>
+    </TableRow>
+  );
+}, (prevProps, nextProps) => {
+  // Deep comparison for memoization: Only re-render if key data points change
+  return (
+    prevProps.row.id === nextProps.row.id &&
+    prevProps.row.isValid === nextProps.row.isValid &&
+    prevProps.row.isDuplicate === nextProps.row.isDuplicate &&
+    prevProps.row.isCleanup === nextProps.row.isCleanup &&
+    prevProps.row.isManualArchive === nextProps.row.isManualArchive &&
+    prevProps.row.marketValue === nextProps.row.marketValue &&
+    prevProps.index === nextProps.index
+  );
+});
+
+RecordRow.displayName = 'RecordRow';
+
 export function DataPreviewTable({ data, isProcessed = false, onRowClick }: DataPreviewTableProps) {
   const [displayLimit, setDisplayLimit] = useState(350);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -48,7 +151,6 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick }: Data
     setIsConfirmOpen(false);
     setIsBulkLoading(true);
     
-    // Using setTimeout to allow the loading state to render before the heavy UI update
     setTimeout(() => {
       setDisplayLimit(data.length);
       setIsBulkLoading(false);
@@ -68,7 +170,6 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick }: Data
 
   return (
     <div className="relative flex-1 flex flex-col min-h-0 bg-card overflow-hidden">
-      {/* Loading Overlay for Bulk Actions */}
       {isBulkLoading && (
         <div className="absolute inset-0 z-[100] bg-background/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-300">
           <div className="bg-card p-10 rounded-3xl border border-white/10 shadow-2xl flex flex-col items-center">
@@ -105,87 +206,14 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick }: Data
             </TableRow>
           </TableHeader>
           <TableBody>
-            {visibleData.map((row, i) => {
-              const isZeroArea = row.landArea === 0 && row.pin && row.arpNo;
-              return (
-                <TableRow 
-                  key={row.id}
-                  onClick={() => onRowClick(row)}
-                  className={cn(
-                    "border-b transition-all duration-200 ease-in-out hover:scale-[1.01] hover:shadow-2xl hover:relative hover:z-20 hover:!bg-card/90 hover:backdrop-blur-sm cursor-pointer",
-                    (row.isDuplicate || row.isCleanup) && "bg-orange-50/30 dark:bg-orange-950/50 opacity-70",
-                    isZeroArea ? "bg-red-100/50 dark:bg-red-950/40 border-red-500/30" : (!row.isValid && "bg-red-500/5 hover:bg-red-500/10 border-red-500/20")
-                  )}
-                >
-                  <TableCell className="text-center font-mono text-muted-foreground p-3 border-r bg-muted/5">{i + 1}</TableCell>
-                  <TableCell className="whitespace-nowrap p-3">{row.date || '---'}</TableCell>
-                  <TableCell className={cn("font-mono font-bold p-3", !row.isValid && row.errors?.some(e => e.field === 'arpNo') ? "text-red-600 underline decoration-wavy" : "text-emerald-800 dark:text-emerald-300")}>
-                    {row.arpNo || '---'}
-                  </TableCell>
-                  <TableCell className={cn("font-mono p-3", !row.isValid && row.errors?.some(e => e.field === 'pin') && "text-red-600 font-black")}>
-                    {row.pin || '---'}
-                  </TableCell>
-                  <TableCell className="p-3 text-center">
-                    {row.update ? (
-                      <span className="bg-muted px-2.5 py-1 rounded font-black text-emerald-900 dark:text-emerald-200 border border-muted-foreground/20 text-[11px]">
-                        {row.update}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground opacity-30">---</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="max-w-[200px] truncate uppercase font-bold p-3">{row.acctName || '---'}</TableCell>
-                  <TableCell className="max-w-[250px] truncate uppercase p-3 text-muted-foreground italic font-medium">
-                    {row.address || '---'}
-                  </TableCell>
-                  <TableCell className="max-w-[250px] truncate uppercase p-3 font-bold text-emerald-900 dark:text-emerald-200 bg-emerald-50/20 dark:bg-emerald-950/50 border-x border-emerald-100/50 dark:border-emerald-900/50">
-                    {row.location || '---'}
-                  </TableCell>
-                  <TableCell className="p-3 font-bold">{row.kind || '---'}</TableCell>
-                  <TableCell className="p-3">
-                    <Badge variant="outline" className="text-[12px] font-black py-0.5 h-5 border-muted-foreground/30">
-                      {row.au || '---'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className={cn(
-                    "text-right font-mono p-3 border-l", 
-                    isZeroArea ? "bg-red-500/10 text-red-600 font-black" : (!row.isValid && row.errors?.some(e => e.field === 'landArea') && "text-red-600 font-black")
-                  )}>
-                    <div className="flex items-center justify-end gap-1.5">
-                      {isZeroArea && <AlertTriangle className="w-3.5 h-3.5 text-red-600 animate-pulse" />}
-                      {row.landArea?.toLocaleString() || '0'}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right font-mono p-3 font-bold text-green-600 dark:text-green-400">
-                    {row.unitValue ? `₱${row.unitValue.toLocaleString()}` : '---'}
-                  </TableCell>
-                  <TableCell className="text-right font-mono font-black p-3 text-emerald-700 dark:text-emerald-300">₱{row.marketValue?.toLocaleString() || '0'}</TableCell>
-                  <TableCell className="text-right font-mono font-black p-3 text-green-800 dark:text-green-300">₱{row.assessedValue?.toLocaleString() || '0'}</TableCell>
-                  <TableCell className="text-right font-mono font-black p-3 text-primary border-l">₱{row.yearlyTax?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}</TableCell>
-                  <TableCell className="text-center p-3">
-                    {!row.isValid ? (
-                      isZeroArea ? (
-                        <Badge variant="destructive" className="text-[10px] h-5 font-black uppercase tracking-tighter flex items-center gap-1 justify-center bg-red-600 hover:bg-red-700">
-                          <AlertTriangle className="w-2.5 h-2.5" /> ERROR
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive" className="text-[10px] h-5 font-black uppercase tracking-tighter flex items-center gap-1 justify-center">
-                          INVALID
-                        </Badge>
-                      )
-                    ) : row.isCleanup ? (
-                      <Badge variant="outline" className="text-[10px] h-5 font-black uppercase tracking-tighter bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800">
-                        {row.cleanupReason || 'CLEANUP'}
-                      </Badge>
-                    ) : row.isDuplicate ? (
-                      <Badge variant="destructive" className="text-[10px] h-5 font-black uppercase tracking-tighter">DUPLICATE</Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-[10px] h-5 font-black uppercase tracking-tighter bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">VALID</Badge>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {visibleData.map((row, i) => (
+              <RecordRow 
+                key={row.id} 
+                row={row} 
+                index={i} 
+                onRowClick={onRowClick} 
+              />
+            ))}
           </TableBody>
         </Table>
       </div>
@@ -217,7 +245,6 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick }: Data
         </div>
       </div>
 
-      {/* Confirmation Dialog for Load All */}
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <AlertDialogContent className="bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl">
           <AlertDialogHeader>
