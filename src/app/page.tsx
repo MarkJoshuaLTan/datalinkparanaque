@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback } from 'react';
+import Image from 'next/image';
 import { 
   FileDown, 
   Eraser, 
@@ -637,7 +638,9 @@ export default function Home() {
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-all active:scale-95 group" onClick={() => window.location.reload()}>
-                <div className="bg-primary/20 p-2 rounded-2xl shadow-inner border border-primary/20 group-hover:bg-primary/30 transition-colors"><Database className="text-primary w-6 h-6" /></div>
+                <div className="bg-primary/20 p-1.5 rounded-2xl shadow-inner border border-primary/20 group-hover:bg-primary/30 transition-colors overflow-hidden">
+                  <Image src="/LOGO.png" alt="DataLink Logo" width={32} height={32} className="object-contain" />
+                </div>
                 <div className="flex flex-col">
                   <h1 className="text-2xl font-black tracking-tight leading-none flex items-center gap-1.5">
                     <span className="bg-gradient-to-br from-blue-600 via-emerald-500 to-green-400 bg-clip-text text-transparent drop-shadow-sm">DataLink</span>
