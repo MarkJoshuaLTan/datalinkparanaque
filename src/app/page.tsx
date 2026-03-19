@@ -641,11 +641,11 @@ export default function Home() {
               <div className="flex items-center gap-6 cursor-pointer hover:opacity-80 transition-all active:scale-95 group relative" onClick={() => window.location.reload()}>
                 <div className="relative w-40 flex items-center h-full">
                   <div className="absolute left-0 -translate-y-1/2 top-1/2">
-                    <Image src="/LOGO.png" alt="DataLink Logo" width={140} height={140} className="object-contain" />
+                    <Image src="/LOGO.png" alt="DataLink Logo" width={120} height={120} className="object-contain" />
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <h1 className="text-5xl font-black tracking-tighter leading-none flex items-center gap-2">
+                  <h1 className="text-[44px] font-black tracking-tighter leading-none flex items-center gap-2">
                     <span className="text-foreground">DataLink</span>
                     <span className="text-primary">Parañaque</span>
                   </h1>
