@@ -367,29 +367,30 @@ export default function Home() {
     });
 
     try {
-      const response = await fetch(`/export_template.xlsx?v=${Date.now()}`);
-      if (!response.ok) throw new Error("Template 'export_template.xlsx' not found.");
-      const arrayBuffer = await response.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const ws = workbook.Sheets[sheetName];
+      const wb = XLSX.utils.book_new();
       const title = exportType === 'results' ? "DATA LINK PARAÑAQUE - SUMMARY RESULTS" : "DATA LINK PARAÑAQUE - ARCHIVE";
-      XLSX.utils.sheet_add_aoa(ws, [[title]], { origin: "A1" });
-      XLSX.utils.sheet_add_aoa(ws, [
+      
+      const activeHeaders = Object.values(headerMapping).filter(h => exportColumns[h]);
+      
+      const sheetData = [
+        [title],
         ["TOTAL RECORDS:", dataToExport.length.toLocaleString()],
         ["TOTAL MARKET VALUE:", `₱${totalMarketValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
-        ["TOTAL ASSESSED VALUE:", `₱${totalAssessedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`]
-      ], { origin: "A2" });
-      const activeHeaders = Object.values(headerMapping).filter(h => exportColumns[h]);
-      XLSX.utils.sheet_add_aoa(ws, [activeHeaders], { origin: "A5" });
+        ["TOTAL ASSESSED VALUE:", `₱${totalAssessedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+        [],
+        activeHeaders
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet(sheetData);
       XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A6", skipHeader: true });
-      if (!ws['!views']) ws['!views'] = [];
-      ws['!views'][0] = { state: 'frozen', ySplit: 5, topLeftCell: 'A6', activePane: 'bottomLeft' };
+      
       ws['!cols'] = activeHeaders.map(() => ({ wch: 22 }));
+
+      XLSX.utils.book_append_sheet(wb, ws, exportType === 'results' ? "Results" : "Archive");
       
       const baseName = (fileNameOverride || importedFileName).replace(/\.[^/.]+$/, "") || "LandRecords";
       const finalFileName = `${baseName}-${exportType === 'results' ? 'Clean' : 'Archive'}-${new Date().toISOString().split('T')[0]}.xlsx`;
-      XLSX.writeFile(workbook, finalFileName);
+      XLSX.writeFile(wb, finalFileName);
       
       const exportReport: ProcessingReport = {
         timestamp: new Date().toLocaleString(),
@@ -405,6 +406,7 @@ export default function Home() {
       };
       setProcessingReports(prev => [exportReport, ...prev]);
     } catch (error: any) {
+      console.error("Export error:", error);
       throw error;
     }
   };
@@ -638,18 +640,17 @@ export default function Home() {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-all active:scale-95 group relative" onClick={() => window.location.reload()}>
-                <div className="relative w-32 flex items-center h-full">
+              <div className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-all active:scale-95 group relative" onClick={() => window.location.reload()}>
+                <div className="relative w-24 flex items-center h-full">
                   <div className="absolute left-0 -translate-y-1/2 top-1/2">
                     <Image src="/LOGO.png" alt="DataLink Logo" width={86} height={86} className="object-contain" />
                   </div>
                 </div>
-                <div className="flex flex-col">
-                  <h1 className="text-[32px] font-black tracking-tighter leading-none flex items-center gap-2">
+                <div className="flex items-center">
+                  <h1 className="text-[32px] font-black tracking-tighter leading-none">
                     <span className="text-foreground">DataLink</span>
-                    <span className="text-primary">Parañaque</span>
+                    <span className="text-primary ml-1.5">Parañaque</span>
                   </h1>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1 ml-0.5 opacity-60">Real Property Batch Processor</p>
                 </div>
               </div>
             </TooltipTrigger>
