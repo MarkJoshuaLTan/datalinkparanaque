@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback } from 'react';
@@ -133,7 +132,7 @@ export default function Home() {
   const [isMarketDetailOpen, setIsMarketDetailOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isBatchExportDialogOpen, setIsBatchExportDialogOpen] = useState(false);
-  const [currentExportType, setCurrentExportType] = useState<'results' | 'archive'>('results');
+  const [currentExportType, setCurrentExportType] = useState<'results' | 'archive' | 'errors'>('results');
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchField, setSearchField] = useState("all");
@@ -172,10 +171,10 @@ export default function Home() {
   }, [previewData, processedData]);
 
   const uniqueBarangays = useMemo(() => {
-    const brgys = new Set<string>();
-    previewData.forEach(r => { if (r.barangayName) brgys.add(r.barangayName); });
-    processedData.forEach(r => { if (r.barangayName) brgys.add(r.barangayName); });
-    return Array.from(brgys).sort();
+    const brgySet = new Set<string>();
+    previewData.forEach(r => { if (r.barangayName) brgySet.add(r.barangayName); });
+    processedData.forEach(r => { if (r.barangayName) brgySet.add(r.barangayName); });
+    return Array.from(brgySet).sort();
   }, [previewData, processedData]);
 
   useEffect(() => {
@@ -272,7 +271,7 @@ export default function Home() {
   const updateStats = (data: LandRecord[], rawCount: number) => {
     const active = data.filter(r => !r.isCleanup && !r.isDuplicate && !r.isManualArchive);
     const valid = active.filter(r => r.isValid);
-    const errors = active.filter(r => !r.isValid).length;
+    const errors = active.filter(r => !r.isValid || (r.landArea === 0 && r.pin && r.arpNo)).length;
     setStats({ 
       totalRawRows: rawCount,
       systemCleanup: data.filter(r => r.isCleanup || r.isManualArchive).length,
@@ -347,7 +346,7 @@ export default function Home() {
     toast({ title: "Record Restored", description: "The record has been moved back to the Results tab." });
   }, [handleSaveRecord]);
 
-  const performExcelExport = async (dataToExport: LandRecord[], exportType: 'results' | 'archive', fileNameOverride?: string) => {
+  const performExcelExport = async (dataToExport: LandRecord[], exportType: 'results' | 'archive' | 'errors', fileNameOverride?: string) => {
     if (dataToExport.length === 0) return;
 
     const totalMarketValue = dataToExport.reduce((sum, r) => sum + (r.marketValue || 0), 0);
@@ -369,7 +368,9 @@ export default function Home() {
 
     try {
       const wb = XLSX.utils.book_new();
-      const title = exportType === 'results' ? "DATA LINK PARAÑAQUE - SUMMARY RESULTS" : "DATA LINK PARAÑAQUE - ARCHIVE";
+      let title = "DATA LINK PARAÑAQUE - SUMMARY RESULTS";
+      if (exportType === 'archive') title = "DATA LINK PARAÑAQUE - ARCHIVE";
+      if (exportType === 'errors') title = "DATA LINK PARAÑAQUE - DATA INTEGRITY ERRORS / ZERO AREA";
       
       const activeHeaders = Object.values(headerMapping).filter(h => exportColumns[h]);
       
@@ -387,10 +388,11 @@ export default function Home() {
       
       ws['!cols'] = activeHeaders.map(() => ({ wch: 22 }));
 
-      XLSX.utils.book_append_sheet(wb, ws, exportType === 'results' ? "Results" : "Archive");
+      const sheetName = exportType === 'results' ? "Results" : (exportType === 'archive' ? "Archive" : "Errors");
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
       
       const baseName = (fileNameOverride || importedFileName).replace(/\.[^/.]+$/, "") || "LandRecords";
-      const finalFileName = `${baseName}-${exportType === 'results' ? 'Clean' : 'Archive'}-${new Date().toISOString().split('T')[0]}.xlsx`;
+      const finalFileName = `${baseName}-${exportType === 'results' ? 'Clean' : (exportType === 'archive' ? 'Archive' : 'Errors')}-${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(wb, finalFileName);
       
       const exportReport: ProcessingReport = {
@@ -412,12 +414,21 @@ export default function Home() {
     }
   };
 
-  const handleExportClick = (type: 'results' | 'archive') => {
-    const currentList = filteredDisplayData;
+  const handleExportClick = (type: 'results' | 'archive' | 'errors') => {
+    let currentList = [];
+    
+    if (type === 'errors') {
+      const baseData = processedData.length > 0 ? processedData : previewData.filter(r => !r.isDuplicate && !r.isCleanup && !r.isManualArchive);
+      currentList = baseData.filter(r => !r.isValid || (r.landArea === 0 && r.pin && r.arpNo));
+    } else {
+      currentList = filteredDisplayData;
+    }
+
     if (currentList.length === 0) {
-      toast({ variant: "destructive", title: "Export Failed", description: "No records found to export." });
+      toast({ variant: "destructive", title: "Export Failed", description: "No records found to export for this category." });
       return;
     }
+
     const uniqueSources = Array.from(new Set(currentList.map(r => r.sourceFile).filter(Boolean)));
     if (uniqueSources.length > 1) {
       setCurrentExportType(type);
@@ -427,10 +438,18 @@ export default function Home() {
     }
   };
 
-  const executeExport = async (type: 'results' | 'archive', mode: 'merged' | 'separate', specificFile?: string) => {
+  const executeExport = async (type: 'results' | 'archive' | 'errors', mode: 'merged' | 'separate', specificFile?: string) => {
     setIsExporting(true);
     if (!specificFile) setIsBatchExportDialogOpen(false);
-    const currentList = filteredDisplayData;
+    
+    let currentList = [];
+    if (type === 'errors') {
+      const baseData = processedData.length > 0 ? processedData : previewData.filter(r => !r.isDuplicate && !r.isCleanup && !r.isManualArchive);
+      currentList = baseData.filter(r => !r.isValid || (r.landArea === 0 && r.pin && r.arpNo));
+    } else {
+      currentList = filteredDisplayData;
+    }
+
     try {
       if (mode === 'merged') {
         await performExcelExport(currentList, type);
@@ -485,7 +504,7 @@ export default function Home() {
       if (!matchesSearch) return false;
       if (statusFilter === 'all') return true;
       if (statusFilter === 'valid') return record.isValid && !record.isDuplicate && !record.isCleanup && !record.isManualArchive;
-      if (statusFilter === 'error') return !record.isValid && !record.isDuplicate && !record.isCleanup && !record.isManualArchive;
+      if (statusFilter === 'error') return (!record.isValid || record.landArea === 0) && !record.isDuplicate && !record.isCleanup && !record.isManualArchive;
       if (statusFilter === 'duplicate') return record.isDuplicate;
       if (statusFilter === 'cleanup') return record.isCleanup || record.isManualArchive;
       return true;
@@ -647,7 +666,7 @@ export default function Home() {
                     <Image src="/LOGO.png" alt="DataLink Logo" width={86} height={86} className="object-contain" />
                   </div>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center" style={{ marginLeft: '5px' }}>
                   <h1 className="text-[32px] font-black tracking-tighter leading-none">
                     <span className="text-foreground">DataLink</span>
                     <span className="text-primary ml-1.5">Parañaque</span>
@@ -820,8 +839,9 @@ export default function Home() {
                 </Card>
                 <div className="flex items-center justify-between bg-card p-4 rounded-xl shadow-2xl border border-white/10 shrink-0">
                   <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => handleExportClick('results')} size="sm" className="font-black uppercase text-xs tracking-widest border-primary/30 text-primary hover:bg-primary hover:text-white transition-all h-10 px-6" disabled={isExporting}><FileDown className="w-4 h-4 mr-2" /> {isExporting ? "..." : "Export Results"}</Button>
-                    <Button variant="outline" onClick={() => handleExportClick('archive')} size="sm" className="font-black uppercase text-xs tracking-widest border-orange-500/30 text-orange-600 hover:bg-orange-600 hover:text-white transition-all h-10 px-6" disabled={isExporting}><Archive className="w-4 h-4 mr-2" /> {isExporting ? "..." : "Export Archive"}</Button>
+                    <Button variant="outline" onClick={() => handleExportClick('results')} size="sm" className="font-black uppercase text-xs tracking-widest border-primary/30 text-primary hover:bg-primary hover:text-white transition-all h-10 px-6" disabled={isExporting}><FileDown className="w-4 h-4 mr-2" /> {isExporting && currentExportType === 'results' ? "..." : "Export Results"}</Button>
+                    <Button variant="outline" onClick={() => handleExportClick('errors')} size="sm" className="font-black uppercase text-xs tracking-widest border-red-500/30 text-red-600 hover:bg-red-600 hover:text-white transition-all h-10 px-6" disabled={isExporting}><AlertTriangle className="w-4 h-4 mr-2" /> {isExporting && currentExportType === 'errors' ? "..." : "Export Errors/Zero Area"}</Button>
+                    <Button variant="outline" onClick={() => handleExportClick('archive')} size="sm" className="font-black uppercase text-xs tracking-widest border-orange-500/30 text-orange-600 hover:bg-orange-600 hover:text-white transition-all h-10 px-6" disabled={isExporting}><Archive className="w-4 h-4 mr-2" /> {isExporting && currentExportType === 'archive' ? "..." : "Export Archive"}</Button>
                     {latestReport && (
                       <Button variant="outline" onClick={() => setIsReportOpen(true)} size="sm" className="font-black uppercase text-xs tracking-widest border-emerald-600/30 text-emerald-700 hover:bg-emerald-600 hover:text-white transition-all h-10 px-6">
                         <ShieldCheck className="w-4 h-4 mr-2" /> Latest Audit
