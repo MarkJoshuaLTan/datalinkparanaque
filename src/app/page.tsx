@@ -398,7 +398,8 @@ export default function Home() {
       ];
 
       const ws = XLSX.utils.aoa_to_sheet(sheetData);
-      XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A7", skipHeader: true });
+      // Origin "A8" ensures headers at Row 7 (index 6) are preserved
+      XLSX.utils.sheet_add_json(ws, formattedExport, { origin: "A8", skipHeader: true });
       ws['!cols'] = activeHeaders.map(() => ({ wch: 22 }));
 
       XLSX.utils.book_append_sheet(wb, ws, "ExportResults");
