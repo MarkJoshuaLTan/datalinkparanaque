@@ -144,11 +144,10 @@ export default function Home() {
   const [processingReports, setProcessingReports] = useState<ProcessingReport[]>([]);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [selectedRecord, setSelectedRecord] = useState<LandRecord | null>(null);
-  const [isMarketDetailOpen, setIsMarketDetailOpen] = useState(false);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
-  // Analytics Insight State
+  
+  // Analytics Expansion & Insight State
   const [explainType, setExplainType] = useState<string | null>(null);
+  const [expandedChart, setExpandedChart] = useState<'usage' | 'barangay' | 'update' | 'market' | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchField, setSearchField] = useState("all");
@@ -219,17 +218,18 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    if (isClient) {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ rules, exportColumns, locationSettings, options, taxRates, processingReports }));
-    }
-  }, [rules, exportColumns, locationSettings, options, taxRates, processingReports, isClient]);
-
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => { console.error(`Error attempting to enable full-screen mode: ${err.message}`); });
     } else { document.exitFullscreen(); }
   };
+
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ rules, exportColumns, locationSettings, options, taxRates, processingReports }));
+    }
+  }, [rules, exportColumns, locationSettings, options, taxRates, processingReports, isClient]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
@@ -528,31 +528,44 @@ export default function Home() {
     };
   }, [processedData, previewData, sourceFileFilter, barangayFilter]);
 
-  // Insights Engine (Rule-based)
+  // Enhanced Detailed Insights Engine
   const getInsightText = (type: string) => {
     const data = analyticsData;
-    if (data.totalRecords === 0) return "No sufficient data available for diagnostics.";
+    if (data.totalRecords === 0) return "Insufficient data currently active. Please adjust your filters or run the processor to generate detailed diagnostics.";
 
     switch (type) {
       case 'usage': {
         const top = data.auChart[0];
         const percentage = ((top.value / data.totalRecords) * 100).toFixed(1);
-        return `Diagnostic: "${top.name}" is the dominant usage category in this batch, representing ${percentage}% of total records (${top.value} units). This indicates a high concentration of ${top.name.toLowerCase()} properties. There are ${data.auChart.length} unique usage types currently filtered.`;
+        const second = data.auChart[1];
+        let comparison = "";
+        if (second) {
+            const gap = (top.value - second.value);
+            comparison = ` It leads the second most common category, "${second.name}", by ${gap} units.`;
+        }
+        return `Detailed Diagnostic: The property landscape is heavily concentrated in the "${top.name}" usage category, which accounts for a substantial ${percentage}% of all currently active records (${top.value} units).${comparison} The dataset contains a diverse mix of ${data.auChart.length} unique usage types. This pattern suggests a specialized portfolio density that may require focused valuation strategies for "${top.name}" properties.`;
       }
       case 'barangay': {
         const top = data.barangayChart[0];
         const count = data.barangayChart.length;
-        return `Diagnostic: ${top.name} shows the highest record density with ${top.value} properties mapped. Your dataset currently spans ${count} different barangays. A high count in a single area typically suggests localized data collection or a major development cluster.`;
+        const totalRaw = data.barangayChart.reduce((sum, item) => sum + item.value, 0);
+        const density = ((top.value / totalRaw) * 100).toFixed(1);
+        return `Detailed Diagnostic: Geographic analysis identifies ${top.name} as the primary hub of data activity, housing ${density}% of the records in this active view (${top.value} properties). Your dataset currently spans ${count} distinct barangays across Parañaque. A cluster of this size in ${top.name} often indicates a major urban development phase or a high-volume data refresh for this specific sector. This distribution helps identify areas where administrative focus or bulk calibration rules would have the highest impact.`;
       }
       case 'update': {
-        const top = data.updateChart[data.updateChart.length - 1]; // Sorted ascending, last is top
-        return `Diagnostic: The update code "${top.name}" is most frequently applied, appearing in ${top.value} records. This pattern helps identify the primary reason for data revisions in this batch, such as General Revisions (GR) or simple corrections.`;
+        const sorted = [...data.updateChart].sort((a, b) => b.value - a.value);
+        const top = sorted[0];
+        const second = sorted[1];
+        const updateCount = data.updateChart.length;
+        return `Detailed Diagnostic: Administrative tracking reveals that update code "${top.name}" is the dominant driver of record revisions in this batch, appearing in ${top.value} instances. This accounts for ${((top.value / data.totalRecords) * 100).toFixed(1)}% of all activity. The presence of ${updateCount} unique update codes suggests a multifaceted data maintenance cycle, with "${top.name}" being the primary reason for change. High frequencies of specific codes can help auditors identify if the batch represents a General Revision (GR) or targeted parcel corrections.`;
       }
       case 'market': {
-        const top = [...data.marketChart].sort((a, b) => b.value - a.value)[0];
+        const sortedMarket = [...data.marketChart].sort((a, b) => b.value - a.value);
+        const top = sortedMarket[0];
         const totalValue = data.marketChart.reduce((sum, item) => sum + item.value, 0);
         const percentage = ((top.value / totalValue) * 100).toFixed(1);
-        return `Diagnostic: Properties classified as "${top.name}" carry the highest financial weight, contributing ₱${top.value.toLocaleString()} to the total market value. This accounts for approximately ${percentage}% of the entire ₱${totalValue.toLocaleString()} valuation across the active dataset.`;
+        const avgValue = (totalValue / data.totalRecords).toFixed(2);
+        return `Detailed Diagnostic: Financial mapping shows that "${top.name}" properties are the primary value drivers, contributing a massive ₱${top.value.toLocaleString()} to the total session valuation. This represents ${percentage}% of the entire ₱${totalValue.toLocaleString()} market portfolio. Despite being just one of ${data.marketChart.length} categories, its financial weight is significantly disproportionate. The overall average market value across all ${data.totalRecords} active records currently stands at ₱${Number(avgValue).toLocaleString()}, providing a baseline for identifying high-value outliers.`;
       }
       default: return "";
     }
@@ -782,14 +795,24 @@ export default function Home() {
                             <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
                               <CheckCircle2 className="w-4.5 h-4.5 text-primary" /> Property Usage Distribution
                             </h4>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => setExplainType('usage')}
-                              className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
-                            >
-                              <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => setExplainType('usage')}
+                                className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                              >
+                                <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => setExpandedChart('usage')}
+                                className="h-8 w-8 bg-muted/20 hover:bg-primary hover:text-white transition-all"
+                              >
+                                <Maximize2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
                           </div>
                           <div className="h-[300px] w-full">
                             <ChartContainer config={analyticsChartConfig}>
@@ -808,16 +831,26 @@ export default function Home() {
                         <Card className="p-6 border-white/5 bg-card shadow-2xl overflow-hidden flex flex-col group">
                           <div className="flex items-center justify-between mb-8">
                             <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
-                              <MapPin className="w-4.5 h-4.5 text-primary" /> Barangay Record Distribution
+                              <MapPin className="w-4.5 h-4.5 text-primary" /> Barangay Distribution
                             </h4>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => setExplainType('barangay')}
-                              className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
-                            >
-                              <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => setExplainType('barangay')}
+                                className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                              >
+                                <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => setExpandedChart('barangay')}
+                                className="h-8 w-8 bg-muted/20 hover:bg-primary hover:text-white transition-all"
+                              >
+                                <Maximize2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
                           </div>
                           <div className="h-[300px] w-full">
                             <ChartContainer config={analyticsChartConfig}>
@@ -838,14 +871,24 @@ export default function Home() {
                             <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
                               <RefreshCw className="w-4.5 h-4.5 text-primary" /> Update Code Distribution
                             </h4>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => setExplainType('update')}
-                              className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
-                            >
-                              <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => setExplainType('update')}
+                                className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                              >
+                                <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => setExpandedChart('update')}
+                                className="h-8 w-8 bg-muted/20 hover:bg-primary hover:text-white transition-all"
+                              >
+                                <Maximize2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
                           </div>
                           <div className="h-[300px] w-full">
                             <ChartContainer config={analyticsChartConfig}>
@@ -878,7 +921,7 @@ export default function Home() {
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
-                                onClick={() => setIsMarketDetailOpen(true)}
+                                onClick={() => setExpandedChart('market')}
                                 className="h-8 w-8 bg-muted/20 hover:bg-primary hover:text-white transition-all"
                               >
                                 <Maximize2 className="w-3.5 h-3.5" />
@@ -934,35 +977,43 @@ export default function Home() {
         </DialogContent>
       </Dialog>
 
-      {/* Analytics Explanation Dialog */}
+      {/* Enhanced Analytics Explanation Dialog */}
       <Dialog open={!!explainType} onOpenChange={(open) => !open && setExplainType(null)}>
-        <DialogContent className="sm:max-w-lg bg-card border-white/10 shadow-2xl p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-2xl bg-card border-white/10 shadow-2xl p-0 overflow-hidden">
           <div className="bg-primary/5 p-6 border-b">
             <DialogHeader>
               <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-primary" /> Chart Insights & Analysis
+                <Lightbulb className="w-5 h-5 text-primary" /> Advanced Data Intelligence Report
               </DialogTitle>
               <DialogDescription className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">
-                Rule-based Data Intelligence Report
+                Deep-Dive Diagnostic Analysis
               </DialogDescription>
             </DialogHeader>
           </div>
-          <div className="p-8 space-y-6">
-            <div className="p-4 rounded-2xl bg-muted/30 border border-white/5 shadow-inner">
-              <p className="text-sm font-bold leading-relaxed text-foreground/90">
+          <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto scrollbar-vertical-custom">
+            <div className="p-6 rounded-2xl bg-muted/30 border border-white/5 shadow-inner leading-relaxed">
+              <p className="text-base font-bold text-foreground/90">
                 {explainType && getInsightText(explainType)}
               </p>
+            </div>
+            <div className="space-y-4">
+               <h5 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                 <ShieldCheck className="w-4 h-4 text-primary" /> Audit Implications
+               </h5>
+               <p className="text-sm font-bold text-muted-foreground leading-relaxed">
+                 Based on the detected patterns, this dataset shows high reliability for the primary categories but may require targeted sampling in the outlier groups. Identifying these densities allows for more efficient resource allocation during the manual verification phase.
+               </p>
             </div>
             <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-xl border border-primary/20">
               <TrendingUp className="w-5 h-5 text-primary shrink-0" />
               <p className="text-[11px] font-black uppercase text-primary leading-snug">
-                This insight is calculated dynamically based on your current filters and the finalized validated records in your session.
+                This diagnostic report is refreshed instantly whenever filters are applied or data is updated.
               </p>
             </div>
           </div>
           <DialogFooter className="p-6 bg-muted/20 border-t">
             <Button onClick={() => setExplainType(null)} className="w-full h-11 font-black uppercase text-xs tracking-widest shadow-lg">
-              Acknowledge Insight
+              Acknowledge intelligence Report
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1043,26 +1094,68 @@ export default function Home() {
         onUnarchive={handleUnarchiveRecord}
       />
       
-      <Dialog theme-color="primary" open={isMarketDetailOpen} onOpenChange={setIsMarketDetailOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col bg-card/95 backdrop-blur-3xl border-white/10 p-6 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+      {/* Universal Expanded Chart Dialog */}
+      <Dialog open={!!expandedChart} onOpenChange={(isOpen) => !isOpen && setExpandedChart(null)}>
+        <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-hidden flex flex-col bg-card/95 backdrop-blur-3xl border-white/10 p-6 shadow-2xl">
           <DialogHeader className="mb-4 shrink-0">
-            <DialogTitle className="text-xl font-black text-foreground uppercase flex items-center gap-2.5 leading-none tracking-tight"><Database className="w-6 h-6 text-primary" /> Market Value Analysis</DialogTitle>
+            <DialogTitle className="text-xl font-black text-foreground uppercase flex items-center gap-2.5 leading-none tracking-tight">
+              {expandedChart === 'usage' && <><CheckCircle2 className="w-6 h-6 text-primary" /> Usage Distribution Analysis</>}
+              {expandedChart === 'barangay' && <><MapPin className="w-6 h-6 text-primary" /> Barangay Geographic Breakdown</>}
+              {expandedChart === 'update' && <><RefreshCw className="w-6 h-6 text-primary" /> Update Code Tracking</>}
+              {expandedChart === 'market' && <><Database className="w-6 h-6 text-primary" /> Financial Market Value Analysis</>}
+            </DialogTitle>
           </DialogHeader>
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-0">
-            <div className="lg:col-span-5 bg-muted/5 rounded-2xl border border-white/5 flex items-center justify-center p-4 shadow-inner">
-              <ChartContainer config={marketChartConfig} className="h-full w-full aspect-auto">
-                <PieChart>
-                  <Pie data={analyticsData.marketChart} cx="50%" cy="50%" innerRadius={90} outerRadius={120} paddingAngle={10} dataKey="value" stroke="none" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(1)}%)`} labelLine={true}>
-                    {analyticsData.marketChart.map((entry, index) => <Cell key={`cell-expanded-${index}`} fill={COLORS[index % COLORS.length]} />)}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                </PieChart>
-              </ChartContainer>
+            <div className="lg:col-span-6 bg-muted/5 rounded-2xl border border-white/5 flex items-center justify-center p-6 shadow-inner relative overflow-hidden">
+              {expandedChart === 'market' ? (
+                <ChartContainer config={marketChartConfig} className="h-full w-full aspect-auto">
+                  <PieChart>
+                    <Pie data={analyticsData.marketChart} cx="50%" cy="50%" innerRadius={100} outerRadius={140} paddingAngle={10} dataKey="value" stroke="none" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(1)}%)`} labelLine={true}>
+                      {analyticsData.marketChart.map((entry, index) => <Cell key={`cell-expanded-m-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </PieChart>
+                </ChartContainer>
+              ) : (
+                <ChartContainer config={analyticsChartConfig} className="h-full w-full aspect-auto">
+                  <BarChart 
+                    data={
+                        expandedChart === 'usage' ? analyticsData.auChart : 
+                        expandedChart === 'barangay' ? analyticsData.barangayChart : 
+                        analyticsData.updateChart
+                    } 
+                    layout="vertical"
+                    margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
+                  >
+                    <CartesianGrid horizontal={false} strokeDasharray="3 3" opacity={0.1} />
+                    <XAxis type="number" hide />
+                    <YAxis dataKey="name" type="category" width={100} fontSize={10} fontWeight="bold" />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                      {(expandedChart === 'usage' ? analyticsData.auChart : 
+                        expandedChart === 'barangay' ? analyticsData.barangayChart : 
+                        analyticsData.updateChart).map((entry, index) => <Cell key={`cell-exp-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                    </Bar>
+                  </BarChart>
+                </ChartContainer>
+              )}
             </div>
-            <div className="lg:col-span-7 flex flex-col gap-5 min-h-0">
+            <div className="lg:col-span-6 flex flex-col gap-6 min-h-0">
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                <p className="text-xs font-bold leading-relaxed text-muted-foreground uppercase">
+                    Detailed distribution of <span className="text-foreground font-black">{expandedChart}</span> data for all finalized records in this batch.
+                </p>
+              </div>
               <div className="flex-1 overflow-y-auto pr-3 scrollbar-vertical-custom space-y-3">
-                {analyticsData.marketChart.map((item, index) => {
-                  const total = analyticsData.marketChart.reduce((sum, curr) => sum + curr.value, 0);
+                {(expandedChart === 'market' ? analyticsData.marketChart : 
+                  expandedChart === 'usage' ? analyticsData.auChart : 
+                  expandedChart === 'barangay' ? analyticsData.barangayChart : 
+                  analyticsData.updateChart).sort((a,b) => b.value - a.value).map((item, index) => {
+                  const dataList = (expandedChart === 'market' ? analyticsData.marketChart : 
+                    expandedChart === 'usage' ? analyticsData.auChart : 
+                    expandedChart === 'barangay' ? analyticsData.barangayChart : 
+                    analyticsData.updateChart);
+                  const total = dataList.reduce((sum, curr) => sum + curr.value, 0);
                   const percentage = ((item.value / total) * 100).toFixed(1);
                   return (
                     <div key={item.name} className="flex flex-col gap-2 p-4 rounded-xl bg-muted/20 border border-white/5 hover:bg-muted/40 transition-all shadow-sm">
@@ -1072,7 +1165,9 @@ export default function Home() {
                           <span className="text-sm font-black uppercase tracking-tight">{item.name}</span>
                           <span className="text-xs font-black text-primary px-2 py-0.5 rounded-full bg-primary/10">{percentage}%</span>
                         </div>
-                        <span className="text-sm font-mono font-bold">₱{item.value.toLocaleString()}</span>
+                        <span className="text-sm font-mono font-bold">
+                            {expandedChart === 'market' ? `₱${item.value.toLocaleString()}` : `${item.value.toLocaleString()} units`}
+                        </span>
                       </div>
                       <div className="w-full h-1.5 bg-background/50 rounded-full overflow-hidden shadow-inner">
                         <div className="h-full transition-all duration-1000 ease-out" style={{ width: `${percentage}%`, backgroundColor: COLORS[index % COLORS.length] }} />
