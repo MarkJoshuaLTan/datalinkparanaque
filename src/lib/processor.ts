@@ -12,6 +12,8 @@ export interface ValidationError {
   message: string;
 }
 
+export type RecordStatusType = 'VALID' | 'INVALID PIN FORMAT' | 'INCOMPLETE' | 'AREA ERROR' | 'DUPLICATE' | 'CLEANUP';
+
 export interface LandRecord {
   id?: string;
   date: string;
@@ -36,6 +38,7 @@ export interface LandRecord {
   isValid?: boolean;
   errors?: ValidationError[];
   sourceFile?: string; // Track original file in batch processing
+  statusLabel?: RecordStatusType; // Specific labeling for UI
 }
 
 export interface CalibrationRule {
@@ -376,21 +379,47 @@ export function processRecords(
     });
   }
 
-  // Final Pass: Validation
+  // Final Pass: Validation and Labeling
   result = result.map(record => {
     const errors = validateRecord(record);
     if (record.arpNo && (arpCounts.get(record.arpNo) || 0) > 1) {
       errors.push({ field: 'arpNo', message: 'Duplicate ARP Number detected in source file' });
     }
 
+    let statusLabel: RecordStatusType = 'VALID';
+    
+    if (record.isDuplicate) {
+      statusLabel = 'DUPLICATE';
+    } else {
+      // Incomplete logic: missing PIN, ACCTNAME, ARP, UPDATE, ADDRESS, KIND, or AU
+      const isIncomplete = !record.pin || !record.acctName || !record.arpNo || !record.update || !record.address || !record.kind || !record.au;
+      
+      if (isIncomplete) {
+        statusLabel = 'INCOMPLETE';
+      } else {
+        const pinRegex = /^\d{3}-\d{2}-\d{3}-\d{3}-\d{3}-\d{4}$/;
+        if (record.pin && !pinRegex.test(record.pin)) {
+          statusLabel = 'INVALID PIN FORMAT';
+        } else if (record.landArea <= 0) {
+          statusLabel = 'AREA ERROR';
+        }
+      }
+    }
+
+    // Cleanup detection (Total rows etc)
+    if (record.isCleanup && statusLabel === 'VALID') {
+      statusLabel = 'CLEANUP';
+    }
+
     return {
       ...record,
       errors,
-      isValid: errors.length === 0
+      isValid: statusLabel === 'VALID',
+      statusLabel
     };
   });
 
-  const finalProcessed = result.filter(r => !r.isDuplicate && !r.isCleanup && !r.isManualArchive);
+  const finalProcessed = result.filter(r => r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP');
   const errorCount = finalProcessed.filter(r => !r.isValid).length;
   const validCount = finalProcessed.filter(r => r.isValid).length;
 

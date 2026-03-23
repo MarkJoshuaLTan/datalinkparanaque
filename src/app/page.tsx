@@ -39,7 +39,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ImportZone } from '@/components/dashboard/import-zone';
 import { CalibrationSidebar } from '@/components/dashboard/calibration-sidebar';
 import { DataPreviewTable } from '@/components/dashboard/data-preview-table';
-import { LandRecord, CalibrationRule, processRecords, TaxRateMap, ProcessingReport } from '@/lib/processor';
+import { LandRecord, CalibrationRule, processRecords, TaxRateMap, ProcessingReport, RecordStatusType } from '@/lib/processor';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import * as XLSX from 'xlsx';
 import { SettingsPanel } from '@/components/dashboard/settings-panel';
@@ -212,7 +212,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
-      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+      document.addEventListener('fullscreenchange', handleFullScreenChange);
     };
   }, []);
 
@@ -277,14 +277,14 @@ export default function Home() {
   };
 
   const updateStats = (data: LandRecord[], rawCount: number) => {
-    const active = data.filter(r => !r.isCleanup && !r.isDuplicate && !r.isManualArchive);
-    const valid = active.filter(r => r.isValid);
-    const errors = active.filter(r => !r.isValid || (r.landArea === 0 && r.pin && r.arpNo)).length;
+    const active = data.filter(r => r.statusLabel !== 'CLEANUP' && r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && !r.isManualArchive);
+    const valid = active.filter(r => r.statusLabel === 'VALID');
+    const errors = active.filter(r => r.statusLabel !== 'VALID').length;
     setStats({ 
       totalRawRows: rawCount,
-      systemCleanup: data.filter(r => r.isCleanup || r.isManualArchive).length,
+      systemCleanup: data.filter(r => r.statusLabel === 'CLEANUP' || r.statusLabel === 'INCOMPLETE' || r.statusLabel === 'DUPLICATE' || r.isManualArchive).length,
       totalImported: rawCount, 
-      duplicatesRemoved: data.filter(r => r.isDuplicate).length, 
+      duplicatesRemoved: data.filter(r => r.statusLabel === 'DUPLICATE').length, 
       finalCount: active.length,
       totalMarketValue: valid.reduce((sum, r) => sum + (r.marketValue || 0), 0),
       totalAssessedValue: valid.reduce((sum, r) => sum + (r.assessedValue || 0), 0),
@@ -410,7 +410,7 @@ export default function Home() {
         cleanupCount: 0,
         duplicatesDetected: 0,
         calibratedCount: 0,
-        errorCount: dataToExport.filter(r => !r.isValid).length,
+        errorCount: dataToExport.filter(r => r.statusLabel !== 'VALID').length,
         validCount: dataToExport.length,
         totalMarketValue: totalMarketValue,
         totalAssessedValue: totalAssessedValue,
@@ -426,8 +426,8 @@ export default function Home() {
     let currentList = [];
     
     if (type === 'errors') {
-      const baseData = processedData.length > 0 ? processedData : previewData.filter(r => !r.isDuplicate && !r.isCleanup && !r.isManualArchive);
-      currentList = baseData.filter(r => !r.isValid || (r.landArea === 0 && r.pin && r.arpNo));
+      const baseData = processedData.length > 0 ? processedData : previewData.filter(r => r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && !r.isManualArchive);
+      currentList = baseData.filter(r => r.statusLabel !== 'VALID' || (r.landArea === 0 && r.pin && r.arpNo));
     } else {
       currentList = filteredDisplayData;
     }
@@ -452,8 +452,8 @@ export default function Home() {
     
     let currentList = [];
     if (type === 'errors') {
-      const baseData = processedData.length > 0 ? processedData : previewData.filter(r => !r.isDuplicate && !r.isCleanup && !r.isManualArchive);
-      currentList = baseData.filter(r => !r.isValid || (r.landArea === 0 && r.pin && r.arpNo));
+      const baseData = processedData.length > 0 ? processedData : previewData.filter(r => r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && !r.isManualArchive);
+      currentList = baseData.filter(r => r.statusLabel !== 'VALID' || (r.landArea === 0 && r.pin && r.arpNo));
     } else {
       currentList = filteredDisplayData;
     }
@@ -492,8 +492,8 @@ export default function Home() {
 
   const filteredDisplayData = useMemo(() => {
     const baseData = viewMode === 'archive' 
-      ? previewData.filter(r => r.isDuplicate || r.isCleanup || r.isManualArchive)
-      : (processedData.length > 0 ? processedData : previewData.filter(r => !r.isDuplicate && !r.isCleanup && !r.isManualArchive));
+      ? previewData.filter(r => r.statusLabel === 'DUPLICATE' || r.statusLabel === 'INCOMPLETE' || r.isManualArchive)
+      : (processedData.length > 0 ? processedData : previewData.filter(r => r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && !r.isManualArchive));
 
     return baseData.filter(record => {
       if (sourceFileFilter !== 'all' && record.sourceFile !== sourceFileFilter) return false;
@@ -511,16 +511,32 @@ export default function Home() {
       }
       if (!matchesSearch) return false;
       if (statusFilter === 'all') return true;
-      if (statusFilter === 'valid') return record.isValid && !record.isDuplicate && !record.isCleanup && !record.isManualArchive;
-      if (statusFilter === 'error') return (!record.isValid || record.landArea === 0) && !record.isDuplicate && !record.isCleanup && !record.isManualArchive;
-      if (statusFilter === 'duplicate') return record.isDuplicate;
-      if (statusFilter === 'cleanup') return record.isCleanup || record.isManualArchive;
+      if (statusFilter === 'VALID') return record.statusLabel === 'VALID';
+      if (statusFilter === 'INVALID PIN FORMAT') return record.statusLabel === 'INVALID PIN FORMAT';
+      if (statusFilter === 'AREA ERROR') return record.statusLabel === 'AREA ERROR';
+      if (statusFilter === 'INCOMPLETE') return record.statusLabel === 'INCOMPLETE';
+      if (statusFilter === 'DUPLICATE') return record.statusLabel === 'DUPLICATE';
+      
       return true;
     });
   }, [previewData, processedData, viewMode, searchQuery, searchField, statusFilter, sourceFileFilter, barangayFilter, userMode]);
 
+  // Determine which status options should be shown in the funneling system based on active data
+  const dynamicStatusOptions = useMemo(() => {
+    const activeData = viewMode === 'archive' 
+      ? previewData.filter(r => r.statusLabel === 'DUPLICATE' || r.statusLabel === 'INCOMPLETE' || r.isManualArchive)
+      : (processedData.length > 0 ? processedData : previewData.filter(r => r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && !r.isManualArchive));
+    
+    const available = new Set<string>();
+    activeData.forEach(r => {
+        if (r.statusLabel) available.add(r.statusLabel);
+    });
+    
+    return Array.from(available);
+  }, [previewData, processedData, viewMode]);
+
   const analyticsData = useMemo(() => {
-    const activeData = processedData.length > 0 ? processedData : previewData.filter(r => !r.isCleanup && !r.isDuplicate && !r.isManualArchive);
+    const activeData = processedData.length > 0 ? processedData : previewData.filter(r => r.statusLabel !== 'CLEANUP' && r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && !r.isManualArchive);
     const filteredActiveData = activeData.filter(record => {
       if (sourceFileFilter !== 'all' && record.sourceFile !== sourceFileFilter) return false;
       if (barangayFilter !== 'all' && record.barangayName !== barangayFilter) return false;
@@ -603,7 +619,7 @@ export default function Home() {
       icon: Eraser,
       color: "border-l-orange-400",
       textClass: "text-orange-600",
-      definition: "Rows the system automatically identified as non-data noise, such as page headers, empty lines, or manually archived records."
+      definition: "Rows identified as non-data noise, duplicates, or incomplete entries that are moved to the Archive tab."
     },
     {
       label: "Valid Records",
@@ -611,7 +627,7 @@ export default function Home() {
       icon: CheckCircle2,
       color: "border-l-primary bg-primary/5",
       textClass: "text-primary",
-      definition: "The finalized set of clean, unique, and verified records that have passed all city-standard validation rules and are ready for official submission."
+      definition: "The finalized set of clean, unique, and verified records that have passed all city-standard validation rules."
     },
     {
       label: "Duplicates",
@@ -619,7 +635,7 @@ export default function Home() {
       icon: Archive,
       color: "border-l-amber-400 bg-amber-500/5",
       textClass: "text-amber-500",
-      definition: "Multiple records sharing the same PIN. The engine automatically keeps only the entry with the most recent or highest ARP sequence number."
+      definition: "Multiple records sharing the same PIN. The engine automatically moves duplicates to the Archive tab."
     },
     {
       label: "Total Market",
@@ -627,7 +643,7 @@ export default function Home() {
       icon: Database,
       color: "border-l-green-600 bg-green-500/5",
       textClass: "text-green-600",
-      definition: "The combined Market Value of all currently filtered valid records, calculated as Land Area multiplied by the designated Unit Value."
+      definition: "The combined Market Value of all currently filtered valid records."
     },
     {
       label: "Total Assessed",
@@ -635,7 +651,7 @@ export default function Home() {
       icon: BarChart3,
       color: "border-l-blue-600 bg-green-500/5",
       textClass: "text-blue-600",
-      definition: "The sum of all Assessed Values, which represents the taxable portion of the Market Value based on the property's specific Actual Use (AU)."
+      definition: "The sum of all Assessed Values for valid records."
     }
   ];
 
@@ -715,7 +731,7 @@ export default function Home() {
         )}
 
         <main className="flex-1 flex flex-col p-6 overflow-hidden gap-4 min-h-0">
-          <Tabs value={viewMode} onValueChange={(val: any) => setViewMode(val)} className="flex-1 flex flex-col min-h-0">
+          <Tabs value={viewMode} onValueChange={(val: any) => { setViewMode(val); setStatusFilter('all'); }} className="flex-1 flex flex-col min-h-0">
             {rawData.length === 0 && viewMode !== 'audit' ? (
               <div className="flex-1 flex items-center justify-center h-full"><ImportZone onDataImported={handleDataImported} /></div>
             ) : (
@@ -753,7 +769,7 @@ export default function Home() {
                       <TabsTrigger value="audit" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><ShieldCheck className="w-3.5 h-3.5 mr-2" /> Audit Log</TabsTrigger>
                     </TabsList>
                     {viewMode !== 'analytics' && viewMode !== 'audit' && (
-                      <div className="flex flex-1 items-center gap-2 w-full max-w-[900px]">
+                      <div className="flex flex-1 items-center gap-2 w-full max-w-[950px]">
                         <div className="flex items-center gap-2 flex-1">
                           {userMode === 'full' && (
                             <Select value={searchField} onValueChange={setSearchField}>
@@ -794,16 +810,15 @@ export default function Home() {
                             </SelectContent>
                           </Select>
                         )}
-                        {userMode === 'full' && (
-                          <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-24 h-9 text-xs font-bold uppercase"><Filter className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="Status" /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All</SelectItem>
-                              <SelectItem value="valid">Valid</SelectItem>
-                              <SelectItem value="error">Errors</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        )}
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                          <SelectTrigger className="w-[160px] h-9 text-xs font-bold uppercase"><Filter className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="Status" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            {dynamicStatusOptions.sort().map(opt => (
+                              <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <Button variant="ghost" size="sm" className="h-9 text-xs font-bold uppercase px-3 text-primary hover:bg-primary/10" onClick={() => setIsImportDialogOpen(true)}>
                           <Plus className="w-3.5 h-3.5 mr-1" /> Add Data
                         </Button>
