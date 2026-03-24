@@ -521,6 +521,9 @@ export default function Home() {
     setIsExportSettingsOpen(false);
 
     try {
+      // Small artificial delay to show "Generating File..." indicator as requested
+      await delay(1500);
+
       const dataToFilter = previewData;
       const filteredForExport = dataToFilter.filter(r => 
         settings.barangays.includes(r.barangayName || 'UNMAPPED') && 
@@ -1219,6 +1222,25 @@ export default function Home() {
 
             <p className="mt-8 text-[11px] font-bold text-muted-foreground uppercase tracking-[0.2em] animate-pulse">
               Validating Parañaque Land Records
+            </p>
+          </Card>
+        </div>
+      )}
+
+      {/* Exporting Status Overlay */}
+      {isExporting && !exportSuccess && (
+        <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-xl flex flex-col items-center justify-center animate-in fade-in duration-300">
+          <Card className="w-full max-w-md p-10 bg-card border-white/10 shadow-2xl flex flex-col items-center scale-105">
+            <div className="relative mb-8">
+              <Loader2 className="w-16 h-16 text-primary animate-spin" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <FileDown className="w-6 h-6 text-primary/40" />
+              </div>
+            </div>
+            
+            <h3 className="text-2xl font-black text-foreground uppercase tracking-tight mb-4">Generating File...</h3>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.2em] animate-pulse">
+              Compiling Parañaque Land Records
             </p>
           </Card>
         </div>
