@@ -76,8 +76,8 @@ import {
   DialogFooter
 } from '@/components/ui/dialog';
 import { 
-  Popover,
-  PopoverContent,
+  Popover, 
+  PopoverContent, 
   PopoverTrigger 
 } from '@/components/ui/popover';
 import { Bar, BarChart, XAxis, YAxis, Cell, Pie, PieChart, Legend, CartesianGrid, ResponsiveContainer } from 'recharts';
@@ -736,6 +736,9 @@ export default function Home() {
                               <SelectItem value="arpNo">ARP No#</SelectItem>
                               <SelectItem value="pin">PIN</SelectItem>
                               <SelectItem value="acctName">Account</SelectItem>
+                              <SelectItem value="update">Update</SelectItem>
+                              <SelectItem value="kind">Kind</SelectItem>
+                              <SelectItem value="au">AU</SelectItem>
                             </SelectContent>
                           </Select>
                           <div className="relative flex-1">
@@ -1183,4 +1186,3 @@ export default function Home() {
     </div>
   );
 }
-
