@@ -237,6 +237,42 @@ export default function Home() {
     return Array.from(brgySet).sort();
   }, [previewData]);
 
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Run Processor: Ctrl + Enter
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        if (rawData.length > 0 && !isProcessing && !isRunProcessorDialogOpen) {
+          e.preventDefault();
+          setIsRunProcessorDialogOpen(true);
+        }
+      }
+      
+      // Export Data: Ctrl + E
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e') {
+        if (rawData.length > 0 && !isExportSettingsOpen) {
+          e.preventDefault();
+          setIsExportSettingsOpen(true);
+        }
+      }
+
+      // Settings: Ctrl + Alt + S
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        setIsSettingsOpen(true);
+      }
+
+      // Clear Session: Ctrl + Alt + C
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        clearWorkspace();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [rawData.length, isProcessing, isRunProcessorDialogOpen, isExportSettingsOpen]);
+
   useEffect(() => {
     setIsClient(true);
     const handleBeforeInstallPrompt = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
@@ -743,7 +779,16 @@ export default function Home() {
           <Button variant="ghost" size="icon" onClick={toggleFullScreen}>{isFullScreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}</Button>
           <Button variant="ghost" size="icon" onClick={() => setIsAboutOpen(true)}><Info className="w-5 h-5" /></Button>
           <ModeToggle />
-          <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}><Settings className="w-5 h-5" /></Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}>
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Shortcut: Ctrl + Alt + S</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </header>
 
@@ -1014,11 +1059,32 @@ export default function Home() {
                 </Card>
                 <div className="flex items-center justify-between bg-card p-4 rounded-xl shadow-2xl border border-white/10 shrink-0">
                   <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => setIsExportSettingsOpen(true)} size="sm" className="font-black uppercase text-xs tracking-widest border-primary/30 text-primary hover:bg-primary hover:text-white transition-all h-10 px-6" disabled={isExporting}><FileDown className="w-4 h-4 mr-2" /> {isExporting ? "Generating..." : "Export Data"}</Button>
-                    <Button variant="ghost" size="sm" className="h-10 text-xs font-bold uppercase px-3" onClick={clearWorkspace}><Eraser className="w-3.5 h-3.5 mr-1" /> Clear Session</Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline" onClick={() => setIsExportSettingsOpen(true)} size="sm" className="font-black uppercase text-xs tracking-widest border-primary/30 text-primary hover:bg-primary hover:text-white transition-all h-10 px-6" disabled={isExporting}><FileDown className="w-4 h-4 mr-2" /> {isExporting ? "Generating..." : "Export Data"}</Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Shortcut: Ctrl + E</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-10 text-xs font-bold uppercase px-3" onClick={clearWorkspace}><Eraser className="w-3.5 h-3.5 mr-1" /> Clear Session</Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Shortcut: Ctrl + Alt + C</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                   {viewMode !== 'analytics' && viewMode !== 'audit' && (
-                    <Button size="lg" className="bg-primary hover:bg-green-700 px-12 font-black uppercase tracking-widest text-xs shadow-2xl transition-all active:scale-95 h-10" disabled={isProcessing} onClick={() => setIsRunProcessorDialogOpen(true)}>{isProcessing ? "Processing Batch..." : "Run Batch Processor"}</Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button size="lg" className="bg-primary hover:bg-green-700 px-12 font-black uppercase tracking-widest text-xs shadow-2xl transition-all active:scale-95 h-10" disabled={isProcessing} onClick={() => setIsRunProcessorDialogOpen(true)}>{isProcessing ? "Processing Batch..." : "Run Batch Processor"}</Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Shortcut: Ctrl + Enter</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                   {viewMode === 'audit' && (
                     <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 px-12 font-black uppercase tracking-widest text-xs shadow-2xl transition-all active:scale-95 h-10" onClick={() => setViewMode('results')}>Return to Dashboard</Button>
@@ -1158,7 +1224,16 @@ export default function Home() {
       </Dialog>
 
       <Dialog open={isRunProcessorDialogOpen} onOpenChange={setIsRunProcessorDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl p-6">
+        <DialogContent 
+          className="sm:max-w-md bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl p-6"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              setIsRunProcessorDialogOpen(false);
+              runProcess();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
               <Cpu className="w-5 h-5 text-primary" /> Processor Configuration
