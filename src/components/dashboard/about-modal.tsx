@@ -23,17 +23,12 @@ import {
   PieChart, 
   ShieldCheck, 
   Zap, 
-  Cpu, 
   FileDown,
   X,
   ArrowRight,
   Database,
-  Search,
-  LayoutDashboard,
-  Clock,
-  UserCheck
+  Clock
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface AboutModalProps {
   open: boolean;
@@ -44,7 +39,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent hideClose className="sm:max-w-[900px] max-h-[90vh] overflow-hidden flex flex-col bg-white dark:bg-zinc-950 border-none p-0 shadow-2xl rounded-2xl transition-colors duration-300">
-        {/* Accessibility Requirements */}
         <DialogHeader className="sr-only">
           <DialogTitle>About DataLink Parañaque</DialogTitle>
           <DialogDescription>
@@ -52,7 +46,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        {/* Fixed Header with Close Button */}
         <div className="absolute right-6 top-6 z-50">
           <button 
             onClick={() => onOpenChange(false)}
@@ -63,7 +56,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto scroll-smooth scrollbar-vertical-custom">
-          {/* Hero Section */}
           <section className="px-12 pt-20 pb-16 text-center space-y-6 bg-gradient-to-b from-slate-50 to-white dark:from-zinc-900 dark:to-zinc-950">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400 animate-in fade-in slide-in-from-bottom-2 duration-700">
               <ShieldCheck className="w-3 h-3" /> Government Grade Accuracy
@@ -90,7 +82,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </div>
           </section>
 
-          {/* Value Prop Section */}
           <section className="px-12 py-16 bg-white dark:bg-zinc-950 border-y border-slate-100 dark:border-zinc-900">
             <div className="max-w-3xl mx-auto text-center space-y-8">
               <h2 className="text-sm font-black uppercase tracking-[0.3em] text-primary">The Vision</h2>
@@ -105,7 +96,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </div>
           </section>
 
-          {/* Features Grid */}
           <section className="px-12 py-20 bg-white dark:bg-zinc-950">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-sm font-black uppercase tracking-[0.3em] text-primary">Core Engine</h2>
@@ -118,7 +108,7 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
                 { title: "Rule-Based Diagnostics", desc: "Get automated explanations for every chart in analytics.", icon: PieChart },
                 { title: "Pre-Run Configuration", desc: "Review and toggle engine settings before every run.", icon: Settings2 },
                 { title: "Persistent Audit Log", desc: "Automatically saves history of every batch run locally.", icon: ShieldCheck },
-                { title: "Intelligent PIN Wildcards", desc: "Auto-mapping via sophisticated pattern recognition.", icon: Cpu },
+                { title: "Intelligent PIN Wildcards", desc: "Auto-mapping via sophisticated pattern recognition.", icon: Database },
                 { title: "Financial Automation", desc: "Auto-computation based on Parañaque city standards.", icon: Database },
               ].map((feature, i) => (
                 <div key={i} className="group p-6 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 hover:border-primary/20 dark:hover:border-primary/40 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-xl transition-all duration-300">
@@ -132,7 +122,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </div>
           </section>
 
-          {/* Benefits Section */}
           <section className="px-12 py-20 bg-slate-900 dark:bg-black text-white">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-8">
@@ -167,7 +156,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </div>
           </section>
 
-          {/* How It Works */}
           <section className="px-12 py-20 bg-white dark:bg-zinc-950">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-sm font-black uppercase tracking-[0.3em] text-primary">Process Flow</h2>
@@ -196,29 +184,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </div>
           </section>
 
-          {/* Testimonials */}
-          <section className="px-12 py-20 bg-slate-50 dark:bg-zinc-900/50">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { quote: "The deduplication engine alone has cleared thousands of duplicate PIN entries that used to take weeks to manually audit.", author: "Data Analyst", role: "Real Property Division" },
-                { quote: "DataLink's offline capability is crucial for our field operations. The export controller is intuitive and lightning fast.", author: "Senior Auditor", role: "City Assessor's Office" },
-                { quote: "The transition from messy Excel sheets to audit-ready data has completely transformed our workflow efficiency.", author: "Systems Administrator", role: "ICT Department" },
-              ].map((t, i) => (
-                <div key={i} className="p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 shadow-sm space-y-6">
-                  <div className="flex gap-1 text-primary">
-                    {[...Array(5)].map((_, j) => <Zap key={j} className="w-3 h-3 fill-current" />)}
-                  </div>
-                  <p className="text-base font-bold text-slate-700 dark:text-zinc-300 italic leading-relaxed">"{t.quote}"</p>
-                  <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
-                    <div className="text-sm font-black text-slate-900 dark:text-zinc-100 uppercase tracking-tight">{t.author}</div>
-                    <div className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest">{t.role}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Pricing / Deployment */}
           <section className="px-12 py-20 bg-white dark:bg-zinc-950">
             <div className="max-w-xl mx-auto p-10 rounded-3xl bg-slate-900 dark:bg-zinc-900 text-white shadow-2xl relative overflow-hidden text-center">
               <div className="relative z-10 space-y-8">
@@ -247,7 +212,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </div>
           </section>
 
-          {/* FAQ */}
           <section className="px-12 py-20 bg-white dark:bg-zinc-950">
             <div className="max-w-2xl mx-auto space-y-12">
               <div className="text-center space-y-4">
@@ -274,7 +238,6 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </div>
           </section>
 
-          {/* Final CTA */}
           <section className="px-12 py-24 bg-gradient-to-t from-slate-50 to-white dark:from-zinc-900 dark:to-zinc-950 text-center space-y-8">
             <h3 className="text-4xl font-black text-slate-900 dark:text-zinc-100 tracking-tight">Start Processing Smarter Today</h3>
             <Button 
