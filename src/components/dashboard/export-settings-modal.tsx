@@ -35,6 +35,7 @@ interface ExportSettingsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: LandRecord[];
+  isProcessed: boolean;
   exportColumns: Record<string, boolean>;
   onColumnToggle: (col: string) => void;
   onBulkColumnChange?: (cols: Record<string, boolean>) => void;
@@ -57,6 +58,7 @@ export function ExportSettingsModal({
   open,
   onOpenChange,
   data,
+  isProcessed,
   exportColumns,
   onColumnToggle,
   onBulkColumnChange,
@@ -70,8 +72,13 @@ export function ExportSettingsModal({
     data.forEach(r => { 
       set.add(r.barangayName || 'UNMAPPED'); 
     });
+
+    if (isProcessed) {
+      set.delete('UNMAPPED');
+    }
+    
     return Array.from(set).sort();
-  }, [data]);
+  }, [data, isProcessed]);
 
   const availableStatuses = useMemo(() => {
     const set = new Set<RecordStatusType>();

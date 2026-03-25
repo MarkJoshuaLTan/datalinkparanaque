@@ -234,8 +234,13 @@ export default function Home() {
   const uniqueBarangays = useMemo(() => {
     const brgySet = new Set<string>();
     previewData.forEach(r => { brgySet.add(r.barangayName || 'UNMAPPED'); });
+
+    if (processedData.length > 0) {
+      brgySet.delete('UNMAPPED');
+    }
+
     return Array.from(brgySet).sort();
-  }, [previewData]);
+  }, [previewData, processedData]);
 
   const clearWorkspace = () => {
     setRawData([]);
@@ -341,7 +346,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
-      document.addEventListener('fullscreenchange', handleFullScreenChange);
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
     };
   }, []);
 
@@ -1332,6 +1337,7 @@ export default function Home() {
         open={isExportSettingsOpen} 
         onOpenChange={setIsExportSettingsOpen} 
         data={previewData} 
+        isProcessed={processedData.length > 0}
         exportColumns={exportColumns}
         onColumnToggle={(col) => setExportColumns(prev => ({ ...prev, [col]: !prev[col] }))}
         onBulkColumnChange={(cols) => setExportColumns(cols)}
