@@ -43,7 +43,7 @@ interface AboutModalProps {
 export function AboutModal({ open, onOpenChange }: AboutModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-hidden flex flex-col bg-white dark:bg-zinc-950 border-none p-0 shadow-2xl rounded-2xl transition-colors duration-300">
+      <DialogContent hideClose className="sm:max-w-[900px] max-h-[90vh] overflow-hidden flex flex-col bg-white dark:bg-zinc-950 border-none p-0 shadow-2xl rounded-2xl transition-colors duration-300">
         {/* Accessibility Requirements */}
         <DialogHeader className="sr-only">
           <DialogTitle>About DataLink Parañaque</DialogTitle>
