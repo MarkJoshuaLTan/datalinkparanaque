@@ -178,9 +178,7 @@ export default function Home() {
   const [processedData, setProcessedData] = useState<LandRecord[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState<ProcessingStep>('idle');
-  const [processingProgress, setProcessingProgress] = useState(0);
   const [isExporting, setIsExporting] = useState(false);
-  const [exportProgress, setExportProgress] = useState(0);
   const [importedFileName, setImportedFileName] = useState<string>("");
   const [rules, setRules] = useState<CalibrationRule[]>([]);
   const [viewMode, setViewMode] = useState<'results' | 'archive' | 'analytics' | 'audit'>('results');
@@ -235,10 +233,14 @@ export default function Home() {
 
   const uniqueBarangays = useMemo(() => {
     const brgySet = new Set<string>();
-    const dataSet = processedData.length > 0 ? processedData : previewData;
-    dataSet.forEach(r => { brgySet.add(r.barangayName || 'UNMAPPED'); });
+    const isActuallyProcessed = processedData.length > 0;
+    
+    const dataSet = isActuallyProcessed ? processedData : previewData;
+    dataSet.forEach(r => { 
+      brgySet.add(r.barangayName || 'UNMAPPED'); 
+    });
 
-    if (processedData.length > 0) {
+    if (isActuallyProcessed) {
       brgySet.delete('UNMAPPED');
     }
 
@@ -430,19 +432,15 @@ export default function Home() {
     if (!silent) {
       setIsProcessing(true);
       setProcessingStep('cleanup');
-      setProcessingProgress(15);
     }
     
     // Multi-step progress simulation
     if (!silent) {
       await delay(1200);
       setProcessingStep('dedupe');
-      setProcessingProgress(45);
       await delay(1000);
       setProcessingStep('calibrate');
-      setProcessingProgress(85);
       await delay(800);
-      setProcessingProgress(100);
     }
 
     startTransition(() => {
@@ -457,7 +455,6 @@ export default function Home() {
           setTimeout(() => {
             setIsProcessing(false);
             setProcessingStep('idle');
-            setProcessingProgress(0);
             showSuccessModal({
                 title: "Engine Analysis Complete",
                 message: `${report.validCount} records have been successfully calibrated. Please conduct a manual review of all results to ensure final data integrity before export.`,
@@ -528,25 +525,12 @@ export default function Home() {
     return Array.from(available);
   }, [previewData, processedData, viewMode]);
 
-  useEffect(() => {
-    let interval: any;
-    if (isExporting) {
-      setExportProgress(0);
-      interval = setInterval(() => {
-        setExportProgress(prev => Math.min(prev + 5, 100));
-      }, 70);
-    } else {
-      setExportProgress(0);
-    }
-    return () => clearInterval(interval);
-  }, [isExporting]);
-
   const handleFinalExport = async (settings: ExportFinalSettings) => {
     setIsExporting(true);
     setIsExportSettingsOpen(false);
 
     try {
-      // Small artificial delay to show "Generating File..." indicator as requested
+      // Small artificial delay to show progress state as requested
       await delay(1500);
 
       const dataToFilter = previewData;
@@ -1206,25 +1190,7 @@ export default function Home() {
       {isProcessing && processingStep !== 'idle' && (
         <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-xl flex flex-col items-center justify-center animate-in fade-in duration-300">
           <Card className="w-full max-w-md p-10 bg-card border-white/10 shadow-2xl flex flex-col items-center scale-105">
-            <div className="relative mb-8 flex items-center justify-center">
-              <svg className="w-24 h-24 transform -rotate-90">
-                <circle cx="48" cy="48" r="36" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-muted/20" />
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="36"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  fill="transparent"
-                  strokeDasharray={226.2}
-                  strokeDashoffset={226.2 - (processingProgress / 100) * 226.2}
-                  strokeLinecap="round"
-                  className="text-primary transition-all duration-500 ease-in-out"
-                />
-              </svg>
-              <span className="absolute text-xl font-black text-foreground tabular-nums">{Math.round(processingProgress)}%</span>
-            </div>
-            
+            <Loader2 className="w-12 h-12 text-primary animate-spin mb-8" />
             <h3 className="text-2xl font-black text-foreground uppercase tracking-tight mb-8">Engine Initializing...</h3>
             
             <div className="w-full space-y-4">
@@ -1291,25 +1257,7 @@ export default function Home() {
       {isExporting && (
         <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-xl flex flex-col items-center justify-center animate-in fade-in duration-300">
           <Card className="w-full max-w-md p-10 bg-card border-white/10 shadow-2xl flex flex-col items-center scale-105">
-            <div className="relative mb-8 flex items-center justify-center">
-              <svg className="w-24 h-24 transform -rotate-90">
-                <circle cx="48" cy="48" r="36" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-muted/20" />
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="36"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  fill="transparent"
-                  strokeDasharray={226.2}
-                  strokeDashoffset={226.2 - (exportProgress / 100) * 226.2}
-                  strokeLinecap="round"
-                  className="text-primary transition-all duration-500 ease-in-out"
-                />
-              </svg>
-              <span className="absolute text-xl font-black text-foreground tabular-nums">{Math.round(exportProgress)}%</span>
-            </div>
-            
+            <Loader2 className="w-12 h-12 text-primary animate-spin mb-8" />
             <h3 className="text-2xl font-black text-foreground uppercase tracking-tight mb-4">Generating File...</h3>
             <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.2em] animate-pulse">
               Compiling Parañaque Land Records

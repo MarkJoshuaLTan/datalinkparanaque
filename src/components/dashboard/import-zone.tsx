@@ -315,7 +315,7 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
                         strokeDasharray={226.2}
                         strokeDashoffset={226.2 - (progress / 100) * 226.2}
                         strokeLinecap="round"
-                        className="text-primary transition-all duration-500 ease-in-out"
+                        className="text-primary animate-pulse transition-all duration-500 ease-in-out"
                       />
                     </svg>
                     <span className="absolute text-xl font-black text-foreground tabular-nums">{Math.round(progress)}%</span>
@@ -344,13 +344,13 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
                           <div className="shrink-0 ml-4">
                             {fileStatuses[idx] === 'done' ? (
                               <div className="bg-primary rounded-full p-0.5 animate-in zoom-in duration-300">
-                                <Check className="w-3 h-3 text-white" />
+                                <Check className="w-3.5 h-3.5 text-white" />
                               </div>
                             ) : (
                               fileStatuses[idx] === 'processing' ? (
-                                <Loader2 className="w-3 h-3 text-primary animate-spin" />
+                                <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
                               ) : (
-                                <div className="w-3 h-3 rounded-full border border-muted-foreground/30" />
+                                <div className="w-3.5 h-3.5 rounded-full border border-muted-foreground/30" />
                               )
                             )}
                           </div>
