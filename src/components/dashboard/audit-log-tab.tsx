@@ -73,7 +73,7 @@ export function AuditLogTab({ reports, onClearHistory, onDeleteReport }: AuditLo
 
     // Summary Text
     doc.setFontSize(11);
-    doc.text(`Certificate No: AUDIT-${report.id}`, 20, 65);
+    doc.text(`Certificate No: AUDIT-${report.id || 'LEGACY'}`, 20, 65);
     doc.text(`Processing Date: ${report.timestamp}`, 20, 72);
     doc.text(`Source File: ${report.fileName}`, 20, 79);
 
@@ -214,9 +214,11 @@ export function AuditLogTab({ reports, onClearHistory, onDeleteReport }: AuditLo
         <div className="grid grid-cols-1 gap-6">
           {reports.map((report) => {
             const hasRecoverableData = report.records && report.records.length > 0;
+            const reportId = report.id || `legacy-${Math.random().toString(36).substr(2, 5)}`;
+            const displayId = report.id && report.id.includes('-') ? report.id.split('-')[1] : 'LEGACY';
             
             return (
-              <Card key={report.id} className="overflow-hidden border-white/10 shadow-xl hover:shadow-2xl transition-all group relative">
+              <Card key={reportId} className="overflow-hidden border-white/10 shadow-xl hover:shadow-2xl transition-all group relative">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-600 group-hover:w-2 transition-all" />
                 
                 <div className="p-8 bg-card">
@@ -231,7 +233,7 @@ export function AuditLogTab({ reports, onClearHistory, onDeleteReport }: AuditLo
                         </h4>
                         <div className="flex items-center gap-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                           <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {report.timestamp}</span>
-                          <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> ID: {report.id.split('-')[1]}</span>
+                          <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> ID: {displayId}</span>
                         </div>
                       </div>
                     </div>
@@ -293,7 +295,7 @@ export function AuditLogTab({ reports, onClearHistory, onDeleteReport }: AuditLo
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              onClick={() => onDeleteReport?.(report.id)}
+                              onClick={() => onDeleteReport?.(reportId)}
                               className="h-11 w-11 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-xl"
                             >
                               <Trash2 className="w-5 h-5" />
