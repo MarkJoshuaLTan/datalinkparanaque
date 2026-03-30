@@ -14,8 +14,7 @@ import {
   Plus,
   HelpCircle,
   Maximize2,
-  Minimize2,
-  Check
+  Minimize2
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import Image from 'next/image';
@@ -37,6 +36,26 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 interface ImportZoneProps {
   onDataImported: (data: LandRecord[], fileName: string, rawCount: number) => void;
 }
+
+/**
+ * Intelligent Header Mapping Dictionary
+ * Maps common Parañaque spreadsheet headers to internal data fields.
+ */
+const HEADER_ALIASES = {
+  pin: ['pin', 'pin #', 'pin no', 'pin no.', 'property index no', 'property index number', 'property identification number', 'td pin', 'p.i.n.'],
+  arpNo: ['arp no#', 'arp no', 'arp', 'arp number', 'current arp', 'current', 'td no', 'td number', 'td no.', 'arp. no.'],
+  acctName: ['acctname', 'account name', 'owner', 'owner name', 'owners name', 'acct name', 'account', 'taxpayer name'],
+  address: ['address', 'location', 'property address', 'location of property', 'addr'],
+  landArea: ['land area', 'area', 'area (sqm)', 'sqm', 'sq.m.', 'sq.m', 'lot area'],
+  unitValue: ['unit value', 'uv', 'unit cost', 'market value per sqm'],
+  marketValue: ['market value', 'mv', 'total market value', 'market val', 'total mv'],
+  assessedValue: ['assessed value', 'av', 'al', 'assessed val', 'total av'],
+  yearlyTax: ['yearly tax', 'tax', 'annual tax', 'tax due'],
+  update: ['update', 'upd', 'update code', 'type', 'upd code', 'u'],
+  kind: ['kind', 'k', 'property kind'],
+  au: ['au', 'actual use', 'use', 'a.u.'],
+  date: ['date', 'effectivity', 'date effectivity', 'eff date']
+};
 
 export function ImportZone({ onDataImported }: ImportZoneProps) {
   const { toast } = useToast();
@@ -148,9 +167,10 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
   };
 
   const addFilesToStage = (files: FileList | File[]) => {
-    const newFiles = Array.from(files).filter(f => 
-      f.name.endsWith('.xlsx') || f.name.endsWith('.xls') || f.name.endsWith('.csv')
-    );
+    const newFiles = Array.from(files).filter(f => {
+      const name = f.name.toLowerCase();
+      return name.endsWith('.xlsx') || name.endsWith('.xls') || name.endsWith('.csv');
+    });
     
     if (newFiles.length === 0) {
       toast({
@@ -210,6 +230,15 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
         norm[cleanKey] = String(item[key]).trim();
       });
 
+      // Helper to find value by checking aliases
+      const getValue = (field: keyof typeof HEADER_ALIASES) => {
+        const aliases = HEADER_ALIASES[field];
+        for (const alias of aliases) {
+          if (norm[alias] !== undefined && norm[alias] !== "") return norm[alias];
+        }
+        return "";
+      };
+
       const parseNum = (val: any) => {
         if (typeof val === 'number') return val;
         if (typeof val === 'string') {
@@ -220,41 +249,42 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
         return 0;
       };
 
-      let kind = String(norm['kind'] || norm['k'] || '').trim();
-      let au = String(norm['au'] || norm['actual use'] || '').trim();
-      const kau = String(norm['k-au'] || '').trim();
+      let kind = String(getValue('kind')).trim();
+      let au = String(getValue('au')).trim();
       
+      // Handle combined K-AU column variation
+      const kau = String(norm['k-au'] || norm['k/au'] || '').trim();
       if (kau && kau.includes('-')) {
         const parts = kau.split('-');
         kind = parts[0]?.trim() || kind;
         au = parts[1]?.trim() || au;
       }
       
-      const pin = String(norm['pin'] || '').trim();
-      const arpNo = String(norm['arp no#'] || norm['arp no'] || norm['current'] || '').trim();
+      const pin = String(getValue('pin')).trim();
+      const arpNo = String(getValue('arpNo')).trim();
 
       const uniqueId = `${fileName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
       return {
         id: uniqueId,
-        date: String(norm['date'] || norm['effectivity'] || '').trim(),
+        date: String(getValue('date')).trim(),
         arpNo: arpNo,
         pin: pin,
-        update: String(norm['update'] || norm['upd'] || norm['update code'] || norm['type'] || '').trim(),
-        acctName: String(norm['acctname'] || norm['owner'] || '').trim(),
-        address: String(norm['address'] || '').trim(),
-        location: String(norm['location'] || '').trim(), 
+        update: String(getValue('update')).trim(),
+        acctName: String(getValue('acctName')).trim(),
+        address: String(getValue('address')).trim(),
+        location: String(norm['location'] || '').trim(), // Calibration handles this
         kind: kind,
         au: au,
-        landArea: parseNum(norm['land area'] || norm['area']),
-        unitValue: parseNum(norm['unit value']),
-        marketValue: parseNum(norm['market value']),
-        assessedValue: parseNum(norm['assessed value']),
-        yearlyTax: parseNum(norm['yearly tax']),
+        landArea: parseNum(getValue('landArea')),
+        unitValue: parseNum(getValue('unitValue')),
+        marketValue: parseNum(getValue('marketValue')),
+        assessedValue: parseNum(getValue('assessedValue')),
+        yearlyTax: parseNum(getValue('yearlyTax')),
         isCleanup: false,
         cleanupReason: "",
         sourceFile: fileName,
-        rawRow: item // 1:1 original data preservation
+        rawRow: item // 1:1 original data preservation for high-fidelity recovery
       };
     });
   };
@@ -466,7 +496,7 @@ export function ImportZone({ onDataImported }: ImportZoneProps) {
             <h4 className="text-sm font-black uppercase tracking-widest text-emerald-900 dark:text-emerald-400">Data Guidelines</h4>
           </div>
           <p className="text-sm text-muted-foreground font-semibold leading-relaxed">
-            Spreadsheets must adhere to the official Parañaque City Real Property data structure. The engine automatically identifies, validates, and cross-references critical fields: PIN, ARP No#, and Account Name. You may import multiple files for simultaneous batch processing. Refer to the &apos;View Format Guide&apos; above for exact header requirements.
+            Spreadsheets must adhere to the official Parañaque City Real Property data structure. The engine automatically identifies, validates, and cross-references critical fields using intelligent header mapping. You may import multiple files for simultaneous batch processing. Recovered raw files from the Audit Log are compatible for re-upload.
           </p>
         </div>
       </Card>
