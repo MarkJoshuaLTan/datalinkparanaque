@@ -234,7 +234,6 @@ export default function Home() {
 
   const uniqueBarangays = useMemo(() => {
     const brgySet = new Set<string>();
-    // Use previewData (superset) to ensure all possible barangays are available in filters
     previewData.forEach(r => { 
       brgySet.add(r.barangayName || 'UNMAPPED'); 
     });
@@ -256,10 +255,8 @@ export default function Home() {
     toast({ title: "Workspace Cleared", description: "All active data removed. Audit logs preserved." });
   };
 
-  // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Run Processor: Ctrl + Enter
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         if (rawData.length > 0 && !isProcessing && !isRunProcessorDialogOpen) {
           e.preventDefault();
@@ -267,7 +264,6 @@ export default function Home() {
         }
       }
       
-      // Export Data: Ctrl + E
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e') {
         if (rawData.length > 0 && !isExportSettingsOpen) {
           e.preventDefault();
@@ -275,13 +271,11 @@ export default function Home() {
         }
       }
 
-      // Settings: Ctrl + Alt + S
       if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 's') {
         e.preventDefault();
         setIsSettingsOpen(true);
       }
 
-      // Clear Session: Ctrl + Alt + C (only if not copying text)
       if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'c') {
         if (window.getSelection()?.toString() === '') {
           e.preventDefault();
@@ -289,13 +283,11 @@ export default function Home() {
         }
       }
 
-      // Add File: Ctrl + Alt + A
       if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'a') {
         e.preventDefault();
         setIsImportDialogOpen(true);
       }
 
-      // Tab Switching: Cycle through dashboard views (Results -> Archive -> Analytics -> Audit)
       if (e.key === 'Tab' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         const activeElem = document.activeElement;
         const isTyping = activeElem instanceof HTMLInputElement || 
@@ -428,7 +420,6 @@ export default function Home() {
       setProcessingStep('cleanup');
     }
     
-    // Multi-step progress simulation
     if (!silent) {
       await delay(1200);
       setProcessingStep('dedupe');
@@ -524,7 +515,6 @@ export default function Home() {
     setIsExportSettingsOpen(false);
 
     try {
-      // Small artificial delay to show progress state as requested
       await delay(1500);
 
       const dataToFilter = previewData;
@@ -539,12 +529,10 @@ export default function Home() {
         return;
       }
 
-      // Sort records in ascending order based on parsed PIN hierarchy
       const sortedForExport = [...filteredForExport].sort((a, b) => {
         const partsA = (a.pin || '').split('-');
         const partsB = (b.pin || '').split('-');
         
-        // PIN format: (City Index)-(District Code)-(Barangay Code)-(Section Code)-(Lot Number)-(Suffix)
         for (let i = 0; i < 6; i++) {
           const segmentA = partsA[i] || '';
           const segmentB = partsB[i] || '';
@@ -555,7 +543,6 @@ export default function Home() {
           if (!isNaN(numA) && !isNaN(numB)) {
             if (numA !== numB) return numA - numB;
           } else {
-            // Fallback to string comparison for non-numeric segments if any
             if (segmentA !== segmentB) return segmentA.localeCompare(segmentB);
           }
         }
@@ -706,8 +693,11 @@ export default function Home() {
     };
   }, [processedData, previewData, sourceFileFilter, barangayFilter]);
 
-  const getInsightText = (type: string) => {
+  const getInsightText = (type: string): React.ReactNode => {
     const data = analyticsData;
+    const highlight = (val: any) => <span className="text-primary font-black underline decoration-primary/30 underline-offset-4">{val}</span>;
+    const neutralHighlight = (val: any) => <span className="text-foreground font-black">{val}</span>;
+    
     if (data.totalRecords === 0) return "Insufficient data currently active. Please adjust your filters or run the processor to generate detailed diagnostics.";
 
     switch (type) {
@@ -715,34 +705,76 @@ export default function Home() {
         const top = data.auChart[0];
         const percentage = ((top.value / data.totalRecords) * 100).toFixed(1);
         const second = data.auChart[1];
-        let comparison = "";
-        if (second) {
-            const gap = (top.value - second.value);
-            comparison = ` It leads the second most common category, "${second.name}", by ${gap} units.`;
-        }
-        return `Detailed Diagnostic: The property landscape is heavily concentrated in the "${top.name}" usage category, which accounts for a substantial ${percentage}% of all currently active records (${top.value} units).${comparison} The dataset contains a diverse mix of ${data.auChart.length} unique usage types. This pattern suggests a specialized portfolio density that may require focused valuation strategies for "${top.name}" properties.`;
+        return (
+          <div className="space-y-4">
+            <p>
+              The property distribution analysis reveals a primary concentration in {highlight(top.name)}, representing {highlight(percentage + "%")} of the active dataset with {highlight(top.value.toLocaleString() + " parcels")}.
+            </p>
+            {second && (
+              <p>
+                This category maintains a significant lead over {neutralHighlight(second.name)}, which holds the second position. The delta between these two primary usages is {highlight((top.value - second.value).toLocaleString() + " units")}, indicating a highly skewed development priority or data refresh cycle.
+              </p>
+            )}
+            <p>
+              Audit Insight: With {highlight(data.auChart.length)} unique usage types detected, the engine suggests prioritizing verification for {highlight(top.name)} to ensure the highest impact on overall data accuracy.
+            </p>
+          </div>
+        );
       }
       case 'barangay': {
         const top = data.barangayChart[0];
-        const count = data.barangayChart.length;
         const totalRaw = data.barangayChart.reduce((sum, item) => sum + item.value, 0);
         const density = ((top.value / totalRaw) * 100).toFixed(1);
-        return `Detailed Diagnostic: Geographic analysis identifies ${top.name} as the primary hub of data activity, housing ${density}% of the records in this active view (${top.value} properties). Your dataset currently spans ${count} distinct barangays across Parañaque. A cluster of this size in ${top.name} often indicates a major urban development phase or a high-volume data refresh for this specific sector. This distribution helps identify areas where administrative focus or bulk calibration rules would have the highest impact.`;
+        return (
+          <div className="space-y-4">
+            <p>
+              Geographic intelligence identifies {highlight(top.name)} as the most active sector in this batch, accounting for {highlight(density + "%")} of all records ({highlight(top.value.toLocaleString() + " properties")}).
+            </p>
+            <p>
+              The current session spans {highlight(data.barangayChart.length)} distinct barangays. The high density in {neutralHighlight(top.name)} suggests a localized general revision or a major parcel subdivision project within this specific administrative boundary.
+            </p>
+            <p>
+              Audit Insight: Concentrated geographic data allows for efficient field-based verification batches. The engine recommends a {highlight("focused audit pass")} for {top.name} to validate the latest boundary adjustments.
+            </p>
+          </div>
+        );
       }
       case 'update': {
         const sorted = [...data.updateChart].sort((a, b) => b.value - a.value);
         const top = sorted[0];
-        const second = sorted[1];
-        const updateCount = data.updateChart.length;
-        return `Detailed Diagnostic: Administrative tracking reveals that update code "${top.name}" is the dominant driver of record revisions in this batch, appearing in ${top.value} instances. This accounts for ${((top.value / data.totalRecords) * 100).toFixed(1)}% of all activity. The presence of ${updateCount} unique update codes suggests a multifaceted data maintenance cycle, with "${top.name}" being the primary reason for change. High frequencies of specific codes can help auditors identify if the batch represents a General Revision (GR) or targeted parcel corrections.`;
+        return (
+          <div className="space-y-4">
+            <p>
+              Administrative tracking shows that update code {highlight(top.name)} is the primary driver of record revisions, appearing in {highlight(top.value.toLocaleString() + " instances")}. This represents {highlight(((top.value / data.totalRecords) * 100).toFixed(1) + "%")} of all session activity.
+            </p>
+            <p>
+              With {highlight(data.updateChart.length)} unique update reasons logged, the data reflects a complex maintenance cycle. The prevalence of {neutralHighlight(top.name)} provides a clear audit trail for the batch's primary objective.
+            </p>
+            <p>
+              Audit Insight: High frequencies of specific update codes can signal systematic data entry patterns. Ensure that {highlight(top.name)} complies with the latest {highlight("City Ordinance valuation standards")}.
+            </p>
+          </div>
+        );
       }
       case 'market': {
         const sortedMarket = [...data.marketChart].sort((a, b) => b.value - a.value);
         const top = sortedMarket[0];
         const totalValue = data.marketChart.reduce((sum, item) => sum + item.value, 0);
         const percentage = ((top.value / totalValue) * 100).toFixed(1);
-        const avgValue = (totalValue / data.totalRecords).toFixed(2);
-        return `Detailed Diagnostic: Financial mapping shows that "${top.name}" properties are the primary value drivers, contributing a massive ₱${top.value.toLocaleString()} to the total session valuation. This represents ${percentage}% of the entire ₱${totalValue.toLocaleString()} market portfolio. Despite being just one of ${data.marketChart.length} categories, its financial weight is significantly disproportionate. The overall average market value across all ${data.totalRecords} active records currently stands at ₱${Number(avgValue).toLocaleString()}, providing a baseline for identifying high-value outliers.`;
+        const avgValue = (totalValue / data.totalRecords);
+        return (
+          <div className="space-y-4">
+            <p>
+              Financial analysis confirms {highlight(top.name)} as the primary value contributor, adding {highlight("₱" + top.value.toLocaleString(undefined, { minimumFractionDigits: 2 }))} to the total session valuation.
+            </p>
+            <p>
+              This single category accounts for {highlight(percentage + "%")} of the entire {highlight("₱" + totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 }))} portfolio currently being processed. The average property value across the session stands at {highlight("₱" + avgValue.toLocaleString(undefined, { minimumFractionDigits: 2 }))}.
+            </p>
+            <p>
+              Audit Insight: High-value outliers in the {highlight(top.name)} category represent the {highlight("highest financial risk")} for the city. Double-verify the land area and unit values for these specific parcels to prevent valuation leakages.
+            </p>
+          </div>
+        );
       }
       default: return "";
     }
@@ -971,7 +1003,6 @@ export default function Home() {
                     </TabsContent>
                     <TabsContent value="analytics" className="m-0 h-full p-6 overflow-y-auto scrollbar-vertical-custom bg-muted/5 data-[state=active]:flex data-[state=active]:flex-col">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10 max-w-7xl mx-auto w-full">
-                        {/* Usage Chart */}
                         <Card className="p-6 border-white/5 bg-card shadow-2xl overflow-hidden flex flex-col group">
                           <div className="flex items-center justify-between mb-8">
                             <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
@@ -1009,7 +1040,6 @@ export default function Home() {
                           </div>
                         </Card>
                         
-                        {/* Barangay Chart */}
                         <Card className="p-6 border-white/5 bg-card shadow-2xl overflow-hidden flex flex-col group">
                           <div className="flex items-center justify-between mb-8">
                             <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
@@ -1047,7 +1077,6 @@ export default function Home() {
                           </div>
                         </Card>
 
-                        {/* Update Code Distribution Chart */}
                         <Card className="p-6 border-white/5 bg-card shadow-2xl overflow-hidden flex flex-col group">
                           <div className="flex items-center justify-between mb-8">
                             <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
@@ -1085,7 +1114,6 @@ export default function Home() {
                           </div>
                         </Card>
 
-                        {/* Market Value Pie Chart */}
                         <Card className="p-6 border-white/5 bg-card shadow-2xl flex flex-col group relative overflow-hidden">
                           <div className="flex items-center justify-between mb-8">
                             <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
@@ -1180,7 +1208,6 @@ export default function Home() {
         </DialogContent>
       </Dialog>
 
-      {/* Processing Status Overlay */}
       {isProcessing && processingStep !== 'idle' && (
         <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-xl flex flex-col items-center justify-center animate-in fade-in duration-300">
           <Card className="w-full max-w-md p-10 bg-card border-white/10 shadow-2xl flex flex-col items-center scale-105">
@@ -1252,7 +1279,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Exporting Status Overlay */}
       {isExporting && (
         <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-xl flex flex-col items-center justify-center animate-in fade-in duration-300">
           <Card className="w-full max-w-md p-10 bg-card border-white/10 shadow-2xl flex flex-col items-center scale-105">
@@ -1270,7 +1296,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Enhanced Analytics Explanation Dialog */}
       <Dialog open={!!explainType} onOpenChange={(open) => !open && setExplainType(null)}>
         <DialogContent className="sm:max-w-2xl bg-card border-white/10 shadow-2xl p-0 overflow-hidden">
           <div className="bg-primary/5 p-6 border-b">
@@ -1285,9 +1310,9 @@ export default function Home() {
           </div>
           <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto scrollbar-vertical-custom">
             <div className="p-6 rounded-2xl bg-muted/30 border border-white/5 shadow-inner leading-relaxed">
-              <p className="text-base font-bold text-foreground/90">
+              <div className="text-base font-bold text-foreground/90">
                 {explainType && getInsightText(explainType)}
-              </p>
+              </div>
             </div>
             <div className="space-y-4">
                <h5 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
@@ -1377,7 +1402,6 @@ export default function Home() {
         onUnarchive={handleUnarchiveRecord}
       />
       
-      {/* Universal Expanded Chart Dialog */}
       <Dialog open={!!expandedChart} onOpenChange={(isOpen) => !isOpen && setExpandedChart(null)}>
         <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-hidden flex flex-col bg-card/95 backdrop-blur-3xl border-white/10 p-6 shadow-2xl">
           <DialogHeader className="mb-4 shrink-0">
