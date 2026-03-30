@@ -1,7 +1,8 @@
+
 "use client";
 
 import React from 'react';
-import { ProcessingReport } from '@/lib/processor';
+import { ProcessingReport, LandRecord } from '@/lib/processor';
 import { Card } from '@/components/ui/card';
 import { 
   ShieldCheck, 
@@ -14,19 +15,29 @@ import {
   Archive, 
   Zap,
   Calendar,
-  Trash2
+  Trash2,
+  Database,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { cn } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AuditLogTabProps {
   reports: ProcessingReport[];
   onClearHistory?: () => void;
+  onDeleteReport?: (id: string) => void;
 }
 
-export function AuditLogTab({ reports, onClearHistory }: AuditLogTabProps) {
+export function AuditLogTab({ reports, onClearHistory, onDeleteReport }: AuditLogTabProps) {
   if (reports.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center py-20 text-muted-foreground">
@@ -59,7 +70,7 @@ export function AuditLogTab({ reports, onClearHistory }: AuditLogTabProps) {
 
     // Summary Text
     doc.setFontSize(11);
-    doc.text(`Certificate No: AUDIT-${Date.now()}`, 20, 65);
+    doc.text(`Certificate No: AUDIT-${report.id}`, 20, 65);
     doc.text(`Processing Date: ${report.timestamp}`, 20, 72);
     doc.text(`Source File: ${report.fileName}`, 20, 79);
 
@@ -98,7 +109,7 @@ export function AuditLogTab({ reports, onClearHistory }: AuditLogTabProps) {
     const legalText = "I hereby certify that the data processing results listed above have been generated through the standardized Parañaque Land Records engine and are ready for official audit review and integration.";
     doc.text(doc.splitTextToSize(legalText, 170), 20, 260);
 
-    doc.save(`AuditReport-${report.fileName}-${Date.now()}.pdf`);
+    doc.save(`AuditReport-${report.fileName.replace(/\s+/g, '_')}.pdf`);
   };
 
   const exportAsExcel = (report: ProcessingReport) => {
@@ -123,111 +134,203 @@ export function AuditLogTab({ reports, onClearHistory }: AuditLogTabProps) {
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Audit Log");
-    XLSX.writeFile(wb, `ProcessingSummary-${report.fileName}.xlsx`);
+    XLSX.writeFile(wb, `ProcessingSummary-${report.fileName.replace(/\s+/g, '_')}.xlsx`);
+  };
+
+  const exportRawData = (report: ProcessingReport) => {
+    if (!report.records || report.records.length === 0) return;
+
+    const sortedRecords = [...report.records].sort((a, b) => {
+      const partsA = (a.pin || '').split('-');
+      const partsB = (b.pin || '').split('-');
+      for (let i = 0; i < 6; i++) {
+        const segmentA = partsA[i] || '';
+        const segmentB = partsB[i] || '';
+        const numA = parseInt(segmentA, 10);
+        const numB = parseInt(segmentB, 10);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          if (numA !== numB) return numA - numB;
+        } else if (segmentA !== segmentB) {
+          return segmentA.localeCompare(segmentB);
+        }
+      }
+      return 0;
+    });
+
+    const headerMapping: Record<string, string> = {
+      date: "DATE", arpNo: "ARP NO#", pin: "PIN", update: "UPDATE",
+      acctName: "ACCTNAME", address: "ADDRESS", location: "LOCATION",
+      kind: "KIND", au: "AU", landArea: "LAND AREA", unitValue: "UNIT VALUE",
+      marketValue: "MARKET VALUE", assessedValue: "ASSESSED VALUE", yearlyTax: "YEARLY TAX"
+    };
+
+    const formattedExport = sortedRecords.map(record => {
+      const row: any = {};
+      Object.entries(headerMapping).forEach(([key, label]) => {
+        row[label] = record[key as keyof LandRecord] ?? '';
+      });
+      return row;
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(formattedExport);
+    XLSX.utils.book_append_sheet(wb, ws, "AuditData");
+    XLSX.writeFile(wb, `AuditRawData-${report.fileName.replace(/\s+/g, '_')}.xlsx`);
   };
 
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-vertical-custom bg-muted/5">
-      <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-            <ShieldCheck className="w-6 h-6 text-emerald-600" /> 
-            Session Audit History
-          </h3>
-          <div className="flex items-center gap-4">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-              {reports.length} Logs Saved
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h3 className="text-2xl font-black uppercase tracking-tight flex items-center gap-3">
+              <ShieldCheck className="w-7 h-7 text-emerald-600" /> 
+              Administrative Audit Vault
+            </h3>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] ml-10">
+              Persistent tracking of all data engine activity
             </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Badge variant="secondary" className="h-8 px-4 text-xs font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border-emerald-200">
+              {reports.length} Verified Entries
+            </Badge>
             {onClearHistory && (
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={onClearHistory}
-                className="h-8 text-[10px] font-black uppercase tracking-widest text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="h-9 text-[10px] font-black uppercase tracking-widest text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Clear History
+                <Eraser className="w-3.5 h-3.5 mr-1.5" /> Purge History
               </Button>
             )}
           </div>
         </div>
 
-        {reports.map((report, index) => (
-          <Card key={index} className="overflow-hidden border-white/5 shadow-xl hover:shadow-2xl transition-all group">
-            <div className="p-6 bg-card">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                <div className="flex items-start gap-4">
-                  <div className="bg-emerald-500/10 p-3 rounded-2xl border border-emerald-500/20">
-                    <FileText className="w-6 h-6 text-emerald-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-black uppercase tracking-tight truncate max-w-[300px]">
-                      {report.fileName}
-                    </h4>
-                    <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase mt-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {report.timestamp}
+        <div className="grid grid-cols-1 gap-6">
+          {reports.map((report) => (
+            <Card key={report.id} className="overflow-hidden border-white/10 shadow-xl hover:shadow-2xl transition-all group relative">
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-600 group-hover:w-2 transition-all" />
+              
+              <div className="p-8 bg-card">
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8 mb-10">
+                  <div className="flex items-start gap-5">
+                    <div className="bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                      <FileText className="w-7 h-7 text-emerald-600" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-xl font-black uppercase tracking-tight truncate max-w-[400px]">
+                        {report.fileName}
+                      </h4>
+                      <div className="flex items-center gap-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                        <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {report.timestamp}</span>
+                        <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> ID: {report.id.split('-')[1]}</span>
+                      </div>
                     </div>
                   </div>
+
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => exportRawData(report)}
+                            disabled={!report.records || report.records.length === 0}
+                            className="h-11 px-5 font-black uppercase text-[11px] tracking-widest border-primary/30 text-primary hover:bg-primary hover:text-white"
+                          >
+                            <FileSpreadsheet className="w-4 h-4 mr-2" /> Recover Raw Data
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Download the full dataset used in this run</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => exportAsPDF(report)}
+                      className="h-11 px-5 font-black uppercase text-[11px] tracking-widest border-emerald-600/30 text-emerald-700 hover:bg-emerald-600 hover:text-white"
+                    >
+                      <Download className="w-4 h-4 mr-2" /> Audit Certificate
+                    </Button>
+
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => exportAsExcel(report)}
+                      className="h-11 px-5 font-black uppercase text-[11px] tracking-widest border-blue-600/30 text-blue-600 hover:bg-blue-600 hover:text-white"
+                    >
+                      <Layers className="w-4 h-4 mr-2" /> Summary Log
+                    </Button>
+
+                    <Separator orientation="vertical" className="h-8 mx-2" />
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => onDeleteReport?.(report.id)}
+                            className="h-11 w-11 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-xl"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Delete this specific log entry</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => exportAsPDF(report)}
-                    className="h-10 px-4 font-black uppercase text-[11px] tracking-widest border-emerald-600/30 text-emerald-700 hover:bg-emerald-600 hover:text-white"
-                  >
-                    <Download className="w-3.5 h-3.5 mr-2" /> PDF Audit
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => exportAsExcel(report)}
-                    className="h-10 px-4 font-black uppercase text-[11px] tracking-widest border-blue-600/30 text-blue-600 hover:bg-blue-600 hover:text-white"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5 mr-2" /> Excel Log
-                  </Button>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
+                  {[
+                    { label: "Imported", val: report.totalImported, color: "text-foreground", sub: "Raw Rows" },
+                    { label: "Cleanup", val: report.cleanupCount, color: "text-orange-600", sub: "Discarded" },
+                    { label: "Duplicates", val: report.duplicatesDetected, color: "text-amber-500", sub: "Merged" },
+                    { label: "Calibrated", val: report.calibratedCount, color: "text-primary", sub: "Auto-Mapped" },
+                    { label: "Errors", val: report.errorCount, color: "text-red-600", sub: "Need Fix" },
+                    { label: "Validated", val: report.validCount, color: "text-emerald-600", sub: "Certified" },
+                  ].map((stat, i) => (
+                    <div key={i} className="p-4 rounded-2xl bg-muted/20 border border-white/5 flex flex-col items-center justify-center text-center shadow-inner hover:bg-muted/30 transition-colors">
+                      <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1.5">{stat.label}</div>
+                      <div className={cn("text-lg font-black leading-none", stat.color)}>{stat.val.toLocaleString()}</div>
+                      <div className="text-[9px] font-bold text-muted-foreground/60 uppercase mt-1.5">{stat.sub}</div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+                
+                <div className="mt-10 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex items-center gap-8">
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Database className="w-3.5 h-3.5 text-primary" /> Total Market Value</div>
+                      <div className="text-base font-black font-mono">₱{report.totalMarketValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2"><ArrowRight className="w-3.5 h-3.5 text-blue-600" /> Total Assessed Value</div>
+                      <div className="text-base font-black font-mono">₱{report.totalAssessedValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div className="p-3 rounded-xl bg-muted/20 border border-white/5 text-center">
-                  <div className="text-[9px] font-black text-muted-foreground uppercase mb-1">Imported</div>
-                  <div className="text-sm font-black">{report.totalImported.toLocaleString()}</div>
-                </div>
-                <div className="p-3 rounded-xl bg-muted/20 border border-white/5 text-center">
-                  <div className="text-[9px] font-black text-muted-foreground uppercase mb-1">Cleanup</div>
-                  <div className="text-sm font-black text-orange-600">{report.cleanupCount}</div>
-                </div>
-                <div className="p-3 rounded-xl bg-muted/20 border border-white/5 text-center">
-                  <div className="text-[9px] font-black text-muted-foreground uppercase mb-1">Duplicates</div>
-                  <div className="text-sm font-black text-amber-500">{report.duplicatesDetected}</div>
-                </div>
-                <div className="p-3 rounded-xl bg-muted/20 border border-white/5 text-center">
-                  <div className="text-[9px] font-black text-muted-foreground uppercase mb-1">Calibrated</div>
-                  <div className="text-sm font-black text-primary">{report.calibratedCount}</div>
-                </div>
-                <div className="p-3 rounded-xl bg-red-500/5 border border-red-500/10 text-center">
-                  <div className="text-[9px] font-black text-red-700 uppercase mb-1">Errors</div>
-                  <div className="text-sm font-black text-red-600">{report.errorCount}</div>
-                </div>
-                <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-center">
-                  <div className="text-[9px] font-black text-emerald-700 uppercase mb-1">Validated</div>
-                  <div className="text-sm font-black text-emerald-600">{report.validCount.toLocaleString()}</div>
+                  {report.errorCount > 0 ? (
+                    <Badge className="h-10 px-6 font-black uppercase tracking-widest bg-red-500/10 text-red-600 border-red-500/20 hover:bg-red-500/20 gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      Incomplete Data Integrity Pass
+                    </Badge>
+                  ) : (
+                    <Badge className="h-10 px-6 font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 gap-2">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Verified Audit Pass
+                    </Badge>
+                  )}
                 </div>
               </div>
-              
-              {report.errorCount > 0 && (
-                <div className="mt-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-3">
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
-                  <p className="text-[10px] font-bold text-red-600 uppercase tracking-tight">
-                    Audit incomplete: {report.errorCount} integrity errors detected. Manual correction required.
-                  </p>
-                </div>
-              )}
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );

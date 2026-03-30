@@ -609,6 +609,7 @@ export default function Home() {
       XLSX.writeFile(wb, fileName);
 
       const exportReport: ProcessingReport = {
+        id: `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date().toLocaleString(),
         fileName: `${fileName} (CUSTOM EXPORT)`,
         totalImported: sortedForExport.length,
@@ -619,6 +620,7 @@ export default function Home() {
         validCount: sortedForExport.filter(r => r.isValid).length,
         totalMarketValue: totalMarketValue,
         totalAssessedValue: totalAssessedValue,
+        records: sortedForExport
       };
       setProcessingReports(prev => [exportReport, ...prev]);
       showSuccessToast(`Exported ${sortedForExport.length} records successfully.`);
@@ -783,6 +785,11 @@ export default function Home() {
   const clearAuditHistory = () => {
     setProcessingReports([]);
     toast({ title: "History Purged", description: "Audit logs cleared permanently." });
+  };
+
+  const handleDeleteReport = (id: string) => {
+    setProcessingReports(prev => prev.filter(r => r.id !== id));
+    toast({ title: "Log Deleted", description: "Audit entry has been removed." });
   };
 
   const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
@@ -1153,7 +1160,7 @@ export default function Home() {
                       </div>
                     </TabsContent>
                     <TabsContent value="audit" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col">
-                      <AuditLogTab reports={processingReports} onClearHistory={clearAuditHistory} />
+                      <AuditLogTab reports={processingReports} onClearHistory={clearAuditHistory} onDeleteReport={handleDeleteReport} />
                     </TabsContent>
                   </div>
                 </Card>

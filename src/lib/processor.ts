@@ -62,6 +62,7 @@ export interface CalibrationRule {
 }
 
 export interface ProcessingReport {
+  id: string; // Unique identifier for deletion
   timestamp: string;
   fileName: string;
   totalImported: number;
@@ -72,6 +73,7 @@ export interface ProcessingReport {
   validCount: number;
   totalMarketValue: number;
   totalAssessedValue: number;
+  records?: LandRecord[]; // Stores the dataset for later export
 }
 
 function lotMatchesPattern(lot: string, pattern: string): boolean {
@@ -444,6 +446,7 @@ export function processRecords(
   const totalAssessed = finalProcessed.reduce((sum, r) => sum + (r.assessedValue || 0), 0);
 
   const report: ProcessingReport = {
+    id: `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     timestamp: new Date().toLocaleString(),
     fileName: fileName,
     totalImported: records.length,
@@ -454,6 +457,7 @@ export function processRecords(
     validCount: validCount,
     totalMarketValue: totalMarket,
     totalAssessedValue: totalAssessed,
+    records: result // Store result records for later re-export
   };
 
   return {
