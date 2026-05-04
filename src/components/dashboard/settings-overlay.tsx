@@ -14,10 +14,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Percent, MapPin, Save, Info } from 'lucide-react';
+import { Search, Percent, MapPin, Save, Info, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const LOCAL_STORAGE_KEY = 'paranaque_datalink_v31';
 
@@ -98,6 +109,20 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
       setCurrentTaxRates({ ...taxRates });
     }
   }, [isClient, selectedBarangay, locationSettings, taxRates]);
+
+  const handleResetToDefaults = () => {
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    setLocationSettings(initialLocationSettings);
+    setTaxRates(defaultTaxRates);
+    
+    // Select the first barangay to trigger data reload
+    setSelectedBarangay(allBarangays[0]);
+    
+    toast({
+      title: "Data Restored",
+      description: "Calibration rules have been reset to factory defaults.",
+    });
+  };
 
   const handleSaveChanges = () => {
     const sectionsToSave = currentSections.map(({ originalIndex, ...rest }) => rest);
@@ -185,11 +210,35 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden animate-in fade-in duration-300">
-        <header className="px-8 pt-8 pb-4 shrink-0">
+        <header className="px-8 pt-8 pb-4 shrink-0 flex items-center justify-between">
             <div>
-                <h1 className="text-2xl font-black tracking-tight text-foreground">Global Calibration Panel</h1>
-                <p className="text-sm text-muted-foreground font-bold">Manage processing rules and financial tax rates.</p>
+                <h1 className="text-2xl font-black tracking-tight text-foreground uppercase">Global Calibration Panel</h1>
+                <p className="text-sm text-muted-foreground font-bold uppercase tracking-wider">Manage processing rules and financial tax rates.</p>
             </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="font-black uppercase text-[10px] tracking-widest h-10 border-orange-500/30 text-orange-600 hover:bg-orange-50">
+                  <RotateCcw className="w-3.5 h-3.5 mr-2" /> Restore Default Mappings
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-xl font-black uppercase tracking-tight">Restore Factory Defaults?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-sm font-bold text-muted-foreground leading-relaxed">
+                    This will overwrite all your custom calibration rules and unit values with the official Parañaque schedule of values. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="gap-3">
+                  <AlertDialogCancel className="font-black uppercase text-xs h-10 px-6">Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={handleResetToDefaults}
+                    className="bg-orange-600 hover:bg-orange-700 font-black uppercase text-xs h-10 px-8"
+                  >
+                    Confirm Reset
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
         </header>
 
         <main className="flex-1 flex flex-col px-8 overflow-y-auto scrollbar-vertical-custom gap-12">
@@ -297,7 +346,7 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
               </div>
 
               <Card className="p-6 bg-primary/5 border border-primary/20">
-                  <p className="text-sm font-bold leading-relaxed text-muted-foreground">
+                  <p className="text-sm font-bold leading-relaxed text-muted-foreground uppercase">
                     <span className="font-black text-primary uppercase mr-2">Financial Settings:</span> These rates determine how Assessed Value and Yearly Tax are calculated based on <span className="font-black text-foreground underline decoration-primary/30 underline-offset-4">Actual Use (AU)</span>.
                   </p>
               </Card>
