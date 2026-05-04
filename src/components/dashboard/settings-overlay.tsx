@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Percent, MapPin, Save } from 'lucide-react';
+import { Search, Percent, MapPin, Save, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
@@ -181,7 +181,7 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
       s.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
-  if (!isClient) return null; // Or a loading spinner
+  if (!isClient) return null;
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden animate-in fade-in duration-300">
@@ -211,7 +211,7 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
                           </SelectTrigger>
                           <SelectContent>
                               {allBarangays.map(b => (
-                                  <SelectItem key={b.name} value={b.name}>{b.name}</SelectItem>
+                                  <SelectItem key={b.barangayCode} value={b.name}>{b.name}</SelectItem>
                               ))}
                           </SelectContent>
                       </Select>
@@ -232,7 +232,7 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
                   </div>
               </Card>
 
-              <div className="border rounded-xl overflow-hidden bg-muted/20 flex flex-col shadow-inner">
+              <div className="border rounded-xl overflow-hidden bg-muted/20 flex flex-col shadow-inner min-h-[400px]">
                 <div className="bg-muted/80 backdrop-blur-sm p-5 border-b shrink-0">
                     <div className="grid grid-cols-12 gap-5 items-center">
                         <div className="col-span-2 text-xs font-black uppercase text-muted-foreground tracking-wide">Section</div>
@@ -242,39 +242,47 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
                     </div>
                 </div>
                 <div className="p-5 space-y-3 max-h-[550px] overflow-y-auto scrollbar-vertical-custom">
-                  {filteredSections.map((location) => {
-                      const { base, filter } = parseSectionKey(location.section);
-                      return (
-                        <div key={location.originalIndex} className="grid grid-cols-12 gap-5 items-center group">
-                            <Input
-                                className="col-span-2 font-mono h-10 text-sm bg-background font-bold"
-                                value={base}
-                                onChange={(e) => handleKeyPartUpdate(location.originalIndex, 'base', e.target.value)}
-                            />
-                            <Input
-                                className="col-span-3 font-mono text-xs h-10 bg-background"
-                                value={filter}
-                                placeholder="ALL LOTS"
-                                onChange={(e) => handleKeyPartUpdate(location.originalIndex, 'filter', e.target.value)}
-                            />
-                            <Input
-                                className="col-span-5 h-10 text-sm bg-background uppercase font-black tracking-tight"
-                                value={location.location}
-                                onChange={(e) => handleLocationUpdate(location.originalIndex, 'location', e.target.value)}
-                            />
-                            <div className="col-span-2 relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-black">₱</span>
-                                <Input
-                                    type="number"
-                                    className="pl-6 font-mono h-10 text-sm bg-background font-black tabular-nums"
-                                    value={location.unitValue || ''}
-                                    placeholder="0"
-                                    onChange={(e) => handleLocationUpdate(location.originalIndex, 'unitValue', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                      )
-                  })}
+                  {filteredSections.length > 0 ? (
+                    filteredSections.map((location) => {
+                        const { base, filter } = parseSectionKey(location.section);
+                        return (
+                          <div key={location.originalIndex} className="grid grid-cols-12 gap-5 items-center group">
+                              <Input
+                                  className="col-span-2 font-mono h-10 text-sm bg-background font-bold"
+                                  value={base}
+                                  onChange={(e) => handleKeyPartUpdate(location.originalIndex, 'base', e.target.value)}
+                              />
+                              <Input
+                                  className="col-span-3 font-mono text-xs h-10 bg-background"
+                                  value={filter}
+                                  placeholder="ALL LOTS"
+                                  onChange={(e) => handleKeyPartUpdate(location.originalIndex, 'filter', e.target.value)}
+                              />
+                              <Input
+                                  className="col-span-5 h-10 text-sm bg-background uppercase font-black tracking-tight"
+                                  value={location.location}
+                                  onChange={(e) => handleLocationUpdate(location.originalIndex, 'location', e.target.value)}
+                              />
+                              <div className="col-span-2 relative">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-black">₱</span>
+                                  <Input
+                                      type="number"
+                                      className="pl-6 font-mono h-10 text-sm bg-background font-black tabular-nums"
+                                      value={location.unitValue || ''}
+                                      placeholder="0"
+                                      onChange={(e) => handleLocationUpdate(location.originalIndex, 'unitValue', e.target.value)}
+                                  />
+                              </div>
+                          </div>
+                        )
+                    })
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                      <Info className="w-10 h-10 opacity-20 mb-4" />
+                      <p className="text-sm font-black uppercase tracking-widest opacity-50">No location mappings found for this barangay.</p>
+                      <p className="text-xs font-bold mt-2 opacity-30">Select another area or check your search criteria.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </section>

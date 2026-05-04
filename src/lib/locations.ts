@@ -24,10 +24,7 @@ export interface BarangayConfig {
 // Export the raw data for initializing state
 export const initialLocationSettings: BarangayConfig[] = locationData.barangays;
 
-// Export just the names and codes for UI dropdowns
-export const allBarangays: Barangay[] = locationData.barangays.map(b => ({
-  name: b.name,
-  barangayCode: b.barangayCode,
-}));
-
-    
+// Export just the names and codes for UI dropdowns, ensuring uniqueness
+export const allBarangays: Barangay[] = Array.from(
+  new Map(locationData.barangays.map(b => [b.barangayCode, { name: b.name, barangayCode: b.barangayCode }])).values()
+);
