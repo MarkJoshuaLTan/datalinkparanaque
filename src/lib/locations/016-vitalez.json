@@ -1,0 +1,28 @@
+{
+  "name": "Vitalez",
+  "barangayCode": "016",
+  "sections": [
+    { "section": "001", "location": "VITALEZ COMPOUND", "unitValue": 23100 },
+    { "section": "002", "location": "VITALEZ COMPOUND", "unitValue": 23100 },
+    { "section": "003", "location": "JETLANE VILLAGE", "unitValue": 23100 },
+    { "section": "004", "location": "AIRPORT VILLAGE (Before Baltao Subd)", "unitValue": 23100 },
+    { "section": "005", "location": "JETLANE VILLAGE", "unitValue": 23100 },
+    { "section": "006", "location": "GAT MENDOZA SUBD", "unitValue": 23100 },
+    { "section": "007", "location": "GAT MENDOZA SUBD", "unitValue": 23100 },
+    { "section": "008", "location": "GAT MENDOZA SUBD", "unitValue": 23100 },
+    { "section": "009", "location": "AIRPORT VILLAGE (Before Baltao Subd)", "unitValue": 23100 },
+    { "section": "010", "location": "AIRPORT VILLAGE (Before Baltao Subd)", "unitValue": 23100 },
+    { "section": "011", "location": "AIRPORT VILLAGE (Before Baltao Subd)", "unitValue": 23100 },
+    { "section": "012", "location": "URMA DRIVE, AIRPORT VILLAGE (Before Baltao Subd)", "unitValue": 85200 },
+    { "section": "013", "location": "VITALEZ COMPOUND", "unitValue": 23100 },
+    { "section": "014", "location": "VITALEZ COMPOUND", "unitValue": 23100 },
+    { "section": "015", "location": "AIRLANE VILLAGE", "unitValue": 23100 },
+    { "section": "016", "location": "AIRLANE VILLAGE", "unitValue": 23100 },
+    { "section": "017", "location": "AIRPORT VILLAGE (Before Baltao Subd)", "unitValue": 23100 },
+    { "section": "018", "location": "AIRPORT VILLAGE (Before Baltao Subd)", "unitValue": 23100 },
+    { "section": "019", "location": "AIRPORT VILLAGE (Before Baltao Subd)", "unitValue": 23100 },
+    { "section": "020", "location": "AIRPORT VILLAGE (Before Baltao Subd)", "unitValue": 23100 },
+    { "section": "021", "location": "N.A.I.A. COMPOUND", "unitValue": 85200 },
+    { "section": "022", "location": "N.A.I.A. COMPOUND", "unitValue": 85200 }
+  ]
+}
