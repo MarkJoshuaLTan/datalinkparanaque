@@ -45,6 +45,7 @@ export interface LandRecord {
   isDuplicate?: boolean;
   isCleanup?: boolean;
   isManualArchive?: boolean;
+  isComparisonInjected?: boolean; // UI-only field for comparison view
   cleanupReason?: string;
   isValid?: boolean;
   errors?: ValidationError[];

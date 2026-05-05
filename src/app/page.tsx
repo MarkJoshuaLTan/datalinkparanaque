@@ -709,7 +709,7 @@ export default function Home() {
       ? previewData.filter(r => r.statusLabel === 'DUPLICATE' || r.statusLabel === 'INCOMPLETE' || r.statusLabel === 'CLEANUP' || r.isManualArchive)
       : (processedData.length > 0 ? processedData : previewData.filter(r => r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && !r.isManualArchive));
 
-    return baseData.filter(record => {
+    const filtered = baseData.filter(record => {
       if (sourceFileFilter !== 'all' && record.sourceFile !== sourceFileFilter) return false;
       if (barangayFilter !== 'all' && (record.barangayName || 'UNMAPPED') !== barangayFilter) return false;
 
@@ -728,6 +728,29 @@ export default function Home() {
       
       return record.statusLabel === statusFilter;
     });
+
+    // SIDE-BY-SIDE DUPLICATE COMPARISON LOGIC
+    // If in Archive mode AND (status filter is ALL or DUPLICATE), inject valid counterparts for visual comparison
+    if (viewMode === 'archive' && (statusFilter === 'all' || statusFilter === 'DUPLICATE')) {
+      const finalWithComparisons: LandRecord[] = [];
+      filtered.forEach(record => {
+        if (record.statusLabel === 'DUPLICATE') {
+          // Find the valid version in the full dataset for comparison reference
+          const validPeer = previewData.find(p => p.pin === record.pin && p.statusLabel === 'VALID');
+          if (validPeer) {
+            finalWithComparisons.push({
+              ...validPeer,
+              id: `comparison-${validPeer.id}-${record.id}`, // Unique ID for table row keying
+              isComparisonInjected: true 
+            });
+          }
+        }
+        finalWithComparisons.push(record);
+      });
+      return finalWithComparisons;
+    }
+
+    return filtered;
   }, [previewData, processedData, viewMode, searchQuery, searchField, statusFilter, sourceFileFilter, barangayFilter]);
 
   const analyticsData = useMemo(() => {
@@ -967,7 +990,7 @@ export default function Home() {
                   </Button>
                 ) : (
                   <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}>
-                    <Settings className="w-5 h-5" />
+                    Settings
                   </Button>
                 )}
               </TooltipTrigger>

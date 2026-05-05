@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, memo } from 'react';
@@ -13,7 +14,7 @@ import { LandRecord } from '@/lib/processor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Plus, AlertTriangle, Loader2 } from 'lucide-react';
+import { Plus, AlertTriangle, Loader2, Info } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +43,10 @@ const RecordRow = memo(({
   onRowClick: (record: LandRecord) => void 
 }) => {
   const getStatusBadge = () => {
+    if (row.isComparisonInjected) {
+      return <Badge variant="outline" className="text-[10px] h-5 font-black uppercase tracking-tighter bg-emerald-500 text-white border-none shadow-sm">VALID REFERENCE</Badge>;
+    }
+    
     switch (row.statusLabel) {
       case 'VALID':
         return <Badge variant="secondary" className="text-[10px] h-5 font-black uppercase tracking-tighter bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">VALID</Badge>;
@@ -71,13 +76,23 @@ const RecordRow = memo(({
       onClick={() => onRowClick(row)}
       className={cn(
         "border-b transition-all duration-200 ease-in-out hover:scale-[1.01] hover:shadow-2xl hover:relative hover:z-20 hover:!bg-card/90 hover:backdrop-blur-sm cursor-pointer",
-        (row.statusLabel === 'DUPLICATE' || row.statusLabel === 'INCOMPLETE' || row.statusLabel === 'CLEANUP') && "bg-orange-50/30 dark:bg-orange-950/50 opacity-70",
-        row.statusLabel === 'AREA ERROR' ? "bg-red-100/50 dark:bg-red-950/40 border-red-500/30" : (row.statusLabel !== 'VALID' && row.statusLabel !== 'DUPLICATE' && row.statusLabel !== 'INCOMPLETE' && "bg-red-500/5 hover:bg-red-500/10 border-red-500/20")
+        row.isComparisonInjected && "bg-emerald-500/10 border-l-4 border-l-emerald-500 opacity-90",
+        (row.statusLabel === 'DUPLICATE' || row.statusLabel === 'INCOMPLETE' || row.statusLabel === 'CLEANUP') && !row.isComparisonInjected && "bg-orange-50/30 dark:bg-orange-950/50 opacity-70",
+        row.statusLabel === 'AREA ERROR' ? "bg-red-100/50 dark:bg-red-950/40 border-red-500/30" : (row.statusLabel !== 'VALID' && row.statusLabel !== 'DUPLICATE' && row.statusLabel !== 'INCOMPLETE' && !row.isComparisonInjected && "bg-red-500/5 hover:bg-red-500/10 border-red-500/20")
       )}
     >
-      <TableCell className="text-center font-mono text-muted-foreground p-3 border-r bg-muted/5">{index + 1}</TableCell>
+      <TableCell className={cn(
+        "text-center font-mono text-muted-foreground p-3 border-r bg-muted/5",
+        row.isComparisonInjected && "text-emerald-700 font-black text-[10px]"
+      )}>
+        {row.isComparisonInjected ? "REF" : index + 1}
+      </TableCell>
       <TableCell className="whitespace-nowrap p-3">{row.date || '---'}</TableCell>
-      <TableCell className={cn("font-mono font-bold p-3", row.statusLabel === 'NO ARP NO#' ? "text-red-600 underline decoration-wavy" : "text-emerald-800 dark:text-emerald-300")}>
+      <TableCell className={cn(
+        "font-mono font-bold p-3", 
+        row.statusLabel === 'NO ARP NO#' ? "text-red-600 underline decoration-wavy" : "text-emerald-800 dark:text-emerald-300",
+        row.isComparisonInjected && "text-emerald-600"
+      )}>
         {row.arpNo || '---'}
       </TableCell>
       <TableCell className={cn("font-mono p-3", (row.statusLabel === 'INVALID PIN FORMAT' || (row.statusLabel === 'INCOMPLETE' && !row.pin)) && "text-red-600 font-black")}>
@@ -134,6 +149,7 @@ const RecordRow = memo(({
     prevProps.row.location === nextProps.row.location &&
     prevProps.row.unitValue === nextProps.row.unitValue &&
     prevProps.row.marketValue === nextProps.row.marketValue &&
+    prevProps.row.isComparisonInjected === nextProps.row.isComparisonInjected &&
     prevProps.index === nextProps.index
   );
 });
@@ -182,6 +198,8 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick }: Data
   const hasMore = data.length > displayLimit;
   const nextBatchSize = Math.min(BATCH_SIZE, data.length - displayLimit);
 
+  const hasComparisons = data.some(r => r.isComparisonInjected);
+
   return (
     <div className="relative flex-1 flex flex-col min-h-0 bg-card overflow-hidden" suppressHydrationWarning>
       {isBulkLoading && (
@@ -191,6 +209,15 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick }: Data
             <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">Rendering Large Dataset...</h3>
             <p className="text-muted-foreground font-bold mt-2">This may take a moment depending on your device performance.</p>
           </div>
+        </div>
+      )}
+
+      {hasComparisons && (
+        <div className="px-4 py-2 bg-emerald-500/10 border-b flex items-center gap-2">
+          <Info className="w-3.5 h-3.5 text-emerald-600" />
+          <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">
+            Conflict Comparison Mode Active: Valid counterparts are injected as reference for all duplicate records.
+          </p>
         </div>
       )}
 
