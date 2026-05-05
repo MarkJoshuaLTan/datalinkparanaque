@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -12,7 +13,7 @@ import { LandRecord, validateRecord, ValidationError } from '@/lib/processor';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Save, Edit3, Archive, RotateCcw } from 'lucide-react';
+import { AlertTriangle, Save, Edit3, Archive, RotateCcw, ArrowRightLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface EditableItemProps {
@@ -72,6 +73,7 @@ const StaticItem = ({ label, value, isMono = false }: { label: string; value: st
 
 interface RecordDetailModalProps {
   record: LandRecord | null;
+  comparisonRecord?: LandRecord | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave?: (updatedRecord: LandRecord) => void;
@@ -79,7 +81,7 @@ interface RecordDetailModalProps {
   onUnarchive?: (record: LandRecord) => void;
 }
 
-export function RecordDetailModal({ record, open, onOpenChange, onSave, onArchive, onUnarchive }: RecordDetailModalProps) {
+export function RecordDetailModal({ record, comparisonRecord, open, onOpenChange, onSave, onArchive, onUnarchive }: RecordDetailModalProps) {
   const [editedRecord, setEditedRecord] = useState<LandRecord | null>(null);
 
   useEffect(() => {
@@ -104,7 +106,7 @@ export function RecordDetailModal({ record, open, onOpenChange, onSave, onArchiv
       updated.marketValue = (Number(updated.landArea) || 0) * (Number(updated.unitValue) || 0);
     }
 
-    const errors = validateRecord(updated, new Set());
+    const errors = validateRecord(updated);
     updated.errors = errors;
     updated.isValid = errors.length === 0;
 
@@ -169,6 +171,39 @@ export function RecordDetailModal({ record, open, onOpenChange, onSave, onArchiv
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto pr-2 scrollbar-vertical-custom space-y-6">
+            {comparisonRecord && editedRecord.statusLabel === 'DUPLICATE' && (
+              <div className="p-6 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-4 shadow-inner">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-[11px] font-black uppercase text-amber-700 flex items-center gap-2 tracking-widest">
+                    <ArrowRightLeft className="w-4 h-4" /> Duplicate Conflict Analysis
+                  </h4>
+                  <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-200 font-black uppercase text-[9px] tracking-widest h-5 px-3 shadow-sm">
+                    Diagnostic Report
+                  </Badge>
+                </div>
+                <p className="text-[11px] font-bold text-amber-600/80 leading-relaxed uppercase">
+                  The engine identified a duplicate PIN. Below is a comparison between this archived row and the prioritized result.
+                </p>
+                
+                <div className="grid grid-cols-2 gap-8 bg-background/40 p-5 rounded-2xl border border-white/10">
+                   <div className="space-y-5">
+                      <div className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] border-b pb-2 mb-4">Archived Duplicate (This Row)</div>
+                      <StaticItem label="ARP No#" value={editedRecord.arpNo} isMono />
+                      <StaticItem label="Effectivity" value={editedRecord.date || '---'} />
+                      <StaticItem label="Market Value" value={formatCurrency(editedRecord.marketValue)} isMono />
+                   </div>
+                   <div className="space-y-5 border-l border-white/10 pl-8">
+                      <div className="text-[9px] font-black uppercase text-emerald-600 tracking-[0.2em] border-b border-emerald-500/20 pb-2 mb-4 flex items-center gap-2">
+                        Active Priority (Chosen) <CheckCircle2 className="w-3 h-3" />
+                      </div>
+                      <StaticItem label="ARP No#" value={comparisonRecord.arpNo} isMono />
+                      <StaticItem label="Effectivity" value={comparisonRecord.date || '---'} />
+                      <StaticItem label="Market Value" value={formatCurrency(comparisonRecord.marketValue)} isMono />
+                   </div>
+                </div>
+              </div>
+            )}
+
             {!editedRecord.isValid && (
               <div className={cn(
                 "p-4 rounded-xl border flex items-start gap-4",

@@ -193,6 +193,7 @@ export default function Home() {
   const [processingReports, setProcessingReports] = useState<ProcessingReport[]>([]);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [selectedRecord, setSelectedRecord] = useState<LandRecord | null>(null);
+  const [comparisonRecord, setComparisonRecord] = useState<LandRecord | null>(null);
   
   const [searchQuery, setSearchQuery] = useState("");
   const [searchField, setSearchField] = useState("all");
@@ -524,6 +525,7 @@ export default function Home() {
 
   const handleSaveRecord = useCallback((updatedRecord: LandRecord, silent = false) => {
     setSelectedRecord(null);
+    setComparisonRecord(null);
     if (!silent) setIsProcessing(true);
 
     startTransition(() => {
@@ -694,7 +696,13 @@ export default function Home() {
 
   const handleRowClick = useCallback((record: LandRecord) => { 
     setSelectedRecord(record); 
-  }, []);
+    if (record.statusLabel === 'DUPLICATE') {
+      const validPeer = previewData.find(r => r.pin === record.pin && r.statusLabel === 'VALID');
+      setComparisonRecord(validPeer || null);
+    } else {
+      setComparisonRecord(null);
+    }
+  }, [previewData]);
 
   const filteredDisplayData = useMemo(() => {
     const baseData = viewMode === 'archive' 
@@ -1479,8 +1487,14 @@ export default function Home() {
       <ProcessingReportModal report={latestReport} open={isReportOpen} onOpenChange={setIsReportOpen} />
       <RecordDetailModal 
         record={selectedRecord} 
+        comparisonRecord={comparisonRecord}
         open={!!selectedRecord} 
-        onOpenChange={(isOpen) => !isOpen && setSelectedRecord(null)} 
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setSelectedRecord(null);
+            setComparisonRecord(null);
+          }
+        }} 
         onSave={handleSaveRecord} 
         onArchive={handleArchiveRecord} 
         onUnarchive={handleUnarchiveRecord}
