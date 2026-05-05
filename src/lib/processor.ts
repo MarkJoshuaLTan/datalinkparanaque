@@ -164,10 +164,13 @@ export function validateRecord(record: LandRecord): ValidationError[] {
   // 2. Land Area Validation
   if (record.landArea === undefined || record.landArea === null || isNaN(record.landArea)) {
     errors.push({ field: 'landArea', message: 'Missing land area' });
-  } else if (record.landArea <= 0) {
+  } else if (record.landArea < 0) {
+    errors.push({ field: 'landArea', message: 'Land area cannot be negative' });
+  } else if (record.landArea === 0 && record.kind !== 'M') {
+    // Machinery (M) does not require land area
     errors.push({ 
       field: 'landArea', 
-      message: record.landArea === 0 ? 'Land area is zero' : 'Land area cannot be negative' 
+      message: 'Land area is zero' 
     });
   }
 
@@ -254,17 +257,21 @@ export function processRecords(
     let marketValue = Number(r.marketValue) || 0;
     let unitValue = Number(r.unitValue) || 0;
     
-    // Auto-calculate unit value if missing but market value exists
+    const kind = r.kind?.trim().toUpperCase() || '';
+
+    // Auto-calculate unit value if missing but market value exists (only if not B or M, though initial mapping is fine)
     if (unitValue === 0 && marketValue > 0 && landArea > 0) {
       unitValue = Math.round(marketValue / landArea);
     } else {
       unitValue = Math.round(unitValue);
     }
 
-    // Auto-calculate market value if area and unit value exist
-    if (unitValue > 0 && landArea > 0) {
+    // Auto-calculate market value if area and unit value exist (only if not B or M)
+    if (unitValue > 0 && landArea > 0 && kind !== 'M' && kind !== 'B') {
       marketValue = unitValue * landArea;
     }
+
+    const assessedValue = calculateAssessedValue(marketValue, r.au || '', taxRates);
 
     const record: LandRecord = {
       ...r,
@@ -275,14 +282,14 @@ export function processRecords(
       acctName: r.acctName?.trim().toUpperCase() || '',
       address: r.address?.trim().toUpperCase() || '',
       location: r.location?.trim().toUpperCase() || "",
-      kind: r.kind?.trim().toUpperCase() || '',
+      kind: kind,
       au: r.au?.trim().toUpperCase() || '',
       barangayName: "UNMAPPED", // Default for data that cannot be mapped
       landArea,
       unitValue,
       marketValue,
-      assessedValue: calculateAssessedValue(marketValue, r.au || '', taxRates),
-      yearlyTax: calculateYearlyTax(0, r.au || '', taxRates),
+      assessedValue,
+      yearlyTax: calculateYearlyTax(assessedValue, r.au || '', taxRates),
       isDuplicate: false,
       isCleanup,
       isManualArchive: r.isManualArchive || false,
@@ -319,6 +326,10 @@ export function processRecords(
   if (options.applyCalibration) {
     result = result.map(record => {
       if (record.isCleanup || record.isManualArchive) return record;
+      
+      // REQUIREMENT: If Kind is M or B, skip calibration overwrites
+      if (record.kind === 'M' || record.kind === 'B') return record;
+
       let updated = { ...record };
       const matchingRule = rules.find(rule => matchesPinPattern(record.pin, rule.pinPattern));
       
@@ -418,7 +429,7 @@ export function processRecords(
       const pinRegex = /^\d{3}-\d{2}-\d{3}-\d{3}-\d{3}-\d{4}$/;
       if (record.pin && !pinRegex.test(record.pin)) {
         statusLabel = 'INVALID PIN FORMAT';
-      } else if (record.landArea <= 0) {
+      } else if (record.landArea <= 0 && record.kind !== 'M') {
         statusLabel = 'AREA ERROR';
       } else if (!record.arpNo) {
         statusLabel = 'NO ARP NO#';

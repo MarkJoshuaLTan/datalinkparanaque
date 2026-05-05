@@ -237,7 +237,7 @@ export default function Home() {
       let matchesSearch = true;
       if (query) {
         if (searchField === 'all') {
-          matchesSearch = record.acctName?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || record.arpNo?.toLowerCase().includes(query) || record.location?.toLowerCase().includes(query) || record.address?.toLowerCase().includes(query) || record.au?.toLowerCase().includes(query) || record.sourceFile?.toLowerCase().includes(query);
+          matchesSearch = record.acctName?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || record.arpNo?.toLowerCase().includes(query) || record.location?.toLowerCase().includes(query) || record.address?.toLowerCase().includes(query) || record.au?.toLowerCase().includes(query) || record.taxability?.toLowerCase().includes(query) || record.sourceFile?.toLowerCase().includes(query);
         } else {
           const value = record[searchField as keyof LandRecord];
           matchesSearch = String(value || '').toLowerCase().includes(query);
@@ -248,10 +248,14 @@ export default function Home() {
       return record.statusLabel === statusFilter;
     });
 
+    // REQUIREMENT: Sort by PIN location (ascending)
+    const sorted = [...filtered].sort((a, b) => (a.pin || '').localeCompare(b.pin || ''));
+
     if (viewMode === 'archive' && (statusFilter === 'all' || statusFilter === 'DUPLICATE')) {
       const finalWithComparisons: LandRecord[] = [];
-      filtered.forEach(record => {
+      sorted.forEach(record => {
         if (record.statusLabel === 'DUPLICATE') {
+          // Find the active version of this PIN (regardless of status errors)
           const validPeer = previewData.find(p => p.pin === record.pin && !p.isDuplicate && !p.isCleanup && !p.isManualArchive);
           if (validPeer) {
             finalWithComparisons.push({ ...validPeer, id: `comparison-${validPeer.id}-${record.id}`, isComparisonInjected: true });
@@ -261,7 +265,7 @@ export default function Home() {
       });
       return finalWithComparisons;
     }
-    return filtered;
+    return sorted;
   }, [previewData, processedData, viewMode, searchQuery, searchField, statusFilter, sourceFileFilter, barangayFilter]);
 
   // --- 8. SIDE EFFECTS (useEffect) ---
@@ -656,7 +660,7 @@ export default function Home() {
                           <div className="flex items-center gap-2 flex-1">
                             <Select value={searchField} onValueChange={setSearchField}>
                               <SelectTrigger className="w-[120px] h-9 text-xs font-bold uppercase"><SelectValue placeholder="In" /></SelectTrigger>
-                              <SelectContent><SelectItem value="all">All Fields</SelectItem><SelectItem value="date">Date</SelectItem><SelectItem value="arpNo">ARP No#</SelectItem><SelectItem value="pin">PIN</SelectItem><SelectItem value="acctName">Account</SelectItem><SelectItem value="address">Address</SelectItem><SelectItem value="update">Update</SelectItem><SelectItem value="kind">Kind</SelectItem><SelectItem value="au">AU</SelectItem></SelectContent>
+                              <SelectContent><SelectItem value="all">All Fields</SelectItem><SelectItem value="date">Date</SelectItem><SelectItem value="arpNo">ARP No#</SelectItem><SelectItem value="pin">PIN</SelectItem><SelectItem value="acctName">Account</SelectItem><SelectItem value="address">Address</SelectItem><SelectItem value="update">Update</SelectItem><SelectItem value="taxability">Taxability</SelectItem><SelectItem value="kind">Kind</SelectItem><SelectItem value="au">AU</SelectItem></SelectContent>
                             </Select>
                             <div className="relative flex-1">
                               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder={`Search property records...`} className="pl-9 text-sm h-9" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
