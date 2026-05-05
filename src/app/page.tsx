@@ -630,18 +630,12 @@ export default function Home() {
                      <h2 className="text-4xl font-black uppercase tracking-tight text-foreground">Select Import Channel</h2>
                      <p className="text-muted-foreground font-bold uppercase tracking-widest text-sm">Choose the type of document you want to stage in the engine</p>
                    </div>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
+                   <div className="w-full max-w-xl mx-auto">
                       <Card className="p-10 flex flex-col items-center text-center group cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all active:scale-[0.98] border-2 border-dashed" onClick={() => { setImportMode('raw'); setIsImportDialogOpen(true); }}>
                          <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><BookUser className="w-10 h-10 text-primary" /></div>
                          <h3 className="text-2xl font-black uppercase tracking-tight mb-2">Import Raw Data</h3>
                          <p className="text-sm font-bold text-muted-foreground leading-relaxed">Load the primary real property records batch. These will be processed as Taxable by default.</p>
                          <Button className="mt-8 font-black uppercase text-xs tracking-widest px-8 h-12 bg-primary group-hover:bg-emerald-700">Open Staging Zone</Button>
-                      </Card>
-                      <Card className="p-10 flex flex-col items-center text-center group cursor-pointer hover:border-blue-500/40 hover:bg-blue-500/5 transition-all active:scale-[0.98] border-2 border-dashed" onClick={() => { setImportMode('exempt'); setIsImportDialogOpen(true); }}>
-                         <div className="w-20 h-20 rounded-3xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><ShieldOff className="w-10 h-10 text-blue-600" /></div>
-                         <h3 className="text-2xl font-black uppercase tracking-tight mb-2">Exempt Reference</h3>
-                         <p className="text-sm font-bold text-muted-foreground leading-relaxed">Load a list of exempt items. These will be added to the session and correctly tagged as Exempt (E).</p>
-                         <Button className="mt-8 font-black uppercase text-xs tracking-widest px-8 h-12 bg-blue-600 group-hover:bg-blue-700 border-none">Open Reference Zone</Button>
                       </Card>
                    </div>
                 </div>
