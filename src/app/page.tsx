@@ -221,7 +221,7 @@ export default function Home() {
 
   const [stats, setStats] = useState({
     totalRawRows: 0, systemCleanup: 0, totalImported: 0, duplicatesRemoved: 0,
-    finalCount: 0, totalMarketValue: 0, totalAssessedValue: 0, totalErrors: 0
+    finalCount: 0, totalMarketValue: 0, totalAssessedValue: 0, totalYearlyTax: 0, totalErrors: 0
   });
 
   const latestReport = processingReports[0] || null;
@@ -251,7 +251,7 @@ export default function Home() {
     setBarangayFilter("all");
     setStats({
       totalRawRows: 0, systemCleanup: 0, totalImported: 0, duplicatesRemoved: 0,
-      finalCount: 0, totalMarketValue: 0, totalAssessedValue: 0, totalErrors: 0
+      finalCount: 0, totalMarketValue: 0, totalAssessedValue: 0, totalYearlyTax: 0, totalErrors: 0
     } as any);
     toast({ title: "Workspace Cleared", description: "All active data removed. Audit logs preserved." });
   };
@@ -353,7 +353,7 @@ export default function Home() {
       }
     } catch (error) { console.error("Failed to parse localStorage:", error); }
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeinstallprompt);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
       document.removeEventListener('fullscreenchange', handleFullScreenChange);
     };
@@ -470,6 +470,7 @@ export default function Home() {
       finalCount: active.length,
       totalMarketValue: valid.reduce((sum, r) => sum + (r.marketValue || 0), 0),
       totalAssessedValue: valid.reduce((sum, r) => sum + (r.assessedValue || 0), 0),
+      totalYearlyTax: valid.reduce((sum, r) => sum + (r.yearlyTax || 0), 0),
       totalErrors: errors
     } as any);
   };
@@ -907,9 +908,17 @@ export default function Home() {
       label: "Total Assessed",
       value: <AnimatedNumber value={stats.totalAssessedValue || 0} prefix="₱" decimals={2} />,
       icon: BarChart3,
-      color: "border-l-blue-600 bg-green-500/5",
+      color: "border-l-blue-600 bg-blue-500/5",
       textClass: "text-blue-600",
       definition: "The sum of all Assessed Values for valid records."
+    },
+    {
+      label: "Total Tax",
+      value: <AnimatedNumber value={stats.totalYearlyTax || 0} prefix="₱" decimals={2} />,
+      icon: TrendingUp,
+      color: "border-l-emerald-600 bg-emerald-500/5",
+      textClass: "text-emerald-600",
+      definition: "The estimated combined Yearly Real Property Tax due for all valid records in this session."
     }
   ];
 
@@ -971,7 +980,7 @@ export default function Home() {
               ) : (
                 <div className="flex-1 flex flex-col gap-4 h-full min-0" suppressHydrationWarning>
                   {viewMode !== 'audit' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4 shrink-0">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4 shrink-0">
                       {statDefinitions.map((stat, i) => (
                         <Popover key={i}>
                           <PopoverTrigger asChild>
