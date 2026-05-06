@@ -21,7 +21,8 @@ import {
   FileCheck2,
   Trash2,
   HelpCircle,
-  Shapes
+  Shapes,
+  ShieldCheck
 } from 'lucide-react';
 import { LandRecord, RecordStatusType } from '@/lib/processor';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +49,7 @@ export interface ExportFinalSettings {
   barangays: string[];
   statuses: RecordStatusType[];
   kinds: string[];
+  taxabilities: ('T' | 'E')[];
 }
 
 const columnLabels = [
@@ -75,6 +77,7 @@ export function ExportSettingsModal({
   const [selectedBarangays, setSelectedBarangays] = React.useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = React.useState<RecordStatusType[]>([]);
   const [selectedKinds, setSelectedKinds] = React.useState<string[]>([]);
+  const [selectedTaxabilities, setSelectedTaxabilities] = React.useState<('T' | 'E')[]>([]);
 
   const availableBarangays = useMemo(() => {
     const set = new Set<string>();
@@ -97,6 +100,12 @@ export function ExportSettingsModal({
     return Array.from(set).sort();
   }, [data]);
 
+  const availableTaxabilities = useMemo(() => {
+    const set = new Set<('T' | 'E')>();
+    data.forEach(r => { if (r.taxability) set.add(r.taxability); });
+    return Array.from(set).sort();
+  }, [data]);
+
   const approvedStatuses = useMemo(() => 
     availableStatuses.filter(s => s !== 'DUPLICATE' && s !== 'INCOMPLETE' && s !== 'CLEANUP'),
     [availableStatuses]
@@ -107,26 +116,11 @@ export function ExportSettingsModal({
     [availableStatuses]
   );
 
-  const approvedGroupCount = useMemo(() => {
-    return data.filter(r => 
-      approvedStatuses.includes(r.statusLabel as any) && 
-      selectedBarangays.includes(r.barangayName || 'UNMAPPED') &&
-      selectedKinds.includes(r.kind?.trim().toUpperCase() || '')
-    ).length;
-  }, [data, approvedStatuses, selectedBarangays, selectedKinds]);
-
-  const archiveGroupCount = useMemo(() => {
-    return data.filter(r => 
-      archiveStatuses.includes(r.statusLabel as any) && 
-      selectedBarangays.includes(r.barangayName || 'UNMAPPED') &&
-      selectedKinds.includes(r.kind?.trim().toUpperCase() || '')
-    ).length;
-  }, [data, archiveStatuses, selectedBarangays, selectedKinds]);
-
   React.useEffect(() => {
     if (open) {
       setSelectedBarangays(availableBarangays);
       setSelectedKinds(availableKinds);
+      setSelectedTaxabilities(availableTaxabilities);
       if (onBulkColumnChange) {
         const allCols = { ...exportColumns };
         columnLabels.forEach(col => allCols[col] = true);
@@ -134,7 +128,7 @@ export function ExportSettingsModal({
       }
       setSelectedStatuses([]);
     }
-  }, [open, availableBarangays, availableKinds]);
+  }, [open, availableBarangays, availableKinds, availableTaxabilities]);
 
   const toggleBarangay = (brgy: string) => {
     setSelectedBarangays(prev => 
@@ -151,6 +145,12 @@ export function ExportSettingsModal({
   const toggleKind = (kind: string) => {
     setSelectedKinds(prev => 
       prev.includes(kind) ? prev.filter(k => k !== kind) : [...prev, kind]
+    );
+  };
+
+  const toggleTaxability = (tax: 'T' | 'E') => {
+    setSelectedTaxabilities(prev => 
+      prev.includes(tax) ? prev.filter(t => t !== tax) : [...prev, tax]
     );
   };
 
@@ -199,7 +199,8 @@ export function ExportSettingsModal({
       columns: exportColumns,
       barangays: selectedBarangays,
       statuses: selectedStatuses,
-      kinds: selectedKinds
+      kinds: selectedKinds,
+      taxabilities: selectedTaxabilities
     });
   };
   
@@ -207,13 +208,14 @@ export function ExportSettingsModal({
     return data.filter(r => 
       selectedBarangays.includes(r.barangayName || 'UNMAPPED') && 
       selectedStatuses.includes(r.statusLabel || 'VALID' as any) &&
-      selectedKinds.includes(r.kind?.trim().toUpperCase() || '')
+      selectedKinds.includes(r.kind?.trim().toUpperCase() || '') &&
+      selectedTaxabilities.includes(r.taxability || 'T')
     ).length;
-  }, [data, selectedBarangays, selectedStatuses, selectedKinds]);
+  }, [data, selectedBarangays, selectedStatuses, selectedKinds, selectedTaxabilities]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      const canExport = selectedBarangays.length > 0 && selectedStatuses.length > 0 && selectedKinds.length > 0 && estimatedRecordCount > 0;
+      const canExport = selectedBarangays.length > 0 && selectedStatuses.length > 0 && selectedKinds.length > 0 && selectedTaxabilities.length > 0 && estimatedRecordCount > 0;
       if (canExport) {
         e.preventDefault();
         handleExport();
@@ -290,14 +292,6 @@ export function ExportSettingsModal({
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-black uppercase text-primary tracking-[0.15em] flex items-center gap-2">
                   <MapPin className="w-5 h-5" /> Filter by Barangays
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button className="text-muted-foreground hover:text-foreground outline-none"><HelpCircle className="w-4 h-4" /></button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80 bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl rounded-xl">
-                      <p className="text-sm font-bold leading-relaxed text-muted-foreground">Export records only from the selected Barangays. Only areas present in your data will appear here.</p>
-                    </PopoverContent>
-                  </Popover>
                 </h3>
                 <div className="flex gap-4">
                   <Button variant="link" size="sm" onClick={selectAllBarangays} className="text-xs font-black uppercase text-muted-foreground h-auto p-0">Select All</Button>
@@ -305,7 +299,7 @@ export function ExportSettingsModal({
                 </div>
               </div>
               <Card className="bg-muted/30 p-5 shadow-inner">
-                <ScrollArea className="h-40">
+                <ScrollArea className="h-32">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {availableBarangays.map(brgy => (
                       <div key={brgy} className="flex items-center gap-3 group">
@@ -320,66 +314,68 @@ export function ExportSettingsModal({
                         </label>
                       </div>
                     ))}
-                    {availableBarangays.length === 0 && (
-                      <p className="col-span-full text-center text-sm font-bold text-muted-foreground py-4 opacity-50">No barangay data detected.</p>
-                    )}
                   </div>
                 </ScrollArea>
               </Card>
             </section>
 
-            <section className="space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <section className="space-y-4">
                 <h3 className="text-sm font-black uppercase text-primary tracking-[0.15em] flex items-center gap-2">
-                  <Shapes className="w-5 h-5" /> Filter by Property Kind
+                  <Shapes className="w-5 h-5" /> Filter by Kind
                 </h3>
-                <div className="flex gap-4">
-                  <Button variant="link" size="sm" onClick={() => setSelectedKinds(availableKinds)} className="text-xs font-black uppercase text-muted-foreground h-auto p-0">Select All</Button>
-                  <Button variant="link" size="sm" onClick={() => setSelectedKinds([])} className="text-xs font-black uppercase text-muted-foreground h-auto p-0">Clear All</Button>
-                </div>
-              </div>
-              <Card className="bg-muted/30 p-5 shadow-inner">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {availableKinds.map(kind => (
-                    <div key={kind} className="flex items-center gap-3 group">
-                      <Checkbox 
-                        id={`exp-kind-${kind}`} 
-                        checked={selectedKinds.includes(kind)} 
-                        onCheckedChange={() => toggleKind(kind)}
-                        className="w-5 h-5"
-                      />
-                      <label htmlFor={`exp-kind-${kind}`} className="text-sm font-bold cursor-pointer truncate">
-                        {KIND_LABELS[kind] || kind}
-                      </label>
-                    </div>
-                  ))}
-                  {availableKinds.length === 0 && (
-                    <p className="col-span-full text-center text-sm font-bold text-muted-foreground py-2 opacity-50">No classifications detected.</p>
-                  )}
-                </div>
-              </Card>
-            </section>
+                <Card className="bg-muted/30 p-5 shadow-inner h-full">
+                  <div className="space-y-3">
+                    {availableKinds.map(kind => (
+                      <div key={kind} className="flex items-center gap-3 group">
+                        <Checkbox 
+                          id={`exp-kind-${kind}`} 
+                          checked={selectedKinds.includes(kind)} 
+                          onCheckedChange={() => toggleKind(kind)}
+                          className="w-5 h-5"
+                        />
+                        <label htmlFor={`exp-kind-${kind}`} className="text-xs font-bold cursor-pointer truncate uppercase">
+                          {KIND_LABELS[kind] || kind}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </section>
+
+              <section className="space-y-4">
+                <h3 className="text-sm font-black uppercase text-primary tracking-[0.15em] flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5" /> Taxability
+                </h3>
+                <Card className="bg-muted/30 p-5 shadow-inner h-full">
+                  <div className="space-y-3">
+                    {['T', 'E'].map(tax => (
+                      <div key={tax} className="flex items-center gap-3 group">
+                        <Checkbox 
+                          id={`exp-tax-${tax}`} 
+                          checked={selectedTaxabilities.includes(tax as any)} 
+                          onCheckedChange={() => toggleTaxability(tax as any)}
+                          className="w-5 h-5"
+                        />
+                        <label htmlFor={`exp-tax-${tax}`} className="text-xs font-bold cursor-pointer truncate uppercase">
+                          {tax === 'T' ? 'Taxable (T)' : 'Exempted (E)'}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </section>
+            </div>
 
             <section className="space-y-4">
               <h3 className="text-sm font-black uppercase text-primary tracking-[0.15em] flex items-center gap-2">
-                <Filter className="w-5 h-5" /> Filter by Data Type
+                <Filter className="w-5 h-5" /> Filter by Data Status
               </h3>
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-bold text-muted-foreground flex items-center gap-2">
                     <FileCheck2 className="w-4 h-4 text-emerald-500" /> Approved Results
-                    <Badge variant="outline" className="ml-2 font-black text-emerald-600 bg-emerald-50 border-emerald-200">
-                      {approvedGroupCount.toLocaleString()} Total
-                    </Badge>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button className="text-muted-foreground hover:text-foreground outline-none"><HelpCircle className="w-3.5 h-3.5" /></button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80 bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl rounded-xl">
-                        <p className="text-sm font-bold leading-relaxed text-muted-foreground">Records that have passed initial cleanup and are not duplicates. This includes both fully valid records and those flagged with correctable errors.</p>
-                      </PopoverContent>
-                    </Popover>
                   </h4>
                   <div className="flex gap-4">
                     <Button variant="link" size="sm" onClick={selectAllApproved} className="text-xs font-black uppercase text-muted-foreground h-auto p-0">Select All</Button>
@@ -398,12 +394,11 @@ export function ExportSettingsModal({
                       <label htmlFor={`exp-stat-${status}`} className="text-sm font-black uppercase cursor-pointer flex items-center justify-between w-full">
                         <span>{status}</span>
                         <Badge variant="secondary" className="h-5 px-2 text-xs bg-emerald-100 text-emerald-800 border-emerald-200">
-                          {data.filter(r => r.statusLabel === status && selectedBarangays.includes(r.barangayName || 'UNMAPPED') && selectedKinds.includes(r.kind?.trim().toUpperCase() || '')).length}
+                          {data.filter(r => r.statusLabel === status && selectedBarangays.includes(r.barangayName || 'UNMAPPED') && selectedKinds.includes(r.kind?.trim().toUpperCase() || '') && selectedTaxabilities.includes(r.taxability || 'T')).length}
                         </Badge>
                       </label>
                     </div>
                   ))}
-                  {approvedStatuses.length === 0 && <p className="text-xs font-bold text-center text-muted-foreground py-2 opacity-50">No approved results in current view.</p>}
                 </div>
               </div>
 
@@ -411,17 +406,6 @@ export function ExportSettingsModal({
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-bold text-muted-foreground flex items-center gap-2">
                     <Trash2 className="w-4 h-4 text-orange-500" /> Archive Data
-                    <Badge variant="outline" className="ml-2 font-black text-orange-600 bg-orange-50 border-orange-200">
-                      {archiveGroupCount.toLocaleString()} Total
-                    </Badge>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button className="text-muted-foreground hover:text-foreground outline-none"><HelpCircle className="w-3.5 h-3.5" /></button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80 bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl rounded-xl">
-                        <p className="text-sm font-bold leading-relaxed text-muted-foreground">Records automatically moved aside by the engine, such as duplicates or rows with critical missing data (PIN/Acct Name).</p>
-                      </PopoverContent>
-                    </Popover>
                   </h4>
                   <div className="flex gap-4">
                     <Button variant="link" size="sm" onClick={selectAllArchive} className="text-xs font-black uppercase text-muted-foreground h-auto p-0">Select All</Button>
@@ -440,12 +424,11 @@ export function ExportSettingsModal({
                       <label htmlFor={`exp-stat-${status}`} className="text-sm font-black uppercase cursor-pointer flex items-center justify-between w-full">
                         <span>{status}</span>
                         <Badge variant="destructive" className="h-5 px-2 text-xs">
-                          {data.filter(r => r.statusLabel === status && selectedBarangays.includes(r.barangayName || 'UNMAPPED') && selectedKinds.includes(r.kind?.trim().toUpperCase() || '')).length}
+                          {data.filter(r => r.statusLabel === status && selectedBarangays.includes(r.barangayName || 'UNMAPPED') && selectedKinds.includes(r.kind?.trim().toUpperCase() || '') && selectedTaxabilities.includes(r.taxability || 'T')).length}
                         </Badge>
                       </label>
                     </div>
                   ))}
-                  {archiveStatuses.length === 0 && <p className="text-xs font-bold text-center text-muted-foreground py-2 opacity-50">No archive data in current view.</p>}
                 </div>
               </div>
             </section>
@@ -463,7 +446,7 @@ export function ExportSettingsModal({
             <Button variant="ghost" onClick={() => onOpenChange(false)} className="font-black uppercase text-xs tracking-widest px-8 h-12">Cancel</Button>
             <Button 
               onClick={handleExport} 
-              disabled={selectedBarangays.length === 0 || selectedStatuses.length === 0 || selectedKinds.length === 0 || estimatedRecordCount === 0}
+              disabled={selectedBarangays.length === 0 || selectedStatuses.length === 0 || selectedKinds.length === 0 || selectedTaxabilities.length === 0 || estimatedRecordCount === 0}
               className="bg-primary hover:bg-emerald-800 font-black uppercase text-xs tracking-widest px-12 h-12 shadow-xl shadow-primary/20"
             >
               <FileDown className="w-4 h-4 mr-2" /> Start Generation

@@ -259,8 +259,8 @@ export function processRecords(
     
     const kind = r.kind?.trim().toUpperCase() || '';
 
-    // Auto-calculate unit value if missing but market value exists (only if not B or M, though initial mapping is fine)
-    if (unitValue === 0 && marketValue > 0 && landArea > 0) {
+    // Auto-calculate unit value if missing but market value exists (only if not B or M)
+    if (kind !== 'M' && kind !== 'B' && unitValue === 0 && marketValue > 0 && landArea > 0) {
       unitValue = Math.round(marketValue / landArea);
     } else {
       unitValue = Math.round(unitValue);
@@ -327,9 +327,6 @@ export function processRecords(
     result = result.map(record => {
       if (record.isCleanup || record.isManualArchive) return record;
       
-      // REQUIREMENT: If Kind is M or B, skip calibration overwrites
-      if (record.kind === 'M' || record.kind === 'B') return record;
-
       let updated = { ...record };
       const matchingRule = rules.find(rule => matchesPinPattern(record.pin, rule.pinPattern));
       
@@ -347,6 +344,9 @@ export function processRecords(
         }
       }
 
+      // Check if B or M kind to bypass financial calibration
+      const isBOrM = record.kind === 'M' || record.kind === 'B';
+
       // Apply Custom Calibration Rules
       if (matchingRule) {
         const brgy = (matchingRule.barangay || "").trim();
@@ -356,7 +356,9 @@ export function processRecords(
           wasCalibrated = true;
           if (brgy) updated.barangayName = brgy;
         }
-        if (matchingRule.unitValue !== undefined && !isNaN(matchingRule.unitValue) && matchingRule.unitValue > 0) {
+        
+        // Calibration for B and M only applies to Location
+        if (!isBOrM && matchingRule.unitValue !== undefined && !isNaN(matchingRule.unitValue) && matchingRule.unitValue > 0) {
           updated.unitValue = Math.round(matchingRule.unitValue);
           wasCalibrated = true;
         }
@@ -389,9 +391,12 @@ export function processRecords(
                       sectionSetting = targetBarangay.sections.find(s => s.section === sectionCode) || null;
                   }
                   if (sectionSetting) {
+                      // Apply location even for B and M
                       updated.location = sectionSetting.location.toUpperCase();
                       wasCalibrated = true;
-                      if (sectionSetting.unitValue && sectionSetting.unitValue > 0) {
+                      
+                      // Financials remain raw for B and M
+                      if (!isBOrM && sectionSetting.unitValue && sectionSetting.unitValue > 0) {
                           updated.unitValue = sectionSetting.unitValue;
                       }
                   }
@@ -401,12 +406,14 @@ export function processRecords(
       
       if (wasCalibrated) calibratedCount++;
 
-      // Recalculate based on calibrated values
-      if (updated.unitValue && updated.unitValue > 0 && updated.landArea > 0) {
-          updated.marketValue = updated.landArea * updated.unitValue;
+      // Recalculate based on calibrated values (Skip for B/M to preserve raw data)
+      if (!isBOrM) {
+          if (updated.unitValue && updated.unitValue > 0 && updated.landArea > 0) {
+              updated.marketValue = updated.landArea * updated.unitValue;
+          }
+          updated.assessedValue = calculateAssessedValue(updated.marketValue, updated.au, taxRates);
+          updated.yearlyTax = calculateYearlyTax(updated.assessedValue, updated.au, taxRates);
       }
-      updated.assessedValue = calculateAssessedValue(updated.marketValue, updated.au, taxRates);
-      updated.yearlyTax = calculateYearlyTax(updated.assessedValue, updated.au, taxRates);
       
       return updated;
     });
@@ -477,7 +484,6 @@ export function processRecords(
     totalMarketValue: totalMarket,
     totalAssessedValue: totalAssessed,
     // CRITICAL: We store the raw records snapshot here for the "Recover Raw Data" functionality
-    // so that users get back exactly what they imported, not the calibrated/deduped results.
     records: rawRecordsSnapshot
   };
 

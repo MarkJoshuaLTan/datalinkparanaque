@@ -510,7 +510,8 @@ export default function Home() {
       const filteredForExport = previewData.filter(r => 
         settings.barangays.includes(r.barangayName || 'UNMAPPED') && 
         settings.statuses.includes(r.statusLabel || 'VALID' as any) &&
-        settings.kinds.includes(r.kind?.trim().toUpperCase() || '')
+        settings.kinds.includes(r.kind?.trim().toUpperCase() || '') &&
+        settings.taxabilities.includes(r.taxability || 'T')
       );
       if (filteredForExport.length === 0) { toast({ variant: "destructive", title: "Export Failed", description: "No records match your selected export criteria." }); setIsExporting(false); return; }
       const sortedForExport = [...filteredForExport].sort((a, b) => {
