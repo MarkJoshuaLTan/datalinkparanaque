@@ -465,20 +465,26 @@ export function processRecords(
     };
   });
 
-  // Assign NEW ARP NO# for BF Homes specifically
-  let bfHomesSequence = 1;
-  // Sort the references in the result array by PIN to assign sequence correctly
+  // Assign NEW ARP NO# for ALL barangays
+  // Create a map to track sequence counters per barangay code
+  const barangaySequences = new Map<string, number>();
+  
+  // Sort the references in the result array by PIN to assign sequence correctly geographically
   const sortedForArp = [...result].sort((a, b) => (a.pin || '').localeCompare(b.pin || ''));
   
   sortedForArp.forEach(record => {
     const pinParts = (record.pin || '').split('-');
     const barangayCode = pinParts.length >= 3 ? pinParts[2] : '';
     
-    // Only assign to active (non-archived) records for BF Homes
-    if (barangayCode === '001' && !record.isDuplicate && !record.isCleanup && !record.isManualArchive) {
-      const seqStr = String(bfHomesSequence).padStart(5, '0');
-      record.newArpNo = `F-001-${seqStr}`;
-      bfHomesSequence++;
+    // Only assign to active (non-archived) records that have a valid barangay code from PIN
+    if (barangayCode && !record.isDuplicate && !record.isCleanup && !record.isManualArchive) {
+      const currentSeq = barangaySequences.get(barangayCode) || 1;
+      const seqStr = String(currentSeq).padStart(5, '0');
+      
+      record.newArpNo = `F-${barangayCode}-${seqStr}`;
+      
+      // Increment counter for this specific barangay
+      barangaySequences.set(barangayCode, currentSeq + 1);
     } else {
       record.newArpNo = '---';
     }
