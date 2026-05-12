@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -83,7 +84,7 @@ export function SuccessModal({
 
           <div className="w-full flex flex-col gap-4">
             <Button 
-              className="w-full font-black uppercase text-xs tracking-widest h-14 bg-primary hover:bg-emerald-800 shadow-xl shadow-primary/20" 
+              className="w-full font-black uppercase text-xs tracking-widest h-14 bg-primary hover:bg-emerald-700 hover:text-white shadow-xl shadow-primary/20" 
               onClick={handleViewResult}
             >
               <FileSearch className="w-4.5 h-4.5 mr-2" />
@@ -93,7 +94,7 @@ export function SuccessModal({
             {/* Minimal Export Action */}
             <button 
               onClick={handleDownload}
-              className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 hover:text-foreground transition-colors py-2 flex items-center justify-center gap-2"
+              className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 hover:text-primary transition-colors py-2 flex items-center justify-center gap-2"
             >
               <Download className="w-3 h-3" />
               Continue to Direct Export
