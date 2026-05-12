@@ -465,7 +465,6 @@ export default function Home() {
     setImportedFileName(newFileName);
     setProcessedData([]);
     setViewMode('results');
-    setShowDetailedResults(false); 
     setSourceFileFilter('all');
     setBarangayFilter('all');
     const { allWithDuplicateMarkers } = processRecords(newData, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, newFileName, updatedExemptPins);
@@ -522,9 +521,6 @@ export default function Home() {
               message: `${report.validCount} records have been successfully calibrated. Please conduct a manual review of all results to ensure final data integrity before export.`, 
               onDownload: () => setIsExportSettingsOpen(true), 
               onViewResult: () => { 
-                // We no longer force back to hero mode here. 
-                // If they were already in detailed view, they stay there.
-                // If they were in hero view, they stay there.
                 setViewMode('results'); 
               } 
             });
