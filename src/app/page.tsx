@@ -521,7 +521,12 @@ export default function Home() {
               title: "Engine Analysis Complete", 
               message: `${report.validCount} records have been successfully calibrated. Please conduct a manual review of all results to ensure final data integrity before export.`, 
               onDownload: () => setIsExportSettingsOpen(true), 
-              onViewResult: () => { setShowDetailedResults(false); setViewMode('results'); } 
+              onViewResult: () => { 
+                // We no longer force back to hero mode here. 
+                // If they were already in detailed view, they stay there.
+                // If they were in hero view, they stay there.
+                setViewMode('results'); 
+              } 
             });
             setTimeout(() => { updateStats(allWithDuplicateMarkers, rawCount); }, 400); 
         }, 800);
@@ -853,14 +858,12 @@ export default function Home() {
 
                   <div className={cn(
                     "mx-auto flex items-center bg-card p-3 rounded-3xl shadow-2xl border border-white/10 shrink-0 transition-all duration-700 ease-in-out px-6 mb-4 w-fit",
-                    showDetailedResults ? "gap-12" : "gap-6"
+                    showDetailedResults ? "gap-12" : "justify-center gap-6"
                   )}>
                     <div className="flex gap-4 items-center">
                       <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="outline" onClick={() => setIsExportSettingsOpen(true)} size="sm" className={cn("font-black uppercase tracking-widest border-primary/30 text-primary hover:bg-muted hover:text-primary transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]")} disabled={isExporting}><FileDown className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> {isExporting ? "Generating..." : "Export Data"}</Button></TooltipTrigger><TooltipContent>Shortcut: Ctrl + E</TooltipContent></Tooltip></TooltipProvider>
                       <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="sm" className="h-10 text-[10px] font-bold uppercase px-4 hover:bg-muted hover:text-foreground transition-all" onClick={clearWorkspace}><Eraser className="w-3.5 h-3.5 mr-1" /> Clear Session</Button></TooltipTrigger><TooltipContent>Shortcut: Ctrl + Alt + C</TooltipContent></Tooltip></TooltipProvider>
-                      {viewMode !== 'audit' && (
-                        <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="outline" size="sm" onClick={() => exemptFileInputRef.current?.click()} className={cn("font-black uppercase tracking-widest text-blue-600 border-blue-500/30 hover:bg-muted hover:text-blue-600 transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]")}><ShieldOff className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> Load Exempt Reference</Button></TooltipTrigger><TooltipContent>Load data to be treated as Tax Exempt</TooltipContent></Tooltip></TooltipProvider>
-                      )}
+                      <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="outline" size="sm" onClick={() => exemptFileInputRef.current?.click()} className={cn("font-black uppercase tracking-widest text-blue-600 border-blue-500/30 hover:bg-muted hover:text-blue-600 transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]")}><ShieldOff className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> Load Exempt Reference</Button></TooltipTrigger><TooltipContent>Load data to be treated as Tax Exempt</TooltipContent></Tooltip></TooltipProvider>
                     </div>
                     <div className="flex gap-4 items-center">
                       {viewMode !== 'analytics' && viewMode !== 'audit' && (
