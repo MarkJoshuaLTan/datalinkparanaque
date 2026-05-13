@@ -37,7 +37,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { parseFile, mapRawToRecords } from '@/lib/importer';
 
 interface ImportZoneProps {
-  onDataImported: (data: LandRecord[], fileName: string, rawCount: number) => void;
+  onDataImported: (data: LandRecord[], fileName: string, rawCount: number, mode: 'raw' | 'exempt') => void;
   mode?: 'raw' | 'exempt';
 }
 
@@ -108,7 +108,7 @@ export function ImportZone({ onDataImported, mode = 'raw' }: ImportZoneProps) {
 
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      onDataImported(allRecords, summaryFileName, totalRawCount);
+      onDataImported(allRecords, summaryFileName, totalRawCount, mode);
       setIsLoading(false);
       setStagedFiles([]); 
       setFileStatuses({});
@@ -173,7 +173,7 @@ export function ImportZone({ onDataImported, mode = 'raw' }: ImportZoneProps) {
       });
 
       setTimeout(() => {
-        onDataImported(mapRawToRecords(records, "Clipboard-Data"), "Clipboard-Data", records.length);
+        onDataImported(mapRawToRecords(records, "Clipboard-Data"), "Clipboard-Data", records.length, mode);
         setIsLoading(false);
       }, 500);
     }, 500);

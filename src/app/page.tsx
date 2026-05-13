@@ -460,24 +460,39 @@ export default function Home() {
       imported.forEach(r => { if (r.pin) updatedExemptPins.add(r.pin.trim()); });
       setExemptPins(updatedExemptPins);
     }
+    
+    // Only append to records if it's raw data
     const isAppending = rawData.length > 0;
-    const newData = isAppending ? [...rawData, ...imported] : imported;
+    const newData = (mode === 'raw') ? (isAppending ? [...rawData, ...imported] : imported) : rawData;
+    
     let newFileName = fileName;
-    if (isAppending) {
+    if (isAppending && mode === 'raw') {
         if (importedFileName.includes('Batch')) { newFileName = `${importedFileName.replace(')', '')}, ${fileName})`; }
         else { newFileName = `Batch (${importedFileName}, ${fileName})`; }
+    } else if (mode === 'raw') {
+      newFileName = fileName;
+    } else {
+      newFileName = importedFileName;
     }
+
     setRawData(newData);
     setImportedFileName(newFileName);
     setProcessedData([]);
     setViewMode('results');
     setSourceFileFilter('all');
     setBarangayFilter('all');
-    setShowDetailedResults(true);
+    
+    // Automatically transition to detailed view if raw records are present
+    if (newData.length > 0) {
+      setShowDetailedResults(true);
+    }
 
     const { allWithDuplicateMarkers } = processRecords(newData, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, newFileName, updatedExemptPins);
     setPreviewData(allWithDuplicateMarkers);
-    toast({ title: mode === 'exempt' ? "Exempt Data Integrated" : (isAppending ? "Data Appended" : "Data Loaded"), description: mode === 'exempt' ? `${imported.length} records integrated and indexed as Exempt reference.` : `${rawCount} records from ${fileName} imported successfully.` });
+    toast({ 
+      title: mode === 'exempt' ? "Exempt Data Integrated" : (isAppending ? "Data Appended" : "Data Loaded"), 
+      description: mode === 'exempt' ? `${imported.length} records integrated and indexed as Exempt reference.` : `${rawCount} records from ${fileName} imported successfully.` 
+    });
   };
 
   const handleDirectImport = async (e: React.ChangeEvent<HTMLInputElement>, mode: 'raw' | 'exempt') => {
@@ -736,8 +751,21 @@ export default function Home() {
                      <h2 className="text-5xl font-black uppercase tracking-tight text-foreground">Welcome to DataLink</h2>
                      <p className="text-muted-foreground font-bold uppercase tracking-widest text-sm">Upload your records to begin the cleanup process.</p>
                    </div>
-                   <div className="w-full max-w-4xl mx-auto px-6">
-                      <ImportZone onDataImported={handleDataImported} mode="raw" />
+                   <div className="w-full max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 px-1">
+                          <BookUser className="w-4 h-4 text-primary" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Primary Dataset</span>
+                        </div>
+                        <ImportZone onDataImported={handleDataImported} mode="raw" />
+                      </div>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 px-1">
+                          <ShieldOff className="w-4 h-4 text-blue-600" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Exempt Reference</span>
+                        </div>
+                        <ImportZone onDataImported={handleDataImported} mode="exempt" />
+                      </div>
                    </div>
                 </div>
               ) : (
