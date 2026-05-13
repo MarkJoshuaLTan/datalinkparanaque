@@ -34,6 +34,22 @@ import {
   X,
   FileText
 } from 'lucide-react';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  Cell, 
+  Pie, 
+  PieChart, 
+  Legend, 
+  CartesianGrid 
+} from 'recharts';
+import { 
+  ChartContainer, 
+  ChartTooltip, 
+  ChartTooltipContent,
+} from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -110,6 +126,8 @@ const defaultTaxRates: TaxRateMap = {
   "SPC4": { assessmentLevel: 0.15, taxRate: 0.025 },
   "SPC5": { assessmentLevel: 0.15, taxRate: 0.025 },
 };
+
+const CHART_COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
 
 type ProcessingStep = 'idle' | 'cleanup' | 'dedupe' | 'calibrate' | 'complete';
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -738,6 +756,25 @@ export default function Home() {
     finally { setIsExporting(false); }
   };
 
+  const getExplanation = (type: string) => {
+    switch (type) {
+      case 'usage':
+        const topUsage = analyticsData.auChart[0];
+        return `The dataset is currently dominated by properties categorized as "${topUsage?.name || 'Unknown'}", which accounts for ${topUsage?.value || 0} records. This high concentration suggests a primary focus on ${topUsage?.name === 'RESI' ? 'residential developments' : 'commercial/industrial activity'} in the current batch processing sequence.`;
+      case 'barangay':
+        const topBrgy = analyticsData.barangayChart[0];
+        return `Geographically, "${topBrgy?.name || 'Unmapped'}" represents the highest volume of activity with ${topBrgy?.value || 0} records. This indicates that the current batch is heavily localized within this sector, requiring careful calibration of unit values to ensure geographic assessment equity.`;
+      case 'update':
+        const topUpdate = analyticsData.updateChart[0];
+        return `Transaction patterns show that "${topUpdate?.name || 'None'}" is the most frequent update code. This identifies that the majority of records are ${topUpdate?.name === 'GR' ? 'General Revisions' : 'Standard Updates'}, which aligns with the RPVARA calibration objectives.`;
+      case 'market':
+        const totalVal = analyticsData.marketChart.reduce((sum, item) => sum + item.value, 0);
+        return `The total market value analyzed in this scope exceeds ₱${totalVal.toLocaleString()}. The distribution highlights significant capital investment in specific asset classes, demanding precision in financial multiplier settings for the 2029 forecast.`;
+      default:
+        return "Analyzing dataset patterns to provide automated intelligence reports based on city standards.";
+    }
+  };
+
   const ImportManager = ({ mode, manifest, onAdd, onDelete }: { mode: 'raw' | 'exempt', manifest: any[], onAdd: () => void, onDelete: (name: string) => void }) => (
     <Popover>
       <TooltipProvider>
@@ -1106,7 +1143,38 @@ export default function Home() {
       )}
 
       <Dialog open={!!explainType} onOpenChange={(open) => !open && setExplainType(null)}>
-        <DialogContent className="sm:max-w-2xl bg-card border-white/10 shadow-2xl p-0 overflow-hidden"><div className="bg-primary/5 p-6 border-b"><DialogHeader><DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2"><Lightbulb className="w-5 h-5 text-primary" /> Advanced Data Intelligence Report</DialogTitle><DialogDescription className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Deep-Dive Diagnostic Analysis</DialogDescription></DialogHeader></div><div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto scrollbar-vertical-custom"><div className="p-6 rounded-2xl bg-muted/30 border border-white/5 shadow-inner leading-relaxed"><div className="text-base font-bold text-foreground/90">Placeholder explanation...</div></div><div className="space-y-4"><h5 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /> Audit Implications</h5><p className="text-sm font-bold text-muted-foreground leading-relaxed">Based on the detected patterns, this dataset shows high reliability for the primary categories but may require targeted sampling in the outlier groups.</p></div></div><DialogFooter className="p-6 bg-muted/20 border-t"><Button onClick={() => setExplainType(null)} className="w-full h-11 font-black uppercase text-xs tracking-widest shadow-lg hover:bg-slate-900 hover:text-white transition-colors">Acknowledge Report</Button></DialogFooter></DialogContent>
+        <DialogContent className="sm:max-w-2xl bg-card border-white/10 shadow-2xl p-0 overflow-hidden">
+          <div className="bg-primary/5 p-6 border-b">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-primary" /> Advanced Data Intelligence Report
+              </DialogTitle>
+              <DialogDescription className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">
+                Deep-Dive Diagnostic Analysis
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto scrollbar-vertical-custom">
+            <div className="p-6 rounded-2xl bg-muted/30 border border-white/5 shadow-inner leading-relaxed">
+              <div className="text-base font-bold text-foreground/90">
+                {explainType ? getExplanation(explainType) : "Generating report..."}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h5 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-primary" /> Audit Implications
+              </h5>
+              <p className="text-sm font-bold text-muted-foreground leading-relaxed">
+                Based on the detected patterns, this dataset shows high reliability for the primary categories but may require targeted sampling in the outlier groups to ensure 100% compliance with City Ordinance 142-71.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="p-6 bg-muted/20 border-t">
+            <Button onClick={() => setExplainType(null)} className="w-full h-11 font-black uppercase text-xs tracking-widest shadow-lg hover:bg-slate-900 hover:text-white transition-colors">
+              Acknowledge Report
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
 
       <Dialog open={isRunProcessorDialogOpen} onOpenChange={setIsRunProcessorDialogOpen}>
@@ -1129,16 +1197,56 @@ export default function Home() {
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-0">
-            <div className="lg:col-span-6 bg-muted/5 rounded-2xl border border-white/5 flex items-center justify-center p-6 shadow-inner relative overflow-hidden">
-               <div className="text-muted-foreground font-black text-xs uppercase">Rendering High Fidelity Expanded Visual...</div>
+            <div className="lg:col-span-8 bg-muted/5 rounded-2xl border border-white/5 flex items-center justify-center p-6 shadow-inner relative overflow-hidden">
+               <ChartContainer config={{ value: { label: "Count", color: "hsl(var(--primary))" } }} className="h-full w-full">
+                  {expandedChart === 'market' ? (
+                    <PieChart>
+                      <Pie data={analyticsData.marketChart} cx="50%" cy="50%" innerRadius={100} outerRadius={150} paddingAngle={8} dataKey="value" stroke="none" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}>
+                        {analyticsData.marketChart.map((entry, index) => <Cell key={`cell-exp-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                    </PieChart>
+                  ) : (
+                    <BarChart data={expandedChart === 'usage' ? analyticsData.auChart : expandedChart === 'barangay' ? analyticsData.barangayChart : analyticsData.updateChart}>
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.1} />
+                      <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
+                      <YAxis fontSize={12} tickLine={false} axisLine={false} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                        {(expandedChart === 'usage' ? analyticsData.auChart : expandedChart === 'barangay' ? analyticsData.barangayChart : analyticsData.updateChart).map((entry, index) => (
+                          <Cell key={`cell-exp-bar-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  )}
+               </ChartContainer>
             </div>
-            <div className="lg:col-span-6 flex flex-col gap-6 min-h-0">
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10"><p className="text-xs font-bold leading-relaxed text-muted-foreground uppercase">Detailed distribution analysis for all finalized records in this batch.</p></div>
-              <div className="flex-1 overflow-y-auto pr-3 scrollbar-vertical-custom space-y-3">
-                <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest animate-pulse">Loading dataset details...</p>
+            <div className="lg:col-span-4 flex flex-col gap-6 min-h-0">
+              <div className="p-5 rounded-2xl bg-primary/5 border border-primary/10">
+                <p className="text-xs font-black leading-relaxed text-muted-foreground uppercase tracking-widest">
+                  High-Fidelity Distribution Analysis for {analyticsData.totalRecords.toLocaleString()} Processed Records.
+                </p>
+              </div>
+              <div className="flex-1 overflow-y-auto pr-3 scrollbar-vertical-custom space-y-4">
+                <h4 className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">Data Breakdown</h4>
+                {(expandedChart === 'market' ? analyticsData.marketChart : (expandedChart === 'usage' ? analyticsData.auChart : expandedChart === 'barangay' ? analyticsData.barangayChart : analyticsData.updateChart)).slice(0, 8).map((item, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-white/5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+                      <span className="text-[11px] font-black uppercase truncate max-w-[120px]">{item.name}</span>
+                    </div>
+                    <span className="text-[11px] font-mono font-black">
+                      {expandedChart === 'market' ? `₱${item.value.toLocaleString()}` : item.value.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
+          <DialogFooter className="p-0 pt-6 mt-6 border-t">
+             <Button onClick={() => setExpandedChart(null)} className="w-full h-12 font-black uppercase text-xs tracking-widest bg-slate-900 text-white hover:bg-black transition-colors rounded-xl">Close Detailed View</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
