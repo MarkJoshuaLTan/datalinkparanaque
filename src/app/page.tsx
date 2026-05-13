@@ -740,21 +740,27 @@ export default function Home() {
 
   const ImportManager = ({ mode, manifest, onAdd, onDelete }: { mode: 'raw' | 'exempt', manifest: any[], onAdd: () => void, onDelete: (name: string) => void }) => (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className={cn(
-            "font-black uppercase tracking-widest transition-all gap-2", 
-            showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]",
-            mode === 'raw' ? "border-primary/30 text-primary hover:bg-primary/10" : "border-blue-500/30 text-blue-600 hover:bg-blue-500/10"
-          )}
-        >
-          {mode === 'raw' ? <BookUser className="w-4 h-4" /> : <ShieldOff className="w-4 h-4" />}
-          {mode === 'raw' ? "Import Records" : "Load Exempt"}
-          <ChevronDown className="w-3.5 h-3.5 opacity-50" />
-        </Button>
-      </PopoverTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className={cn(
+                  "h-9 w-9 transition-all", 
+                  mode === 'raw' ? "border-primary/30 text-primary hover:bg-primary/10" : "border-blue-500/30 text-blue-600 hover:bg-blue-500/10"
+                )}
+              >
+                {mode === 'raw' ? <BookUser className="w-4 h-4" /> : <ShieldOff className="w-4 h-4" />}
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="font-black uppercase text-[10px] tracking-widest">
+            {mode === 'raw' ? "Manage Raw Records" : "Manage Exempt Reference"}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <PopoverContent className="w-80 p-0 bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl rounded-2xl overflow-hidden" align="end">
         <div className="p-4 bg-muted/30 border-b flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -980,7 +986,7 @@ export default function Home() {
                     </Card>
                   )}
 
-                  <div className="mx-6 mb-4 flex items-center justify-between bg-card p-3 rounded-3xl shadow-2xl border border-white/10 shrink-0 transition-all duration-700 ease-in-out px-6">
+                  <div className="mb-4 flex items-center justify-between bg-card p-3 rounded-3xl shadow-2xl border border-white/10 shrink-0 transition-all duration-700 ease-in-out px-6">
                     <div className="flex items-center gap-4">
                       <TooltipProvider>
                         <Tooltip>
