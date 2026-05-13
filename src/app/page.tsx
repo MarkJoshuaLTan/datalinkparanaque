@@ -480,7 +480,6 @@ export default function Home() {
       setRawFileManifest(prev => [...prev, { name: fileName, count: rawCount }]);
     }
     
-    // Only append to records if it's raw data
     const isAppending = rawData.length > 0;
     const newData = (mode === 'raw') ? [...rawData, ...imported] : rawData;
     
@@ -501,7 +500,6 @@ export default function Home() {
     setSourceFileFilter('all');
     setBarangayFilter('all');
     
-    // Automatically transition to detailed view if raw records are present
     if (newData.length > 0 || mode === 'raw') {
       setShowDetailedResults(true);
     }
@@ -520,10 +518,9 @@ export default function Home() {
       setRawData(newRawData);
       setRawFileManifest(prev => prev.filter(f => f.name !== fileName));
       
-      // Update preview
       const { allWithDuplicateMarkers } = processRecords(newRawData, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, importedFileName, exemptPins);
       setPreviewData(allWithDuplicateMarkers);
-      setProcessedData([]); // Force re-process
+      setProcessedData([]); 
 
       if (newRawData.length === 0) {
         setShowDetailedResults(false);
@@ -536,15 +533,13 @@ export default function Home() {
       const newExemptFiles = exemptFileManifest.filter(f => f.name !== fileName);
       setExemptFileManifest(newExemptFiles);
       
-      // Rebuild exempt pins set
       const newExemptPins = new Set<string>();
       newExemptFiles.forEach(f => f.pins.forEach(pin => newExemptPins.add(pin)));
       setExemptPins(newExemptPins);
       
-      // Re-validate current raw data with new pins
       const { allWithDuplicateMarkers } = processRecords(rawData, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, importedFileName, newExemptPins);
       setPreviewData(allWithDuplicateMarkers);
-      setProcessedData([]); // Force re-process
+      setProcessedData([]); 
     }
     toast({ title: "File Removed", description: `${fileName} has been removed from the session.` });
   };
@@ -651,7 +646,6 @@ export default function Home() {
       const sum = (recs: LandRecord[], field: keyof LandRecord) => recs.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
       const fmt = (val: number) => `₱${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
 
-      // Summaries for Taxable
       const tMV28 = sum(taxableRecords, 'marketValue2028');
       const tAV28 = sum(taxableRecords, 'assessedValue2028');
       const tYT28 = sum(taxableRecords, 'yearlyTax2028');
@@ -659,7 +653,6 @@ export default function Home() {
       const tAV29 = sum(taxableRecords, 'assessedValue2029');
       const tYT29 = sum(taxableRecords, 'yearlyTax2029');
 
-      // Summaries for Exempt
       const eMV28 = sum(exemptRecords, 'marketValue2028');
       const eAV28 = sum(exemptRecords, 'assessedValue2028');
       const eMV29 = sum(exemptRecords, 'marketValue2029');
@@ -943,21 +936,26 @@ export default function Home() {
                             {uniqueSourceFiles.length > 1 && (
                               <Select value={sourceFileFilter} onValueChange={setSourceFileFilter}>
                                 <SelectTrigger className="w-[150px] h-9 text-xs font-bold uppercase"><Files className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="File Source" /></SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="all">All Files</SelectItem>
-                                  {uniqueSourceFiles.map(file => (
-                                    <SelectItem key={file} value={file}>{file}</SelectItem>
-                                  ))}
-                                </SelectContent>
+                                <SelectContent><SelectItem value="all">All Files</SelectItem>{uniqueSourceFiles.map(file => (<SelectItem key={file} value={file}>{file}</SelectItem>))}</SelectContent>
                               </Select>
                             )}
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
                               <SelectTrigger className="w-[160px] h-9 text-xs font-bold uppercase"><Filter className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="Status" /></SelectTrigger>
                               <SelectContent><SelectItem value="all">All</SelectItem>{dynamicStatusOptions.sort().map(opt => (<SelectItem key={opt} value={opt}>{opt}</SelectItem>))}</SelectContent>
                             </Select>
-                            <div className="flex gap-1">
-                               <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-primary hover:bg-muted transition-colors" onClick={() => rawFileInputRef.current?.click()}><Plus className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Import Raw Records (Ctrl + Alt + A)</TooltipContent></Tooltip></TooltipProvider>
-                               <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-blue-600 hover:bg-muted transition-colors" onClick={() => exemptFileInputRef.current?.click()}><ShieldOff className="w-4 h-4" /></Button></TooltipTrigger><TooltipContent>Load Exempt Reference</TooltipContent></Tooltip></TooltipProvider>
+                            <div className="flex gap-2 items-center">
+                              <ImportManager 
+                                mode="raw" 
+                                manifest={rawFileManifest} 
+                                onAdd={() => rawFileInputRef.current?.click()} 
+                                onDelete={(name) => deleteFile(name, 'raw')} 
+                              />
+                              <ImportManager 
+                                mode="exempt" 
+                                manifest={exemptFileManifest} 
+                                onAdd={() => exemptFileInputRef.current?.click()} 
+                                onDelete={(name) => deleteFile(name, 'exempt')} 
+                              />
                             </div>
                           </div>
                         )}
@@ -1011,18 +1009,6 @@ export default function Home() {
                       </TooltipProvider>
                     </div>
                     <div className="flex gap-4 items-center">
-                      <ImportManager 
-                        mode="raw" 
-                        manifest={rawFileManifest} 
-                        onAdd={() => rawFileInputRef.current?.click()} 
-                        onDelete={(name) => deleteFile(name, 'raw')} 
-                      />
-                      <ImportManager 
-                        mode="exempt" 
-                        manifest={exemptFileManifest} 
-                        onAdd={() => exemptFileInputRef.current?.click()} 
-                        onDelete={(name) => deleteFile(name, 'exempt')} 
-                      />
                       {viewMode !== 'analytics' && viewMode !== 'audit' && (
                         <TooltipProvider>
                           <Tooltip>
@@ -1137,7 +1123,6 @@ export default function Home() {
           </DialogHeader>
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-0">
             <div className="lg:col-span-6 bg-muted/5 rounded-2xl border border-white/5 flex items-center justify-center p-6 shadow-inner relative overflow-hidden">
-               {/* Simplified chart placeholders for expansion */}
                <div className="text-muted-foreground font-black text-xs uppercase">Rendering High Fidelity Expanded Visual...</div>
             </div>
             <div className="lg:col-span-6 flex flex-col gap-6 min-h-0">
@@ -1152,4 +1137,3 @@ export default function Home() {
     </div>
   );
 }
-
