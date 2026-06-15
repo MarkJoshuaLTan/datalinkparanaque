@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback, useRef } from 'react';
@@ -208,7 +207,7 @@ export default function Home() {
     "AU": true, "LAND AREA": true, "UNIT VALUE (2028)": true, "MARKET VALUE (2028)": true,
     "ASSESSED VALUE (2028)": true, "YEARLY TAX (2028 CAP)": true,
     "UNIT VALUE": true, "MARKET VALUE": true,
-    "ASSESSED VALUE": true, "YEARLY TAX": true,
+    "ASSESSED VALUE": true, "YEARLY TAX": true, "DUPLICATE WITH REFERENCE": true
   };
   const [exportColumns, setExportColumns] = useState<Record<string, boolean>>(defaultExportColumns);
 
@@ -704,7 +703,8 @@ export default function Home() {
         unitValue: "UNIT VALUE", 
         marketValue: "MARKET VALUE", 
         assessedValue: "ASSESSED VALUE", 
-        yearlyTax: "YEARLY TAX" 
+        yearlyTax: "YEARLY TAX",
+        duplicateWithReference: "DUPLICATE WITH REFERENCE"
       };
 
       const activeHeaders = Object.values(headerMapping).filter(h => settings.columns[h]);
@@ -1238,6 +1238,7 @@ export default function Home() {
       </Dialog>
 
       <ExportSettingsModal open={isExportSettingsOpen} onOpenChange={setIsExportSettingsOpen} data={previewData} isProcessed={processedData.length > 0} exportColumns={exportColumns} onColumnToggle={(col) => setExportColumns(prev => ({ ...prev, [col]: !prev[col] }))} onBulkColumnChange={(cols) => setExportColumns(cols)} onExport={handleFinalExport} />
+      <AboutModal open={isAboutOpen} onOpenChange={setIsAboutOpen} />
       <AboutModal open={isAboutOpen} onOpenChange={setIsAboutOpen} />
       <ProcessingReportModal report={latestReport} open={isReportOpen} onOpenChange={setIsReportOpen} />
       <RecordDetailModal record={selectedRecord} comparisonRecord={comparisonRecord} open={!!selectedRecord} onOpenChange={(isOpen) => { if (!isOpen) { setSelectedRecord(null); setComparisonRecord(null); } }} onSave={handleSaveRecord} onArchive={handleArchiveRecord} onUnarchive={handleUnarchiveRecord} />

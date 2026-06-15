@@ -68,6 +68,7 @@ export interface LandRecord {
   sourceFile?: string; // Track original file in batch processing
   statusLabel?: RecordStatusType; // Specific labeling for UI
   rawRow?: any; // CRITICAL: Stores the 1:1 original source data for recovery
+  duplicateWithReference?: string; // New: Link between duplicate and primary
 }
 
 export interface CalibrationRule {
@@ -293,23 +294,33 @@ export function processRecords(
       isDuplicate: false,
       isCleanup,
       isManualArchive: r.isManualArchive || false,
-      cleanupReason
+      cleanupReason,
+      duplicateWithReference: "N/A"
     };
     return record;
   });
 
   if (options.removeDuplicates) {
-    const pinToBestRecord = new Map<string, { index: number, arpVal: number }>();
+    const pinToBestRecord = new Map<string, { index: number, arpVal: number, arpNo: string }>();
     result.forEach((record, idx) => {
       if (record.isCleanup || record.isManualArchive || !record.pin || record.pin === '') return;
       const currentArpVal = extractArpNumeric(record.arpNo);
       const existing = pinToBestRecord.get(record.pin);
-      if (!existing) { pinToBestRecord.set(record.pin, { index: idx, arpVal: currentArpVal }); }
+      if (!existing) { 
+        pinToBestRecord.set(record.pin, { index: idx, arpVal: currentArpVal, arpNo: record.arpNo }); 
+        record.duplicateWithReference = "[VALID REFERENCE]";
+      }
       else {
         if (currentArpVal > existing.arpVal) {
           result[existing.index].isDuplicate = true;
-          pinToBestRecord.set(record.pin, { index: idx, arpVal: currentArpVal });
-        } else { record.isDuplicate = true; }
+          result[existing.index].duplicateWithReference = `[ARCHIVED DUPLICATE] -> Ref ARP: ${record.arpNo}`;
+          pinToBestRecord.set(record.pin, { index: idx, arpVal: currentArpVal, arpNo: record.arpNo });
+          record.isDuplicate = false;
+          record.duplicateWithReference = "[VALID REFERENCE]";
+        } else { 
+          record.isDuplicate = true; 
+          record.duplicateWithReference = `[ARCHIVED DUPLICATE] -> Ref ARP: ${existing.arpNo}`;
+        }
       }
     });
   }
