@@ -30,18 +30,21 @@ interface DataPreviewTableProps {
   data: LandRecord[];
   isProcessed?: boolean;
   onRowClick: (record: LandRecord) => void;
+  showLabels?: boolean;
 }
 
 const RecordRow = memo(({ 
   row, 
   index, 
   isProcessed,
-  onRowClick 
+  onRowClick,
+  showLabels
 }: { 
   row: LandRecord; 
   index: number; 
   isProcessed: boolean;
-  onRowClick: (record: LandRecord) => void 
+  onRowClick: (record: LandRecord) => void;
+  showLabels?: boolean;
 }) => {
   const getStatusBadge = () => {
     if (row.isComparisonInjected) {
@@ -78,8 +81,10 @@ const RecordRow = memo(({
   const displayYearlyTax = isProcessed ? (row.yearlyTax2029 ?? row.yearlyTax) : row.yearlyTax2028;
 
   const getTypeLabel = () => {
-    if (row.isComparisonInjected || row.duplicateWithReference === 'REF') return "REF";
-    if (row.isDuplicate || row.duplicateWithReference === 'DUP') return "DUP";
+    if (showLabels) {
+      if (row.isComparisonInjected || row.duplicateWithReference === 'REF') return "REF";
+      if (row.isDuplicate || row.duplicateWithReference === 'DUP') return "DUP";
+    }
     return index + 1;
   };
 
@@ -95,7 +100,7 @@ const RecordRow = memo(({
     >
       <TableCell className={cn(
         "text-center font-black p-3 border-r bg-muted/5",
-        (row.isComparisonInjected || row.duplicateWithReference === 'REF') ? "text-emerald-600 text-[10px] tracking-widest" : "text-muted-foreground font-mono"
+        (showLabels && (row.isComparisonInjected || row.duplicateWithReference === 'REF')) ? "text-emerald-600 text-[10px] tracking-widest" : "text-muted-foreground font-mono"
       )}>
         {getTypeLabel()}
       </TableCell>
@@ -189,13 +194,14 @@ const RecordRow = memo(({
     prevProps.row.newArpNo === nextProps.row.newArpNo &&
     prevProps.row.duplicateWithReference === nextProps.row.duplicateWithReference &&
     prevProps.isProcessed === nextProps.isProcessed &&
-    prevProps.index === nextProps.index
+    prevProps.index === nextProps.index &&
+    prevProps.showLabels === nextProps.showLabels
   );
 });
 
 RecordRow.displayName = 'RecordRow';
 
-export function DataPreviewTable({ data, isProcessed = false, onRowClick }: DataPreviewTableProps) {
+export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLabels = false }: DataPreviewTableProps) {
   const [displayLimit, setDisplayLimit] = useState(350);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isBulkLoading, setIsBulkLoading] = useState(false);
@@ -307,6 +313,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick }: Data
                 index={i} 
                 isProcessed={isProcessed}
                 onRowClick={onRowClick} 
+                showLabels={showLabels}
               />
             ))}
           </TableBody>
