@@ -663,50 +663,57 @@ export default function Home() {
     setIsExporting(true); setIsExportSettingsOpen(false);
     try {
       await delay(1500);
-      const baseFilteredForExport = previewData.filter(r => 
+      
+      // 1. Initial Filtering
+      const baseFilteredSet = previewData.filter(r => 
         settings.barangays.includes(r.barangayName || 'UNMAPPED') && 
         settings.statuses.includes(r.statusLabel || 'VALID' as any) &&
         settings.kinds.includes(r.kind?.trim().toUpperCase() || '') &&
         settings.taxabilities.includes(r.taxability || 'T')
       );
 
-      if (baseFilteredForExport.length === 0) { toast({ variant: "destructive", title: "Export Failed", description: "No records match your selected export criteria." }); setIsExporting(false); return; }
+      if (baseFilteredSet.length === 0) { 
+        toast({ variant: "destructive", title: "Export Failed", description: "No records match your selected export criteria." }); 
+        setIsExporting(false); 
+        return; 
+      }
       
-      // CONFLICT COMPARISON LOGIC: If exporting DUPs, inject their REFs for context
-      const filteredForExport: LandRecord[] = [];
-      const includedIds = new Set<string>();
+      // 2. Strict Conflict Comparison Logic: Forced grouping of DUP then REF
+      // Logic requirement: Sort by DUP ARP, REF always below its DUP. Standalones sorted by ARP.
+      const finalOutputList: LandRecord[] = [];
+      const handledIds = new Set<string>();
 
-      baseFilteredForExport.forEach(record => {
-        if (record.statusLabel === 'DUPLICATE' && !includedIds.has(record.id!)) {
-           // Find matching reference
-           const validPeer = previewData.find(p => p.pin === record.pin && !p.isDuplicate && !p.isCleanup && !p.isManualArchive);
-           if (validPeer && !includedIds.has(validPeer.id!)) {
-              filteredForExport.push({ ...validPeer, isComparisonInjected: true });
-              includedIds.add(validPeer.id!);
-           }
-        }
-        if (!includedIds.has(record.id!)) {
-          filteredForExport.push(record);
-          includedIds.add(record.id!);
+      // Force a baseline ARP sort as requested for duplicate management
+      const baselineSorted = [...baseFilteredSet].sort((a, b) => (a.arpNo || '').localeCompare(b.arpNo || ''));
+
+      baselineSorted.forEach(record => {
+        if (handledIds.has(record.id!)) return;
+
+        if (record.statusLabel === 'DUPLICATE') {
+          // It's a duplicate. Find its reference peer in the total preview dataset.
+          const ref = previewData.find(p => p.pin === record.pin && !p.isDuplicate && !p.isCleanup && !p.isManualArchive);
+          
+          finalOutputList.push(record); // Push DUP (top)
+          handledIds.add(record.id!);
+
+          if (ref) {
+            // Push REF (directly below)
+            finalOutputList.push({ ...ref, isComparisonInjected: true });
+            
+            // Mark it handled if it was part of the original intended filter to avoid double listing
+            if (baseFilteredSet.some(r => r.id === ref.id)) {
+              handledIds.add(ref.id!);
+            }
+          }
+        } else {
+          // Standard valid record
+          finalOutputList.push(record);
+          handledIds.add(record.id!);
         }
       });
 
-      const sortedForExport = [...filteredForExport].sort((a, b) => {
-         const fieldA = settings.sortBy === 'pin' ? (a.pin || '') : (a.arpNo || '');
-         const fieldB = settings.sortBy === 'pin' ? (b.pin || '') : (b.arpNo || '');
-         const fieldCompare = fieldA.localeCompare(fieldB);
-         
-         if (fieldCompare !== 0) return fieldCompare;
-         // Ensure REF (injected or real) comes before DUP
-         const isARef = a.isComparisonInjected || a.duplicateWithReference === 'REF';
-         const isBRef = b.isComparisonInjected || b.duplicateWithReference === 'REF';
-         if (isARef && !isBRef) return -1;
-         if (!isARef && isBRef) return 1;
-         return 0;
-      });
-      
-      const taxableRecords = sortedForExport.filter(r => r.taxability === 'T');
-      const exemptRecords = sortedForExport.filter(r => r.taxability === 'E');
+      const taxableRecords = finalOutputList.filter(r => r.taxability === 'T');
+      const exemptRecords = finalOutputList.filter(r => r.taxability === 'E');
 
       const sum = (recs: LandRecord[], field: keyof LandRecord) => recs.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
       const fmt = (val: number) => `₱${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
@@ -724,7 +731,7 @@ export default function Home() {
       const eAV29 = sum(exemptRecords, 'assessedValue2029');
 
       const headerMapping: Record<string, string> = { 
-        isComparisonInjected: "TYPE", // Mapped to our helper logic in generation
+        isComparisonInjected: "TYPE", 
         date: "DATE", 
         arpNo: "ARP NO#", 
         pin: "PIN", 
@@ -749,11 +756,13 @@ export default function Home() {
       };
 
       const activeHeaders = Object.values(headerMapping).filter(h => settings.columns[h]);
-      const formattedExport = sortedForExport.map(record => {
+      const formattedExport = finalOutputList.map(record => {
         const row: any = {};
         Object.entries(headerMapping).forEach(([key, label]) => { 
           if (settings.columns[label]) {
-            if (label === "TYPE") row[label] = record.isComparisonInjected || record.duplicateWithReference === 'REF' ? "REF" : "DUP";
+            if (label === "TYPE") {
+              row[label] = record.statusLabel === 'DUPLICATE' ? "DUP" : "REF";
+            }
             else if (label === "UNIT VALUE") row[label] = processedData.length > 0 ? record.unitValue2029 : record.unitValue2028;
             else if (label === "MARKET VALUE") row[label] = processedData.length > 0 ? record.marketValue2029 : record.marketValue2028;
             else if (label === "ASSESSED VALUE") row[label] = processedData.length > 0 ? record.assessedValue2029 : record.assessedValue2028;
@@ -768,7 +777,7 @@ export default function Home() {
       const sheetData = [
         ["DATA LINK PARAÑAQUE - SMART EXPORT"], 
         ["EXPORT DATE:", new Date().toLocaleString()], 
-        ["TOTAL RECORDS:", sortedForExport.length.toLocaleString()], 
+        ["TOTAL RECORDS:", finalOutputList.length.toLocaleString()], 
         [],
         ["SUMMARY TAXABLE PROPERTIES"],
         [],
@@ -800,7 +809,7 @@ export default function Home() {
       ws['!cols'] = activeHeaders.map(() => ({ wch: 22 }));
       XLSX.utils.book_append_sheet(wb, ws, "ExportResults");
       XLSX.writeFile(wb, `DataLink-SmartExport-${new Date().toISOString().split('T')[0]}.xlsx`);
-      showSuccessToast(`Exported ${sortedForExport.length} records successfully.`);
+      showSuccessToast(`Exported ${finalOutputList.length} records successfully.`);
     } catch (error: any) { toast({ variant: "destructive", title: "Export Failed", description: error.message }); }
     finally { setIsExporting(false); }
   };
