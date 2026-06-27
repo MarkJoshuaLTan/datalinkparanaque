@@ -66,7 +66,7 @@ const RecordRow = memo(({
         <TableCell className="font-mono p-3 font-black text-primary">{row.pin || '---'}</TableCell>
         <TableCell className="max-w-[180px] truncate uppercase font-black p-3 text-foreground" title={row.acctName}>{row.acctName || '---'}</TableCell>
         
-        {/* Corrected Mapping Columns for Join Preview */}
+        {/* Relational Mapping Columns for Join Preview */}
         <TableCell className={cn(
           "max-w-[180px] truncate uppercase p-3 font-bold border-l",
           abstractRow.isJoined ? "text-blue-700 dark:text-blue-400 bg-blue-50/10" : "text-red-400 italic opacity-50"

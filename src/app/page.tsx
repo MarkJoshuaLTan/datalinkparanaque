@@ -786,9 +786,7 @@ export default function Home() {
     try {
       await delay(1500);
       
-      // Corrected Abstract Join Logic:
-      // Transaction specifics come from Journal. 
-      // Registered identifiers come from Assessment Roll based on PIN.
+      // Corrected Abstract Join Logic based on requested mapping:
       const journals = journalData.length > 0 ? journalData : rawData.filter(r => r.sourceFile?.toLowerCase().includes('journal'));
       const rolls = rawData.filter(r => !r.sourceFile?.toLowerCase().includes('journal'));
       
@@ -804,19 +802,19 @@ export default function Home() {
       const abstractData = journals.map(j => {
         const rollMatch = rollLookup.get(normalizePin(j.pin)) || null;
         return {
-          "Date of Conveyance/Transfer": j.date || "",
-          "Ownership Transfer (From)": rollMatch?.acctName || "", // OWNER of Assessment Roll
-          "Ownership Transfer (To)": j.acctName || "", // NEW OWNER from Journal
-          "Address of New Owner": rollMatch?.address || "", // ADDRESS of Assessment Roll
-          "Location of Property": j.location || "", // LOCATION of Journal
-          "Mode of Conveyance": "",
-          "Amount of Consideration": "",
-          "Property Conveyed (L)": j.kind || "", // KIND of Journal
-          "Property Conveyed (B)": j.au || "", // AU of Journal
-          "Area Land/Bldg.": j.landArea || 0, // LandArea of Journal
-          "Lot No.": rollMatch?.lotNo || "", // LOT# of Assessment Roll
-          "Title No. (Previous)": "",
-          "Title No. (New)": rollMatch?.tctNo || "" // TCT# of Assessment Roll
+          "col1": j.date || "", // Date of Conveyance/Transfer
+          "col2": rollMatch?.acctName || "", // Ownership Transfer (From)
+          "col3": j.acctName || "", // Ownership Transfer (To)
+          "col4": rollMatch?.address || "", // Address of New Owner
+          "col5": j.location || "", // Location of Property
+          "col6": "", // Mode of Conveyance (Blank)
+          "col7": "", // Amount of Consideration (Blank)
+          "col8": j.kind || "", // Property Conveyed (L)
+          "col9": j.au || "", // Property Conveyed (B)
+          "col10": j.landArea || 0, // Area Land/Bldg.
+          "col11": rollMatch?.lotNo || "", // Lot No.
+          "col12": "", // Title No. (Previous) (Blank)
+          "col13": rollMatch?.tctNo || "" // Title No. (New)
         };
       });
 
@@ -997,7 +995,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex-col flex overflow-hidden">
           <main className="flex-1 flex flex-col p-6 overflow-hidden gap-4 min-h-0">
             <Tabs value={viewMode} onValueChange={(val: any) => { setViewMode(val); setStatusFilter('all'); }} className="flex-1 flex flex-col min-h-0">
               {workflowMode === 'idle' && viewMode !== 'audit' ? (
