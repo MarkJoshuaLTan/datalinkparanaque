@@ -330,12 +330,13 @@ export default function Home() {
       const rollMatch = rollLookup.get(normalizePin(j.pin)) || null;
       return {
         ...j,
-        // Enrich with roll data for preview
+        // Enrich with roll data for preview based on corrected mapping
+        rollOwner: rollMatch?.acctName || '---',
         rollAddress: rollMatch?.address || '---',
         rollLotNo: rollMatch?.lotNo || '---',
         rollTctNo: rollMatch?.tctNo || '---',
         isJoined: !!rollMatch
-      } as LandRecord & { rollAddress: string; rollLotNo: string; rollTctNo: string; isJoined: boolean };
+      } as LandRecord & { rollOwner: string; rollAddress: string; rollLotNo: string; rollTctNo: string; isJoined: boolean };
     });
   }, [workflowMode, journalData, rawData]);
 
@@ -344,7 +345,7 @@ export default function Home() {
       const query = searchQuery.toLowerCase();
       return joinedAbstractData.filter(record => {
         if (query) {
-           return record.acctName?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || record.rollTctNo?.toLowerCase().includes(query);
+           return record.acctName?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || record.rollTctNo?.toLowerCase().includes(query) || record.rollOwner?.toLowerCase().includes(query);
         }
         return true;
       });
@@ -785,9 +786,9 @@ export default function Home() {
     try {
       await delay(1500);
       
-      // Abstract Join Logic:
-      // Primary records are from Journal logs. 
-      // Secondary data (Address, Lot, TCT) comes from Assessment Roll based on PIN.
+      // Corrected Abstract Join Logic:
+      // Transaction specifics come from Journal. 
+      // Registered identifiers come from Assessment Roll based on PIN.
       const journals = journalData.length > 0 ? journalData : rawData.filter(r => r.sourceFile?.toLowerCase().includes('journal'));
       const rolls = rawData.filter(r => !r.sourceFile?.toLowerCase().includes('journal'));
       
@@ -804,18 +805,18 @@ export default function Home() {
         const rollMatch = rollLookup.get(normalizePin(j.pin)) || null;
         return {
           "Date of Conveyance/Transfer": j.date || "",
-          "Ownership Transfer (From)": "",
-          "Ownership Transfer (To)": j.acctName || "",
-          "Address of New Owner": rollMatch?.address || "",
-          "Location of Property": j.location || "",
+          "Ownership Transfer (From)": rollMatch?.acctName || "", // OWNER of Assessment Roll
+          "Ownership Transfer (To)": j.acctName || "", // NEW OWNER from Journal
+          "Address of New Owner": rollMatch?.address || "", // ADDRESS of Assessment Roll
+          "Location of Property": j.location || "", // LOCATION of Journal
           "Mode of Conveyance": "",
           "Amount of Consideration": "",
-          "Property Conveyed (L)": j.kind || "",
-          "Property Conveyed (B)": j.au || "",
-          "Area Land/Bldg.": j.landArea || 0,
-          "Lot No.": rollMatch?.lotNo || "",
+          "Property Conveyed (L)": j.kind || "", // KIND of Journal
+          "Property Conveyed (B)": j.au || "", // AU of Journal
+          "Area Land/Bldg.": j.landArea || 0, // LandArea of Journal
+          "Lot No.": rollMatch?.lotNo || "", // LOT# of Assessment Roll
           "Title No. (Previous)": "",
-          "Title No. (New)": rollMatch?.tctNo || ""
+          "Title No. (New)": rollMatch?.tctNo || "" // TCT# of Assessment Roll
         };
       });
 

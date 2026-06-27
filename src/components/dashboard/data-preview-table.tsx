@@ -64,16 +64,25 @@ const RecordRow = memo(({
         </TableCell>
         <TableCell className="whitespace-nowrap p-3 font-bold">{row.date || '---'}</TableCell>
         <TableCell className="font-mono p-3 font-black text-primary">{row.pin || '---'}</TableCell>
-        <TableCell className="max-w-[200px] truncate uppercase font-black p-3 text-foreground">{row.acctName || '---'}</TableCell>
-        <TableCell className="max-w-[200px] truncate uppercase p-3 text-muted-foreground italic">{row.location || '---'}</TableCell>
+        <TableCell className="max-w-[180px] truncate uppercase font-black p-3 text-foreground" title={row.acctName}>{row.acctName || '---'}</TableCell>
         
-        {/* Roll Join Columns */}
+        {/* Corrected Mapping Columns for Join Preview */}
+        <TableCell className={cn(
+          "max-w-[180px] truncate uppercase p-3 font-bold border-l",
+          abstractRow.isJoined ? "text-blue-700 dark:text-blue-400 bg-blue-50/10" : "text-red-400 italic opacity-50"
+        )} title={abstractRow.rollOwner}>
+          {abstractRow.rollOwner || 'NOT FOUND'}
+        </TableCell>
+
         <TableCell className={cn(
           "max-w-[250px] truncate uppercase p-3 font-bold border-l",
           abstractRow.isJoined ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50/10" : "text-red-400 italic opacity-50"
-        )}>
-          {abstractRow.rollAddress || 'NOT FOUND IN ROLL'}
+        )} title={abstractRow.rollAddress}>
+          {abstractRow.rollAddress || 'NOT FOUND'}
         </TableCell>
+
+        <TableCell className="max-w-[150px] truncate uppercase p-3 text-muted-foreground italic border-l">{row.location || '---'}</TableCell>
+
         <TableCell className={cn(
           "p-3 font-mono text-center border-l",
           abstractRow.isJoined ? "text-blue-600 font-black" : "text-muted-foreground opacity-30"
@@ -359,9 +368,10 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
                 <TableHead className="w-14 text-center font-black bg-card border-r">#</TableHead>
                 <TableHead className="min-w-[120px] font-black uppercase bg-card">Conveyance Date</TableHead>
                 <TableHead className="min-w-[200px] font-black uppercase bg-card">PIN (Index)</TableHead>
-                <TableHead className="min-w-[250px] font-black uppercase bg-card">New Owner (To)</TableHead>
-                <TableHead className="min-w-[200px] font-black uppercase bg-card">Transaction Loc.</TableHead>
-                <TableHead className="min-w-[300px] font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">Roll Address</TableHead>
+                <TableHead className="min-w-[200px] font-black uppercase bg-card">New Owner (To)</TableHead>
+                <TableHead className="min-w-[200px] font-black uppercase bg-blue-50 dark:bg-blue-950 border-l border-blue-100 dark:border-blue-900">Prev. Owner (From)</TableHead>
+                <TableHead className="min-w-[250px] font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">Registered Address</TableHead>
+                <TableHead className="min-w-[200px] font-black uppercase bg-card border-l">Transaction Loc.</TableHead>
                 <TableHead className="min-w-[100px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">Lot #</TableHead>
                 <TableHead className="min-w-[120px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">TCT #</TableHead>
                 <TableHead className="min-w-[100px] text-center font-black uppercase bg-card border-l">K-AU</TableHead>
