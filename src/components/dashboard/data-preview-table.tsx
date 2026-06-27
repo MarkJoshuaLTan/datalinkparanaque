@@ -111,15 +111,20 @@ const RecordRow = memo(({
         </TableCell>
         
         <TableCell className="text-center p-3 border-l">
-          {abstractRow.isJoined ? (
-            <Badge className="bg-emerald-600 text-white font-black text-[9px] tracking-widest gap-1 uppercase">
-              <Link2 className="w-3 h-3" /> Linked
-            </Badge>
-          ) : (
-            <Badge variant="destructive" className="font-black text-[9px] tracking-widest gap-1 uppercase opacity-60">
-              <Unlink2 className="w-3 h-3" /> No Match
-            </Badge>
-          )}
+          <div className="flex flex-col items-center gap-1">
+            {abstractRow.isJoined ? (
+              <Badge className="bg-emerald-600 text-white font-black text-[9px] tracking-widest gap-1 uppercase">
+                <Link2 className="w-3 h-3" /> Linked
+              </Badge>
+            ) : (
+              <Badge variant="destructive" className="font-black text-[9px] tracking-widest gap-1 uppercase opacity-60">
+                <Unlink2 className="w-3 h-3" /> No Match
+              </Badge>
+            )}
+            {row.taxability === 'E' && (
+              <Badge variant="outline" className="text-[9px] font-black h-4 px-1.5 bg-blue-600 text-white border-none shadow-sm">EXEMPT</Badge>
+            )}
+          </div>
         </TableCell>
       </TableRow>
     );

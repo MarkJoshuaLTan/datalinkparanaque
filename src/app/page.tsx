@@ -402,17 +402,22 @@ export default function Home() {
     const rollLookup = new Map<string, LandRecord>();
     rolls.forEach(r => { if (r.pin) rollLookup.set(normalizePin(r.pin), r); });
 
+    const normalizedExemptPins = new Set(Array.from(exemptPins).map(p => normalizePin(p)));
+
     return journals.map(j => {
-      const rollMatch = rollLookup.get(normalizePin(j.pin)) || null;
+      const pinNorm = normalizePin(j.pin);
+      const rollMatch = rollLookup.get(pinNorm) || null;
       
       const rollOwnerRaw = (rollMatch?.acctName || "").trim().toUpperCase();
       const journalOwnerRaw = (j.acctName || "").trim().toUpperCase();
       
       // Ownership comparison logic: blank From if same as To
       const ownersMatch = rollOwnerRaw !== "" && journalOwnerRaw !== "" && rollOwnerRaw === journalOwnerRaw;
-      
+      const isExempt = normalizedExemptPins.has(pinNorm);
+
       return {
         ...j,
+        taxability: isExempt ? 'E' : 'T',
         // Enrich with roll data for preview based on corrected mapping
         rollOwner: ownersMatch ? "" : (rollMatch?.acctName || '---'),
         rollAddress: rollMatch?.address || '---',
@@ -421,7 +426,7 @@ export default function Home() {
         isJoined: !!rollMatch
       } as LandRecord & { rollOwner: string; rollAddress: string; rollLotNo: string; rollTctNo: string; isJoined: boolean };
     });
-  }, [workflowMode, journalData, rawData]);
+  }, [workflowMode, journalData, rawData, exemptPins]);
 
   const filteredDisplayData = useMemo(() => {
     if (workflowMode === 'abstract' && viewMode === 'results') {
@@ -882,15 +887,18 @@ export default function Home() {
       const rollLookup = new Map<string, LandRecord>();
       rolls.forEach(r => { if (r.pin) rollLookup.set(normalizePin(r.pin), r); });
 
+      const normalizedExemptPins = new Set(Array.from(exemptPins).map(p => normalizePin(p)));
+
       const abstractData = journals.map(j => {
-        const rollMatch = rollLookup.get(normalizePin(j.pin)) || null;
+        const pinNorm = normalizePin(j.pin);
+        const rollMatch = rollLookup.get(pinNorm) || null;
         
         const rollOwnerRaw = (rollMatch?.acctName || "").trim().toUpperCase();
         const journalOwnerRaw = (j.acctName || "").trim().toUpperCase();
         
         // Ownership comparison logic: blank From if same as To
         const ownersMatch = rollOwnerRaw !== "" && journalOwnerRaw !== "" && rollOwnerRaw === journalOwnerRaw;
-        
+        const isExempt = normalizedExemptPins.has(pinNorm);
         const kind = (j.kind || "").trim().toUpperCase();
         
         return {
@@ -1087,7 +1095,7 @@ export default function Home() {
                 </div>
               ) : (
                 <div className={cn(
-                  "flex-1 flex flex-col min-0 transition-all duration-700 ease-in-out",
+                  "flex-1 flex flex-col min-h-0 transition-all duration-700 ease-in-out",
                   showDetailedResults ? "gap-4 h-full" : "items-center justify-center h-full",
                   isClearing && "animate-out fade-out zoom-out-95 duration-500 fill-mode-forwards"
                 )}>
