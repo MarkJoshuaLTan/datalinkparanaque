@@ -801,6 +801,7 @@ export default function Home() {
       const abstractData = journals.map(j => {
         const rollMatch = rollLookup.get(normalizePin(j.pin)) || null;
         const kind = (j.kind || "").trim().toUpperCase();
+        const au = (j.au || "").trim().toUpperCase();
         
         return {
           "col1": j.date || "", // Date of Conveyance/Transfer
@@ -810,8 +811,8 @@ export default function Home() {
           "col5": j.location || "", // Location of Property
           "col6": "", // Mode of Conveyance (Blank)
           "col7": "", // Amount of Consideration (Blank)
-          "col8": kind === 'L' || kind === 'LAND' ? 'L' : "", // Property Conveyed (L)
-          "col9": kind === 'B' || kind === 'BUILDING' ? 'B' : "", // Property Conveyed (B)
+          "col8": kind === 'L' || kind === 'LAND' ? au : "", // Property Conveyed (L)
+          "col9": kind === 'B' || kind === 'BUILDING' ? au : "", // Property Conveyed (B)
           "col10": j.landArea || 0, // Area Land/Bldg.
           "col11": rollMatch?.lotNo || "", // Lot No.
           "col12": "", // Title No. (Previous) (Blank)

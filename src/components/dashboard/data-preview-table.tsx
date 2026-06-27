@@ -53,6 +53,8 @@ const RecordRow = memo(({
   if (workflowMode === 'abstract') {
     const abstractRow = row as any;
     const kind = (row.kind || "").trim().toUpperCase();
+    const classification = (row.au || "").trim().toUpperCase();
+    
     return (
       <TableRow 
         className={cn(
@@ -100,11 +102,17 @@ const RecordRow = memo(({
         <TableCell className="p-3 text-center border-l">
           <div className="flex flex-col gap-1 items-center">
             {kind === 'L' || kind === 'LAND' ? (
-              <Badge variant="outline" className="text-[10px] font-black h-5 px-1.5 border-primary/40 text-primary bg-primary/5">L</Badge>
+              <div className="flex flex-col items-center">
+                <Badge variant="outline" className="text-[10px] font-black h-5 px-1.5 border-primary/40 text-primary bg-primary/5">L</Badge>
+                <span className="text-[9px] font-black text-primary mt-1">{classification}</span>
+              </div>
             ) : kind === 'B' || kind === 'BUILDING' ? (
-              <Badge variant="outline" className="text-[10px] font-black h-5 px-1.5 border-blue-400/40 text-blue-600 bg-blue-50/10">B</Badge>
+              <div className="flex flex-col items-center">
+                <Badge variant="outline" className="text-[10px] font-black h-5 px-1.5 border-blue-400/40 text-blue-600 bg-blue-50/10">B</Badge>
+                <span className="text-[9px] font-black text-blue-600 mt-1">{classification}</span>
+              </div>
             ) : (
-              <span className="text-[10px] font-bold text-muted-foreground">{kind || '---'}</span>
+              <span className="text-[10px] font-bold text-muted-foreground">{classification || '---'}</span>
             )}
           </div>
         </TableCell>
@@ -278,6 +286,8 @@ const RecordRow = memo(({
     prevProps.row.newArpNo === nextProps.row.newArpNo &&
     prevProps.row.previous === nextProps.row.previous &&
     prevProps.row.duplicateWithReference === nextProps.row.duplicateWithReference &&
+    prevProps.row.au === nextProps.row.au &&
+    prevProps.row.kind === nextProps.row.kind &&
     prevProps.isProcessed === nextProps.isProcessed &&
     prevProps.index === nextProps.index &&
     prevProps.showLabels === nextProps.showLabels &&
@@ -381,7 +391,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
                 <TableHead className="min-w-[200px] font-black uppercase bg-card border-l">Transaction Loc.</TableHead>
                 <TableHead className="min-w-[100px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">Lot #</TableHead>
                 <TableHead className="min-w-[120px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">TCT #</TableHead>
-                <TableHead className="min-w-[100px] text-center font-black uppercase bg-card border-l">Property Conveyed (L/B)</TableHead>
+                <TableHead className="min-w-[100px] text-center font-black uppercase bg-card border-l">Classification (L/B)</TableHead>
                 <TableHead className="min-w-[120px] text-right font-black uppercase bg-card border-l">Area (sqm)</TableHead>
                 <TableHead className="min-w-[140px] text-center font-black uppercase bg-card border-l">Join Status</TableHead>
               </TableRow>
