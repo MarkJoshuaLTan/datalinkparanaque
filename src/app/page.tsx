@@ -1035,6 +1035,36 @@ export default function Home() {
           </main>
       </div>
 
+      <Dialog open={isRunProcessorDialogOpen} onOpenChange={setIsRunProcessorDialogOpen}>
+        <DialogContent className="sm:max-w-md bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+              <Cpu className="w-5 h-5 text-primary" /> Run Batch Processor
+            </DialogTitle>
+            <DialogDescription className="text-sm font-bold text-muted-foreground leading-relaxed">
+              The engine will now perform a multi-pass validation sequence including system cleanup, deduplication, and financial calibration.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <CalibrationSidebar 
+              options={options} 
+              setOptions={setOptions}
+              rules={rules}
+              setRules={setRules}
+            />
+          </div>
+          <DialogFooter className="gap-3">
+            <Button variant="ghost" onClick={() => setIsRunProcessorDialogOpen(false)} className="font-black uppercase text-xs h-10 px-6">Cancel</Button>
+            <Button 
+              onClick={() => { setIsRunProcessorDialogOpen(false); runProcess(); }}
+              className="bg-primary hover:bg-emerald-700 text-white font-black uppercase text-xs h-10 px-8 shadow-lg shadow-primary/20"
+            >
+              Execute Engine
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Sheet open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
         <SheetContent side="right" className="sm:max-w-[1200px] w-[95vw] p-0 border-none bg-card shadow-2xl">
           <SheetHeader className="sr-only">
