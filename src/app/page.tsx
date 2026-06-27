@@ -1209,9 +1209,9 @@ export default function Home() {
                      <h2 className="text-6xl font-black uppercase tracking-tight text-foreground">Select Engine Workflow</h2>
                      <p className="text-muted-foreground font-bold uppercase tracking-widest text-sm">Choose the processing logic tailored to your source data format.</p>
                    </div>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto px-6">
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto px-6 items-stretch">
                       <Card 
-                        className="p-10 border-white/10 bg-card hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer group shadow-2xl flex flex-col items-center text-center"
+                        className="p-10 border-white/10 bg-card hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer group shadow-2xl flex flex-col items-center text-center h-full"
                         onClick={() => setWorkflowMode('standard')}
                       >
                         <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner">
@@ -1219,11 +1219,11 @@ export default function Home() {
                         </div>
                         <h3 className="text-2xl font-black uppercase tracking-tight mb-4">Standard Processor</h3>
                         <p className="text-sm font-bold text-muted-foreground leading-relaxed mb-8">Best for general land record spreadsheets. Uses flexible header aliases.</p>
-                        <Button className="w-full h-14 bg-primary hover:bg-emerald-700 font-black uppercase text-xs tracking-widest">Launch Standard</Button>
+                        <Button className="w-full h-14 bg-primary hover:bg-emerald-700 font-black uppercase text-xs tracking-widest mt-auto">Launch Standard</Button>
                       </Card>
 
                       <Card 
-                        className="p-10 border-white/10 bg-card hover:bg-blue-600/5 hover:border-blue-500/50 transition-all cursor-pointer group shadow-2xl flex flex-col items-center text-center"
+                        className="p-10 border-white/10 bg-card hover:bg-blue-600/5 hover:border-blue-500/50 transition-all cursor-pointer group shadow-2xl flex flex-col items-center text-center h-full"
                         onClick={() => { setWorkflowMode('abstract'); setAbstractStep('roll'); }}
                       >
                         <div className="w-20 h-20 rounded-3xl bg-blue-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner">
@@ -1231,7 +1231,7 @@ export default function Home() {
                         </div>
                         <h3 className="text-2xl font-black uppercase tracking-tight mb-4">Abstract of Transactions</h3>
                         <p className="text-sm font-bold text-muted-foreground leading-relaxed mb-8">Specialized mode for joining Journals with Assessment Rolls for transfer reports.</p>
-                        <Button className="w-full h-14 bg-blue-600 hover:bg-blue-700 font-black uppercase text-xs tracking-widest">Launch Abstract</Button>
+                        <Button className="w-full h-14 bg-blue-600 hover:bg-blue-700 font-black uppercase text-xs tracking-widest mt-auto">Launch Abstract</Button>
                       </Card>
                    </div>
                 </div>
