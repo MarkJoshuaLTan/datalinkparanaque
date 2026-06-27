@@ -72,7 +72,8 @@ const RecordRow = memo(({
           "max-w-[180px] truncate uppercase p-3 font-bold border-l",
           abstractRow.isJoined ? "text-blue-700 dark:text-blue-400 bg-blue-50/10" : "text-red-400 italic opacity-50"
         )} title={abstractRow.rollOwner}>
-          {abstractRow.rollOwner || 'NOT FOUND'}
+          {/* LEAVE BLANK AS REQUESTED FOR REPORT CONSISTENCY */}
+          {''}
         </TableCell>
 
         <TableCell className={cn(
@@ -179,7 +180,7 @@ const RecordRow = memo(({
         "border-b transition-all duration-200 ease-in-out hover:scale-[1.01] hover:shadow-2xl hover:relative hover:z-20 hover:!bg-card/90 hover:backdrop-blur-sm cursor-pointer",
         row.isComparisonInjected && "bg-emerald-500/10 border-l-4 border-l-emerald-500 opacity-90",
         (row.statusLabel === 'DUPLICATE' || row.statusLabel === 'INCOMPLETE' || row.statusLabel === 'CLEANUP') && !row.isComparisonInjected && "bg-orange-50/30 dark:bg-orange-950/50 opacity-70",
-        row.statusLabel === 'AREA ERROR' ? "bg-red-100/50 dark:bg-red-950/40 border-red-500/30" : (row.statusLabel !== 'VALID' && row.statusLabel !== 'DUPLICATE' && row.statusLabel !== 'INCOMPLETE' && !row.isComparisonInjected && "bg-red-500/5 hover:bg-red-500/10 border-red-500/20")
+        row.statusLabel === 'AREA ERROR' ? "bg-red-100/50 dark:bg-red-950/40 border-red-500/30" : (row.statusLabel !== 'VALID' && record.statusLabel !== 'DUPLICATE' && record.statusLabel !== 'INCOMPLETE' && !row.isComparisonInjected && "bg-red-500/5 hover:bg-red-500/10 border-red-500/20")
       )}
     >
       <TableCell className={cn(

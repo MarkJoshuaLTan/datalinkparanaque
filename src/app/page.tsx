@@ -958,7 +958,7 @@ export default function Home() {
         return;
       }
 
-      // Visual Grouping logic for the Export: Show all dates to verify carry-forward
+      // Visual logic for the Export: Show all dates to verify carry-forward
       const abstractData = baseData.map(j => {
         const currentDate = j.date || "";
         const kind = (j.kind || "").trim().toUpperCase();
@@ -966,7 +966,7 @@ export default function Home() {
         return {
           "col1": j.arpNo || "",
           "col2": currentDate,
-          "col3": (j as any).rollOwner || "", 
+          "col3": "", // LEAVE BLANK AS REQUESTED
           "col4": j.acctName || "", 
           "col5": (j as any).rollAddress || "", 
           "col6": j.location || "", 
