@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, memo } from 'react';
@@ -13,7 +14,7 @@ import { LandRecord } from '@/lib/processor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Plus, AlertTriangle, Loader2, Info } from 'lucide-react';
+import { Plus, AlertTriangle, Loader2, Info, Link2, Unlink2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +32,7 @@ interface DataPreviewTableProps {
   isProcessed?: boolean;
   onRowClick: (record: LandRecord) => void;
   showLabels?: boolean;
+  workflowMode?: 'standard' | 'abstract';
 }
 
 const RecordRow = memo(({ 
@@ -38,14 +40,77 @@ const RecordRow = memo(({
   index, 
   isProcessed,
   onRowClick,
-  showLabels
+  showLabels,
+  workflowMode
 }: { 
   row: LandRecord; 
   index: number; 
   isProcessed: boolean;
   onRowClick: (record: LandRecord) => void;
   showLabels?: boolean;
+  workflowMode?: 'standard' | 'abstract';
 }) => {
+  if (workflowMode === 'abstract') {
+    const abstractRow = row as any;
+    return (
+      <TableRow 
+        className={cn(
+          "border-b transition-all duration-200 hover:bg-muted/30",
+          !abstractRow.isJoined && "bg-red-50/30 dark:bg-red-950/20"
+        )}
+      >
+        <TableCell className="text-center font-black p-3 border-r bg-muted/5 text-muted-foreground font-mono">
+          {index + 1}
+        </TableCell>
+        <TableCell className="whitespace-nowrap p-3 font-bold">{row.date || '---'}</TableCell>
+        <TableCell className="font-mono p-3 font-black text-primary">{row.pin || '---'}</TableCell>
+        <TableCell className="max-w-[200px] truncate uppercase font-black p-3 text-foreground">{row.acctName || '---'}</TableCell>
+        <TableCell className="max-w-[200px] truncate uppercase p-3 text-muted-foreground italic">{row.location || '---'}</TableCell>
+        
+        {/* Roll Join Columns */}
+        <TableCell className={cn(
+          "max-w-[250px] truncate uppercase p-3 font-bold border-l",
+          abstractRow.isJoined ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50/10" : "text-red-400 italic opacity-50"
+        )}>
+          {abstractRow.rollAddress || 'NOT FOUND IN ROLL'}
+        </TableCell>
+        <TableCell className={cn(
+          "p-3 font-mono text-center border-l",
+          abstractRow.isJoined ? "text-blue-600 font-black" : "text-muted-foreground opacity-30"
+        )}>
+          {abstractRow.rollLotNo || '---'}
+        </TableCell>
+        <TableCell className={cn(
+          "p-3 font-mono text-center border-l",
+          abstractRow.isJoined ? "text-blue-600 font-black" : "text-muted-foreground opacity-30"
+        )}>
+          {abstractRow.rollTctNo || '---'}
+        </TableCell>
+
+        <TableCell className="p-3 text-center border-l">
+          <Badge variant="outline" className="text-[11px] font-black h-6 px-2 border-muted-foreground/30">
+            {row.kind || '---'}-{row.au || '---'}
+          </Badge>
+        </TableCell>
+        <TableCell className="text-right font-mono p-3 font-black border-l">
+          {row.landArea?.toLocaleString() || '0'}
+        </TableCell>
+        
+        <TableCell className="text-center p-3 border-l">
+          {abstractRow.isJoined ? (
+            <Badge className="bg-emerald-600 text-white font-black text-[9px] tracking-widest gap-1 uppercase">
+              <Link2 className="w-3 h-3" /> Linked
+            </Badge>
+          ) : (
+            <Badge variant="destructive" className="font-black text-[9px] tracking-widest gap-1 uppercase opacity-60">
+              <Unlink2 className="w-3 h-3" /> No Match
+            </Badge>
+          )}
+        </TableCell>
+      </TableRow>
+    );
+  }
+
   const getStatusBadge = () => {
     if (row.isComparisonInjected) {
       return <Badge variant="outline" className="text-[10px] h-5 font-black uppercase tracking-tighter bg-emerald-500 text-white border-none shadow-sm">VALID REFERENCE</Badge>;
@@ -199,13 +264,14 @@ const RecordRow = memo(({
     prevProps.row.duplicateWithReference === nextProps.row.duplicateWithReference &&
     prevProps.isProcessed === nextProps.isProcessed &&
     prevProps.index === nextProps.index &&
-    prevProps.showLabels === nextProps.showLabels
+    prevProps.showLabels === nextProps.showLabels &&
+    prevProps.workflowMode === nextProps.workflowMode
   );
 });
 
 RecordRow.displayName = 'RecordRow';
 
-export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLabels = false }: DataPreviewTableProps) {
+export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLabels = false, workflowMode = 'standard' }: DataPreviewTableProps) {
   const [displayLimit, setDisplayLimit] = useState(350);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isBulkLoading, setIsBulkLoading] = useState(false);
@@ -273,42 +339,62 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
         </div>
       )}
 
+      {workflowMode === 'abstract' && (
+        <div className="px-4 py-2 bg-blue-500/10 border-b flex items-center gap-2">
+          <Info className="w-3.5 h-3.5 text-blue-600" />
+          <p className="text-[10px] font-bold text-blue-700 uppercase tracking-widest">
+            Relational Preview: Showing Journal transactions enriched with Assessment Roll parcel details.
+          </p>
+        </div>
+      )}
+
       <div className="flex-1 overflow-auto border-t scrollbar-custom">
         <Table 
-          className="text-[13px] min-w-[4000px] select-none border-separate border-spacing-0"
+          className="text-[13px] min-w-[2000px] select-none border-separate border-spacing-0"
           wrapperClassName="overflow-visible" 
         >
           <TableHeader className="bg-card sticky top-0 z-20 shadow-sm">
-            <TableRow className="hover:bg-transparent border-b-2">
-              <TableHead className="w-14 text-center font-black bg-card border-r">#</TableHead>
-              <TableHead className="min-w-[110px] font-black uppercase bg-card">Date</TableHead>
-              <TableHead className="min-w-[130px] font-black uppercase bg-card">ARP No#</TableHead>
-              <TableHead className="min-w-[200px] font-black uppercase bg-card">PIN</TableHead>
-              <TableHead className="min-w-[160px] font-black uppercase bg-card">Previous</TableHead>
-              <TableHead className="min-w-[110px] font-black uppercase bg-card">NEW ARP#</TableHead>
-              <TableHead className="min-w-[80px] font-black uppercase text-center bg-card">Update</TableHead>
-              <TableHead className="min-w-[100px] font-black uppercase text-center bg-card">Taxability</TableHead>
-              <TableHead className="min-w-[200px] font-black uppercase bg-card">AcctName</TableHead>
-              <TableHead className="min-w-[250px] font-black uppercase bg-card">Address</TableHead>
-              <TableHead className="min-w-[250px] font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-x border-emerald-100 dark:border-emerald-900">Location</TableHead>
-              <TableHead className="min-w-[90px] font-black uppercase bg-card">Kind</TableHead>
-              <TableHead className="min-w-[90px] font-black uppercase bg-card">AU</TableHead>
-              <TableHead className="text-right min-w-[110px] font-black uppercase bg-card">Area (sqm)</TableHead>
-              
-              {/* Static 2028 Baseline Headers */}
-              <TableHead className="text-right min-w-[130px] font-black uppercase bg-slate-100 dark:bg-slate-900 border-l">Unit (2028)</TableHead>
-              <TableHead className="text-right min-w-[140px] font-black uppercase bg-slate-100 dark:bg-slate-900">Market (2028)</TableHead>
-              <TableHead className="text-right min-w-[140px] font-black uppercase bg-slate-100 dark:bg-slate-900">Assessed (2028)</TableHead>
-              <TableHead className="text-right min-w-[140px] font-black uppercase bg-slate-100 dark:bg-slate-900">Tax (2028 CAP)</TableHead>
-
-              {/* Dynamic Yearly Headers */}
-              <TableHead className="text-right min-w-[130px] font-black uppercase bg-card border-l">Unit ({yearLabel})</TableHead>
-              <TableHead className="text-right min-w-[140px] font-black uppercase bg-card">Market ({yearLabel})</TableHead>
-              <TableHead className="text-right min-w-[140px] font-black uppercase bg-card">Assessed ({yearLabel})</TableHead>
-              <TableHead className="text-right min-w-[140px] font-black uppercase bg-card border-l">Tax ({yearLabel}{taxSuffix})</TableHead>
-              
-              <TableHead className="w-36 text-center font-black uppercase bg-card">Record Status</TableHead>
-            </TableRow>
+            {workflowMode === 'abstract' ? (
+              <TableRow className="hover:bg-transparent border-b-2">
+                <TableHead className="w-14 text-center font-black bg-card border-r">#</TableHead>
+                <TableHead className="min-w-[120px] font-black uppercase bg-card">Conveyance Date</TableHead>
+                <TableHead className="min-w-[200px] font-black uppercase bg-card">PIN (Index)</TableHead>
+                <TableHead className="min-w-[250px] font-black uppercase bg-card">New Owner (To)</TableHead>
+                <TableHead className="min-w-[200px] font-black uppercase bg-card">Transaction Loc.</TableHead>
+                <TableHead className="min-w-[300px] font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">Roll Address</TableHead>
+                <TableHead className="min-w-[100px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">Lot #</TableHead>
+                <TableHead className="min-w-[120px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">TCT #</TableHead>
+                <TableHead className="min-w-[100px] text-center font-black uppercase bg-card border-l">K-AU</TableHead>
+                <TableHead className="min-w-[120px] text-right font-black uppercase bg-card border-l">Area (sqm)</TableHead>
+                <TableHead className="min-w-[140px] text-center font-black uppercase bg-card border-l">Join Status</TableHead>
+              </TableRow>
+            ) : (
+              <TableRow className="hover:bg-transparent border-b-2">
+                <TableHead className="w-14 text-center font-black bg-card border-r">#</TableHead>
+                <TableHead className="min-w-[110px] font-black uppercase bg-card">Date</TableHead>
+                <TableHead className="min-w-[130px] font-black uppercase bg-card">ARP No#</TableHead>
+                <TableHead className="min-w-[200px] font-black uppercase bg-card">PIN</TableHead>
+                <TableHead className="min-w-[160px] font-black uppercase bg-card">Previous</TableHead>
+                <TableHead className="min-w-[110px] font-black uppercase bg-card">NEW ARP#</TableHead>
+                <TableHead className="min-w-[80px] font-black uppercase text-center bg-card">Update</TableHead>
+                <TableHead className="min-w-[100px] font-black uppercase text-center bg-card">Taxability</TableHead>
+                <TableHead className="min-w-[200px] font-black uppercase bg-card">AcctName</TableHead>
+                <TableHead className="min-w-[250px] font-black uppercase bg-card">Address</TableHead>
+                <TableHead className="min-w-[250px] font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-x border-emerald-100 dark:border-emerald-900">Location</TableHead>
+                <TableHead className="min-w-[90px] font-black uppercase bg-card">Kind</TableHead>
+                <TableHead className="min-w-[90px] font-black uppercase bg-card">AU</TableHead>
+                <TableHead className="text-right min-w-[110px] font-black uppercase bg-card">Area (sqm)</TableHead>
+                <TableHead className="text-right min-w-[130px] font-black uppercase bg-slate-100 dark:bg-slate-900 border-l">Unit (2028)</TableHead>
+                <TableHead className="text-right min-w-[140px] font-black uppercase bg-slate-100 dark:bg-slate-900">Market (2028)</TableHead>
+                <TableHead className="text-right min-w-[140px] font-black uppercase bg-slate-100 dark:bg-slate-900">Assessed (2028)</TableHead>
+                <TableHead className="text-right min-w-[140px] font-black uppercase bg-slate-100 dark:bg-slate-900">Tax (2028 CAP)</TableHead>
+                <TableHead className="text-right min-w-[130px] font-black uppercase bg-card border-l">Unit ({yearLabel})</TableHead>
+                <TableHead className="text-right min-w-[140px] font-black uppercase bg-card">Market ({yearLabel})</TableHead>
+                <TableHead className="text-right min-w-[140px] font-black uppercase bg-card">Assessed ({yearLabel})</TableHead>
+                <TableHead className="text-right min-w-[140px] font-black uppercase bg-card border-l">Tax ({yearLabel}{taxSuffix})</TableHead>
+                <TableHead className="w-36 text-center font-black uppercase bg-card">Record Status</TableHead>
+              </TableRow>
+            )}
           </TableHeader>
           <TableBody>
             {visibleData.map((row, i) => (
@@ -319,6 +405,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
                 isProcessed={isProcessed}
                 onRowClick={onRowClick} 
                 showLabels={showLabels}
+                workflowMode={workflowMode}
               />
             ))}
           </TableBody>

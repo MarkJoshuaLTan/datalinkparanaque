@@ -313,7 +313,43 @@ export default function Home() {
     };
   }, [processedData, previewData, sourceFileFilter, barangayFilter, taxabilityFilter]);
 
+  /**
+   * Specialized Join logic for Abstract workflow preview
+   */
+  const joinedAbstractData = useMemo(() => {
+    if (workflowMode !== 'abstract') return [];
+    
+    // Journal entries are the primary rows for the abstract preview
+    const journals = journalData.length > 0 ? journalData : rawData.filter(r => r.sourceFile?.toLowerCase().includes('journal'));
+    const rolls = rawData.filter(r => !r.sourceFile?.toLowerCase().includes('journal'));
+    
+    const rollLookup = new Map<string, LandRecord>();
+    rolls.forEach(r => { if (r.pin) rollLookup.set(normalizePin(r.pin), r); });
+
+    return journals.map(j => {
+      const rollMatch = rollLookup.get(normalizePin(j.pin)) || null;
+      return {
+        ...j,
+        // Enrich with roll data for preview
+        rollAddress: rollMatch?.address || '---',
+        rollLotNo: rollMatch?.lotNo || '---',
+        rollTctNo: rollMatch?.tctNo || '---',
+        isJoined: !!rollMatch
+      } as LandRecord & { rollAddress: string; rollLotNo: string; rollTctNo: string; isJoined: boolean };
+    });
+  }, [workflowMode, journalData, rawData]);
+
   const filteredDisplayData = useMemo(() => {
+    if (workflowMode === 'abstract' && viewMode === 'results') {
+      const query = searchQuery.toLowerCase();
+      return joinedAbstractData.filter(record => {
+        if (query) {
+           return record.acctName?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || record.rollTctNo?.toLowerCase().includes(query);
+        }
+        return true;
+      });
+    }
+
     const baseData = viewMode === 'results' 
       ? (processedData.length > 0 ? processedData : previewData.filter(r => r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && !r.isManualArchive))
       : previewData.filter(r => r.statusLabel === 'DUPLICATE' || r.statusLabel === 'INCOMPLETE' || r.statusLabel === 'CLEANUP' || r.isManualArchive);
@@ -356,7 +392,7 @@ export default function Home() {
       return finalWithComparisons;
     }
     return sorted;
-  }, [previewData, processedData, viewMode, searchQuery, searchField, statusFilter, sourceFileFilter, barangayFilter, sortBy]);
+  }, [previewData, processedData, joinedAbstractData, workflowMode, viewMode, searchQuery, searchField, statusFilter, sourceFileFilter, barangayFilter, sortBy]);
 
   // Initialization & Storage Load
   useEffect(() => {
@@ -657,13 +693,14 @@ export default function Home() {
   const handleUnarchiveRecord = useCallback((record: LandRecord) => { handleSaveRecord({ ...record, isManualArchive: false }, true); toast({ title: "Record Restored", description: "The record has been moved back to the Results tab." }); }, [handleSaveRecord]);
 
   const handleRowClick = useCallback((record: LandRecord) => { 
+    if (workflowMode === 'abstract') return; // Disable detail modal for abstract join view
     setSelectedRecord(record); 
     if (record.statusLabel === 'DUPLICATE') {
       const validPeer = previewData.find(p => p.pin === record.pin && !p.isDuplicate && !p.isCleanup && !p.isManualArchive);
       setSelectedRecord({ ...record, duplicateWithReference: validPeer?.arpNo || "N/A" });
       setComparisonRecord(validPeer || null);
     } else { setComparisonRecord(null); }
-  }, [previewData]);
+  }, [previewData, workflowMode]);
 
   const handleFinalExport = async (settings: ExportFinalSettings) => {
     setIsExporting(true); setIsExportSettingsOpen(false);
@@ -1057,7 +1094,7 @@ export default function Home() {
                     <Card className="flex-1 overflow-hidden flex flex-col min-h-0 shadow-xl border-white/5 animate-in fade-in slide-in-from-bottom-4 duration-500">
                       <div className="p-3 bg-muted/30 border-b flex flex-col xl:flex-row items-center justify-between gap-4 shrink-0">
                         <TabsList className="bg-background border">
-                          <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-white h-9 text-xs font-bold px-4"><TableIcon className="w-3.5 h-3.5 mr-2" /> Results</TabsTrigger>
+                          <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-white h-9 text-xs font-bold px-4"><TableIcon className="w-3.5 h-3.5 mr-2" /> {workflowMode === 'abstract' ? 'Joined Preview' : 'Results'}</TabsTrigger>
                           <TabsTrigger value="archive" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Archive className="w-3.5 h-3.5 mr-2" /> Archive</TabsTrigger>
                           <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><BarChart3 className="w-3.5 h-3.5 mr-2" /> Analytics</TabsTrigger>
                           <TabsTrigger value="audit" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><ShieldCheck className="w-3.5 h-3.5 mr-2" /> Audit Log</TabsTrigger>
@@ -1125,7 +1162,14 @@ export default function Home() {
                         )}
                       </div>
                       <div className="flex-1 overflow-hidden min-h-0">
-                        <TabsContent value="results" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col"><DataPreviewTable data={filteredDisplayData} isProcessed={processedData.length > 0} onRowClick={handleRowClick} /></TabsContent>
+                        <TabsContent value="results" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col">
+                          <DataPreviewTable 
+                            data={filteredDisplayData} 
+                            isProcessed={processedData.length > 0} 
+                            onRowClick={handleRowClick} 
+                            workflowMode={workflowMode}
+                          />
+                        </TabsContent>
                         <TabsContent value="archive" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col"><DataPreviewTable data={filteredDisplayData} isProcessed={true} onRowClick={handleRowClick} showLabels /></TabsContent>
                         <TabsContent value="analytics" className="m-0 h-full p-6 overflow-y-auto scrollbar-vertical-custom bg-muted/5 data-[state=active]:flex data-[state=active]:flex-col">
                           <AnalyticsView 
