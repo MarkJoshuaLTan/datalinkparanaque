@@ -13,7 +13,11 @@ import {
   BarChart3, 
   TrendingUp,
   ShieldCheck,
-  Calculator
+  Calculator,
+  Link2,
+  Unlink2,
+  BookUser,
+  FileSpreadsheet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -69,16 +73,29 @@ interface MetricOverviewProps {
     totalAssessedValue: number;
     totalYearlyTax: number;
     totalErrors: number;
+    // Abstract Specific
+    linkedCount?: number;
+    unlinkedCount?: number;
+    rollCount?: number;
+    exemptedCount?: number;
   };
   variant?: 'default' | 'hero';
   taxViewMode: 'T' | 'E';
   onTaxViewModeChange: (mode: 'T' | 'E') => void;
+  workflowMode?: 'standard' | 'abstract';
 }
 
-export function MetricOverview({ stats, variant = 'default', taxViewMode, onTaxViewModeChange }: MetricOverviewProps) {
+export function MetricOverview({ 
+  stats, 
+  variant = 'default', 
+  taxViewMode, 
+  onTaxViewModeChange,
+  workflowMode = 'standard'
+}: MetricOverviewProps) {
   const isHero = variant === 'hero';
+  const isAbstract = workflowMode === 'abstract';
 
-  const statDefinitions = [
+  const standardStats = [
     {
       label: "Imported Rows",
       value: <AnimatedNumber value={stats.totalRawRows} />,
@@ -144,6 +161,74 @@ export function MetricOverview({ stats, variant = 'default', taxViewMode, onTaxV
     }
   ];
 
+  const abstractStats = [
+    {
+      label: "Journal Logs",
+      value: <AnimatedNumber value={stats.totalRawRows} />,
+      icon: BookUser,
+      color: isHero ? "border-t-amber-500 bg-amber-500/5" : "border-l-amber-500 bg-amber-500/5",
+      textClass: "text-amber-600",
+      definition: "Total number of transaction records imported from the Journal files."
+    },
+    {
+      label: "Unlinked Records",
+      value: <AnimatedNumber value={stats.unlinkedCount || 0} />,
+      icon: Unlink2,
+      color: isHero ? "border-t-red-500 bg-red-500/5" : "border-l-red-500 bg-red-500/5",
+      textClass: "text-red-600",
+      definition: "Journal entries whose PINs could not be found within the staged Assessment Roll reference."
+    },
+    {
+      label: "Assessment Roll",
+      value: <AnimatedNumber value={stats.rollCount || 0} />,
+      icon: FileSpreadsheet,
+      color: isHero ? "border-t-blue-500 bg-blue-500/5" : "border-l-blue-500 bg-blue-500/5",
+      textClass: "text-blue-600",
+      definition: "Total reference parcel records loaded from the Assessment Roll files."
+    },
+    {
+      label: "Successful Joins",
+      value: <AnimatedNumber value={stats.linkedCount || 0} />,
+      icon: Link2,
+      color: isHero ? "border-t-emerald-600 bg-emerald-50/5" : "border-l-emerald-600 bg-emerald-50/5",
+      textClass: "text-emerald-600",
+      definition: "Total records successfully matched between the Journal and the Assessment Roll."
+    },
+    {
+      label: "Exempted Count",
+      value: <AnimatedNumber value={stats.exemptedCount || 0} />,
+      icon: ShieldCheck,
+      color: isHero ? "border-t-blue-700 bg-blue-600/5" : "border-l-blue-700 bg-blue-600/5",
+      textClass: "text-blue-700",
+      definition: "Count of matched records identified as Exempt based on the imported Exempt list."
+    },
+    {
+      label: "Total Area",
+      value: <AnimatedNumber value={stats.finalCount || 0} />,
+      icon: Database,
+      color: isHero ? "border-t-slate-400" : "border-l-slate-400",
+      definition: "Sum of land area from all transaction records in the current batch."
+    },
+    {
+      label: "Total Assessed",
+      value: <AnimatedNumber value={stats.totalAssessedValue || 0} prefix="₱" decimals={2} />,
+      icon: BarChart3,
+      color: isHero ? "border-t-blue-600 bg-blue-500/5" : "border-l-blue-600 bg-blue-500/5",
+      textClass: "text-blue-600",
+      definition: "Total Assessed Value baseline for matched parcels."
+    },
+    {
+      label: "Total Market",
+      value: <AnimatedNumber value={stats.totalMarketValue || 0} prefix="₱" decimals={2} />,
+      icon: Database,
+      color: isHero ? "border-t-green-600 bg-green-500/5" : "border-l-green-600 bg-green-500/5",
+      textClass: "text-green-600",
+      definition: "Total Market Value baseline for matched parcels."
+    }
+  ];
+
+  const statDefinitions = isAbstract ? abstractStats : standardStats;
+
   return (
     <div className="space-y-4 w-full">
       <div className={cn(
@@ -155,15 +240,21 @@ export function MetricOverview({ stats, variant = 'default', taxViewMode, onTaxV
             <Calculator className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <h3 className="text-xs font-black uppercase tracking-tight leading-none">Dashboard Analytics Context</h3>
-            <p className="text-[9px] font-bold text-muted-foreground mt-1 uppercase tracking-widest">Toggle view for specific financial subsets</p>
+            <h3 className="text-xs font-black uppercase tracking-tight leading-none">
+              {isAbstract ? "Abstract Joiner Summary" : "Dashboard Analytics Context"}
+            </h3>
+            <p className="text-[9px] font-bold text-muted-foreground mt-1 uppercase tracking-widest">
+              {isAbstract ? "Relational join metrics for Journal vs Roll" : "Toggle view for specific financial subsets"}
+            </p>
           </div>
         </div>
         
-        <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-xl border border-zinc-800">
-           <Button onClick={() => onTaxViewModeChange('T')} variant={taxViewMode === 'T' ? 'secondary' : 'ghost'} size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2", taxViewMode === 'T' && "bg-emerald-600 text-white hover:bg-emerald-500")}><CheckCircle2 className="w-3 h-3" /> Taxable</Button>
-           <Button onClick={() => onTaxViewModeChange('E')} variant={taxViewMode === 'E' ? 'secondary' : 'ghost'} size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2", taxViewMode === 'E' && "bg-blue-600 text-white hover:bg-blue-500")}><Database className="w-3 h-3" /> Exempted</Button>
-        </div>
+        {!isAbstract && (
+          <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-xl border border-zinc-800">
+             <Button onClick={() => onTaxViewModeChange('T')} variant={taxViewMode === 'T' ? 'secondary' : 'ghost'} size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2", taxViewMode === 'T' && "bg-emerald-600 text-white hover:bg-emerald-500")}><CheckCircle2 className="w-3 h-3" /> Taxable</Button>
+             <Button onClick={() => onTaxViewModeChange('E')} variant={taxViewMode === 'E' ? 'secondary' : 'ghost'} size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2", taxViewMode === 'E' && "bg-blue-600 text-white hover:bg-blue-500")}><Database className="w-3 h-3" /> Exempted</Button>
+          </div>
+        )}
       </div>
 
       <div className={cn(

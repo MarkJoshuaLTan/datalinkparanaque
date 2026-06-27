@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback, useRef } from 'react';
@@ -300,7 +299,69 @@ export default function Home() {
   const [exportColumns, setExportColumns] = useState<Record<string, boolean>>(defaultExportColumns);
 
   // --- 7. STATS CALCULATION ---
+  const joinedAbstractData = useMemo(() => {
+    if (workflowMode !== 'abstract') return [];
+    
+    // Journal entries are the primary rows for the abstract preview
+    const journals = journalData.length > 0 ? journalData : rawData.filter(r => r.sourceFile?.toLowerCase().includes('journal'));
+    const rolls = rawData.filter(r => !r.sourceFile?.toLowerCase().includes('journal'));
+    
+    const rollLookup = new Map<string, LandRecord>();
+    rolls.forEach(r => { if (r.pin) rollLookup.set(normalizePin(r.pin), r); });
+
+    const normalizedExemptPins = new Set(Array.from(exemptPins).map(p => normalizePin(p)));
+
+    return journals.map(j => {
+      const pinNorm = normalizePin(j.pin);
+      const rollMatch = rollLookup.get(pinNorm) || null;
+      
+      const rollOwnerRaw = (rollMatch?.acctName || "").trim().toUpperCase();
+      const journalOwnerRaw = (j.acctName || "").trim().toUpperCase();
+      
+      // Ownership comparison logic: blank From if same as To
+      const ownersMatch = rollOwnerRaw !== "" && journalOwnerRaw !== "" && rollOwnerRaw === journalOwnerRaw;
+      const isExempt = normalizedExemptPins.has(pinNorm);
+
+      return {
+        ...j,
+        taxability: isExempt ? 'E' : 'T',
+        // Enrich with roll data for preview based on corrected mapping
+        rollOwner: ownersMatch ? "" : (rollMatch?.acctName || '---'),
+        rollAddress: rollMatch?.address || '---',
+        rollLotNo: rollMatch?.lotNo || '---',
+        rollTctNo: rollMatch?.tctNo || '---',
+        isJoined: !!rollMatch
+      } as LandRecord & { rollOwner: string; rollAddress: string; rollLotNo: string; rollTctNo: string; isJoined: boolean };
+    });
+  }, [workflowMode, journalData, rawData, exemptPins]);
+
   const stats = useMemo(() => {
+    if (workflowMode === 'abstract') {
+      const journals = journalData.length > 0 ? journalData : rawData.filter(r => r.sourceFile?.toLowerCase().includes('journal'));
+      const rolls = rawData.filter(r => !r.sourceFile?.toLowerCase().includes('journal'));
+      const joined = joinedAbstractData;
+      const linkedCount = joined.filter(r => r.isJoined).length;
+      const unlinkedCount = joined.length - linkedCount;
+      const exemptedCount = joined.filter(r => r.taxability === 'E').length;
+      
+      return {
+        totalRawRows: journals.length, 
+        systemCleanup: 0,
+        totalImported: journals.length,
+        duplicatesRemoved: 0,
+        finalCount: joined.reduce((sum, r) => sum + (r.landArea || 0), 0), // Use area as primary metric if needed or just count
+        totalMarketValue: joined.reduce((sum, r) => sum + (r.marketValue || 0), 0),
+        totalAssessedValue: joined.reduce((sum, r) => sum + (r.assessedValue || 0), 0),
+        totalYearlyTax: 0,
+        totalErrors: unlinkedCount,
+        // Mode Specific
+        linkedCount,
+        unlinkedCount,
+        rollCount: rolls.length,
+        exemptedCount
+      };
+    }
+
     const active = previewData.filter(r => r.statusLabel !== 'CLEANUP' && r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && !r.isManualArchive);
     const valid = active.filter(r => r.statusLabel === 'VALID');
     const filteredValid = valid.filter(r => r.taxability === taxViewMode);
@@ -321,7 +382,7 @@ export default function Home() {
       totalYearlyTax: filteredValid.reduce((sum, r) => sum + (r[ytField as keyof LandRecord] as number || 0), 0),
       totalErrors: errors
     };
-  }, [previewData, rawData.length, journalData.length, taxViewMode, processedData.length]);
+  }, [previewData, rawData.length, journalData.length, taxViewMode, processedData.length, workflowMode, joinedAbstractData]);
 
   const latestReport = processingReports[0] || null;
 
@@ -388,45 +449,6 @@ export default function Home() {
       barangayChart: Object.entries(barangayDistribution).map(([name, value]) => ({ name, value })).filter(item => item.value > 0).sort((a, b) => b.value - a.value)
     };
   }, [processedData, previewData, sourceFileFilter, barangayFilter, taxabilityFilter]);
-
-  /**
-   * Specialized Join logic for Abstract workflow preview
-   */
-  const joinedAbstractData = useMemo(() => {
-    if (workflowMode !== 'abstract') return [];
-    
-    // Journal entries are the primary rows for the abstract preview
-    const journals = journalData.length > 0 ? journalData : rawData.filter(r => r.sourceFile?.toLowerCase().includes('journal'));
-    const rolls = rawData.filter(r => !r.sourceFile?.toLowerCase().includes('journal'));
-    
-    const rollLookup = new Map<string, LandRecord>();
-    rolls.forEach(r => { if (r.pin) rollLookup.set(normalizePin(r.pin), r); });
-
-    const normalizedExemptPins = new Set(Array.from(exemptPins).map(p => normalizePin(p)));
-
-    return journals.map(j => {
-      const pinNorm = normalizePin(j.pin);
-      const rollMatch = rollLookup.get(pinNorm) || null;
-      
-      const rollOwnerRaw = (rollMatch?.acctName || "").trim().toUpperCase();
-      const journalOwnerRaw = (j.acctName || "").trim().toUpperCase();
-      
-      // Ownership comparison logic: blank From if same as To
-      const ownersMatch = rollOwnerRaw !== "" && journalOwnerRaw !== "" && rollOwnerRaw === journalOwnerRaw;
-      const isExempt = normalizedExemptPins.has(pinNorm);
-
-      return {
-        ...j,
-        taxability: isExempt ? 'E' : 'T',
-        // Enrich with roll data for preview based on corrected mapping
-        rollOwner: ownersMatch ? "" : (rollMatch?.acctName || '---'),
-        rollAddress: rollMatch?.address || '---',
-        rollLotNo: rollMatch?.lotNo || '---',
-        rollTctNo: rollMatch?.tctNo || '---',
-        isJoined: !!rollMatch
-      } as LandRecord & { rollOwner: string; rollAddress: string; rollLotNo: string; rollTctNo: string; isJoined: boolean };
-    });
-  }, [workflowMode, journalData, rawData, exemptPins]);
 
   const filteredDisplayData = useMemo(() => {
     if (workflowMode === 'abstract' && viewMode === 'results') {
@@ -642,7 +664,6 @@ export default function Home() {
       } else if (abstractStep === 'journal') {
         setAbstractStep('ready');
         setShowDetailedResults(true);
-        // In abstract mode, we just show the data as reference, skipping heavy logic as requested
         const { allWithDuplicateMarkers } = processRecords(newData, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, newFileName, updatedExemptPins);
         setPreviewData(allWithDuplicateMarkers);
         toast({ title: "Data Staged", description: "Roll and Journal joined. Report ready for Abstract Export." });
@@ -783,7 +804,7 @@ export default function Home() {
   const handleUnarchiveRecord = useCallback((record: LandRecord) => { handleSaveRecord({ ...record, isManualArchive: false }, true); toast({ title: "Record Restored", description: "The record has been moved back to the Results tab." }); }, [handleSaveRecord]);
 
   const handleRowClick = useCallback((record: LandRecord) => { 
-    if (workflowMode === 'abstract') return; // Disable detail modal for abstract join view
+    if (workflowMode === 'abstract') return; 
     setSelectedRecord(record); 
     if (record.statusLabel === 'DUPLICATE') {
       const validPeer = previewData.find(p => p.pin === record.pin && !p.isDuplicate && !p.isCleanup && !p.isManualArchive);
@@ -896,25 +917,24 @@ export default function Home() {
         const rollOwnerRaw = (rollMatch?.acctName || "").trim().toUpperCase();
         const journalOwnerRaw = (j.acctName || "").trim().toUpperCase();
         
-        // Ownership comparison logic: blank From if same as To
         const ownersMatch = rollOwnerRaw !== "" && journalOwnerRaw !== "" && rollOwnerRaw === journalOwnerRaw;
-        const isExempt = normalizedExemptPins.has(pinNorm);
         const kind = (j.kind || "").trim().toUpperCase();
+        const au = (j.au || "").trim().toUpperCase();
         
         return {
-          "col1": j.date || "", // Date of Conveyance/Transfer
-          "col2": ownersMatch ? "" : (rollMatch?.acctName || ""), // Ownership Transfer (From)
-          "col3": j.acctName || "", // Ownership Transfer (To)
-          "col4": rollMatch?.address || "", // Address of New Owner
-          "col5": j.location || "", // Location of Property
-          "col6": "", // Mode of Conveyance (Blank)
-          "col7": "", // Amount of Consideration (Blank)
-          "col8": (kind === 'L' || kind === 'LAND') ? "x" : "", // Property Conveyed (L)
-          "col9": (kind === 'B' || kind === 'BUILDING') ? "x" : "", // Property Conveyed (B)
-          "col10": j.landArea || 0, // Area Land/Bldg.
-          "col11": rollMatch?.lotNo || "", // Lot No.
-          "col12": "", // Title No. (Previous) (Blank)
-          "col13": rollMatch?.tctNo || "" // Title No. (New)
+          "col1": j.date || "", 
+          "col2": ownersMatch ? "" : (rollMatch?.acctName || ""), 
+          "col3": j.acctName || "", 
+          "col4": rollMatch?.address || "", 
+          "col5": j.location || "", 
+          "col6": "", 
+          "col7": "", 
+          "col8": (kind === 'L' || kind === 'LAND') ? au : "", 
+          "col9": (kind === 'B' || kind === 'BUILDING') ? au : "", 
+          "col10": j.landArea || 0, 
+          "col11": rollMatch?.lotNo || "", 
+          "col12": "", 
+          "col13": rollMatch?.tctNo || "" 
         };
       });
 
@@ -1113,6 +1133,7 @@ export default function Home() {
                         variant={showDetailedResults ? 'default' : 'hero'} 
                         taxViewMode={taxViewMode}
                         onTaxViewModeChange={setTaxViewMode}
+                        workflowMode={workflowMode}
                       />
                     </div>
                   </div>
@@ -1354,7 +1375,7 @@ export default function Home() {
         <AlertDialogContent className="bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
-              <Trash2 className="w-5 h-5 text-red-600" /> Confirm Session Reset
+              <Trash2 className="w-4 h-4 text-red-600" /> Confirm Session Reset
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm font-bold text-muted-foreground leading-relaxed">
               Are you sure you want to clear your current workspace? All property records and processing results in this session will be permanently removed.
