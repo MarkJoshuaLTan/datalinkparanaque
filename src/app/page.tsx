@@ -986,24 +986,26 @@ export default function Home() {
               <ChevronLeft className="w-3.5 h-3.5" /> Switch Engine
             </Button>
           )}
-          <div className="flex items-center gap-2 mr-3 px-4 border-r border-white/10">
-             <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-3">
-                      <Label htmlFor="summary-toggle" className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground cursor-pointer hover:text-primary transition-colors">Show Summary</Label>
-                      <Switch 
-                        id="summary-toggle" 
-                        checked={showSummary} 
-                        onCheckedChange={setShowSummary}
-                        className="data-[state=checked]:bg-primary scale-90"
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>Toggle Dashboard KPI Overview</TooltipContent>
-                </Tooltip>
-             </TooltipProvider>
-          </div>
+          {showDetailedResults && (
+            <div className="flex items-center gap-2 mr-3 px-4 border-r border-white/10">
+              <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-3">
+                        <Label htmlFor="summary-toggle" className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground cursor-pointer hover:text-primary transition-colors">Show Summary</Label>
+                        <Switch 
+                          id="summary-toggle" 
+                          checked={showSummary} 
+                          onCheckedChange={setShowSummary}
+                          className="data-[state=checked]:bg-primary scale-90"
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Toggle Dashboard KPI Overview</TooltipContent>
+                  </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
           {deferredPrompt && <Button variant="ghost" size="icon" onClick={handleInstallClick} className="hover:bg-muted"><Download className="w-5 h-5" /></Button>}
           <Button variant="ghost" size="icon" onClick={toggleFullScreen} className="hover:bg-muted">{isFullScreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}</Button>
           <ModeToggle />
@@ -1403,3 +1405,79 @@ export default function Home() {
     </div>
   );
 }
+
+const ImportManager = ({ mode, manifest, onAdd, onDelete }: { mode: 'raw' | 'exempt' | 'journal', manifest: any[], onAdd: () => void, onDelete: (name: string) => void }) => (
+  <Popover>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className={cn(
+                "h-9 w-9 transition-all", 
+                mode === 'raw' ? "border-primary/30 text-primary hover:bg-primary/10" : 
+                mode === 'exempt' ? "border-blue-500/30 text-blue-600 hover:bg-blue-50/10" :
+                "border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+              )}
+            >
+              {mode === 'raw' ? <BookUser className="w-4 h-4" /> : 
+               mode === 'exempt' ? <ShieldOff className="w-4 h-4" /> :
+               <FileText className="w-4 h-4" />}
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="font-black uppercase text-[10px] tracking-widest">
+          {mode === 'raw' ? "Manage Raw Records" : mode === 'exempt' ? "Manage Exempt Reference" : "Manage Journal Files"}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+    <PopoverContent className="w-80 p-0 bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl rounded-2xl overflow-hidden" align="end">
+      <div className="p-4 bg-muted/30 border-b flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {mode === 'raw' ? <BookUser className="w-4 h-4 text-primary" /> : 
+           mode === 'exempt' ? <ShieldOff className="w-4 h-4 text-blue-600" /> :
+           <FileText className="w-4 h-4 text-amber-600" />}
+          <span className="text-[10px] font-black uppercase tracking-widest">{mode === 'raw' ? "Raw File Manager" : mode === 'exempt' ? "Exempt File Manager" : "Journal File Manager"}</span>
+        </div>
+        <Button variant="ghost" size="sm" onClick={onAdd} className="h-7 px-2 text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white">
+          <Plus className="w-3 h-3 mr-1" /> Add File
+        </Button>
+      </div>
+      <ScrollArea className="h-[250px]">
+        {manifest.length === 0 ? (
+          <div className="p-10 text-center flex flex-col items-center justify-center opacity-30">
+            <Files className="w-8 h-8 mb-2" />
+            <p className="text-[9px] font-black uppercase tracking-widest">No Files Loaded</p>
+          </div>
+        ) : (
+          <div className="p-2 space-y-1">
+            {manifest.map((file, i) => (
+              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/10 border border-white/5 group hover:bg-muted/30 transition-all">
+                <div className="flex items-center gap-3 min-w-0">
+                  <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-black uppercase truncate pr-2">{file.name}</p>
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase">{file.count} Records</p>
+                  </div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => onDelete(file.name)}
+                  className="h-8 w-8 text-muted-foreground hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </ScrollArea>
+      <div className="p-3 bg-muted/30 border-t flex items-center justify-between">
+        <span className="text-[9px] font-black text-muted-foreground uppercase">Total records: {manifest.reduce((sum, f) => sum + f.count, 0).toLocaleString()}</span>
+      </div>
+    </PopoverContent>
+  </Popover>
+);
