@@ -484,14 +484,7 @@ export default function Home() {
         return true;
       });
 
-      // APPLY VISUAL GROUPING AFTER FILTERING
-      let lastDate = "";
-      return filtered.map(record => {
-        const currentDate = record.date || "";
-        const displayDate = currentDate === lastDate ? "" : currentDate;
-        lastDate = currentDate;
-        return { ...record, displayDate };
-      });
+      return filtered;
     }
 
     const baseData = viewMode === 'results' 
@@ -928,7 +921,7 @@ export default function Home() {
     try {
       await delay(1500);
       
-      // Start with the full joined set (with carry-forward dates assigned)
+      // Start with the full joined set
       let baseData = [...joinedAbstractData];
 
       const start = settings.startDate ? startOfDay(new Date(settings.startDate)) : null;
@@ -965,18 +958,14 @@ export default function Home() {
         return;
       }
 
-      // Visual Grouping logic for the Export: Blank out repeating dates
-      let lastDate = "";
+      // Visual Grouping logic for the Export: Show all dates to verify carry-forward
       const abstractData = baseData.map(j => {
         const currentDate = j.date || "";
-        const dateToShow = currentDate === lastDate ? "" : currentDate;
-        lastDate = currentDate;
-
         const kind = (j.kind || "").trim().toUpperCase();
         
         return {
           "col1": j.arpNo || "",
-          "col2": dateToShow,
+          "col2": currentDate,
           "col3": (j as any).rollOwner || "", 
           "col4": j.acctName || "", 
           "col5": (j as any).rollAddress || "", 

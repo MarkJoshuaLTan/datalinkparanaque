@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, memo, useMemo } from 'react';
@@ -64,7 +65,7 @@ const RecordRow = memo(({
           {index + 1}
         </TableCell>
         <TableCell className="font-mono p-3 font-black text-primary">{row.arpNo || '---'}</TableCell>
-        <TableCell className="whitespace-nowrap p-3 font-bold">{abstractRow.displayDate || ''}</TableCell>
+        <TableCell className="whitespace-nowrap p-3 font-bold">{row.date || ''}</TableCell>
         
         {/* Relational Mapping Columns for Join Preview */}
         <TableCell className={cn(
@@ -282,7 +283,7 @@ const RecordRow = memo(({
     prevProps.row.duplicateWithReference === nextProps.row.duplicateWithReference &&
     prevProps.row.au === nextProps.row.au &&
     prevProps.row.kind === nextProps.row.kind &&
-    (prevProps.row as any).displayDate === (nextProps.row as any).displayDate &&
+    prevProps.row.date === nextProps.row.date &&
     prevProps.isProcessed === nextProps.isProcessed &&
     prevProps.index === nextProps.index &&
     prevProps.showLabels === nextProps.showLabels &&
@@ -331,13 +332,6 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
   }
 
   const visibleData = data.slice(0, displayLimit);
-
-  // Verification Mode: Showing all dates to verify carry-forward assignment
-  const abstractVisibleRows = useMemo(() => {
-    if (workflowMode !== 'abstract') return visibleData;
-    return visibleData.map(row => ({ ...row, displayDate: row.date }));
-  }, [visibleData, workflowMode]);
-
   const hasMore = data.length > displayLimit;
   const nextBatchSize = Math.min(BATCH_SIZE, data.length - displayLimit);
 
@@ -371,7 +365,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
         <div className="px-4 py-2 bg-blue-500/10 border-b flex items-center gap-2">
           <Info className="w-3.5 h-3.5 text-blue-600" />
           <p className="text-[10px] font-bold text-blue-700 uppercase tracking-widest">
-            Relational Preview: Showing Journal transactions enriched with Assessment Roll parcel details. (Date Carry-Forward Active)
+            Relational Preview: Showing Journal transactions enriched with Assessment Roll parcel details.
           </p>
         </div>
       )}
@@ -427,7 +421,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
             )}
           </TableHeader>
           <TableBody>
-            {abstractVisibleRows.map((row, i) => (
+            {visibleData.map((row, i) => (
               <RecordRow 
                 key={row.id} 
                 row={row} 
