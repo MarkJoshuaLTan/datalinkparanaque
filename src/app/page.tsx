@@ -427,6 +427,10 @@ export default function Home() {
   }, [previewData]);
 
   const dynamicStatusOptions = useMemo(() => {
+    if (workflowMode === 'abstract' && viewMode === 'results') {
+      return ['Linked', 'No Match'];
+    }
+
     const activeData = viewMode === 'archive' 
       ? previewData.filter(r => r.statusLabel === 'DUPLICATE' || r.statusLabel === 'INCOMPLETE' || r.statusLabel === 'CLEANUP' || r.isManualArchive)
       : (processedData.length > 0 ? processedData : previewData.filter(r => r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && !r.isManualArchive));
@@ -436,7 +440,7 @@ export default function Home() {
         if (r.statusLabel) available.add(r.statusLabel);
     });
     return Array.from(available);
-  }, [previewData, processedData, viewMode]);
+  }, [previewData, processedData, viewMode, workflowMode]);
 
   const analyticsData = useMemo(() => {
     const activeData = processedData.length > 0 ? processedData : previewData.filter(r => r.statusLabel !== 'CLEANUP' && r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && !r.isManualArchive);
@@ -478,8 +482,34 @@ export default function Home() {
     if (workflowMode === 'abstract' && viewMode === 'results') {
       const query = searchQuery.toLowerCase();
       const filtered = joinedAbstractData.filter(record => {
+        // Relational source file filter
+        if (sourceFileFilter !== 'all' && record.sourceFile !== sourceFileFilter) return false;
+        
+        // Relational barangay filter
+        if (barangayFilter !== 'all' && (record.barangayName || 'UNMAPPED') !== barangayFilter) return false;
+
+        // Relational status filter (Linked vs No Match)
+        if (statusFilter !== 'all') {
+          if (statusFilter === 'Linked' && !record.isJoined) return false;
+          if (statusFilter === 'No Match' && record.isJoined) return false;
+        }
+
+        // Relational search logic
         if (query) {
-           return record.acctName?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || record.rollTctNo?.toLowerCase().includes(query) || record.rollOwner?.toLowerCase().includes(query);
+          if (searchField === 'all') {
+            return (
+              record.arpNo?.toLowerCase().includes(query) ||
+              record.date?.toLowerCase().includes(query) ||
+              record.acctName?.toLowerCase().includes(query) ||
+              (record as any).rollAddress?.toLowerCase().includes(query) ||
+              record.location?.toLowerCase().includes(query) ||
+              record.pin?.toLowerCase().includes(query) ||
+              (record as any).rollTctNo?.toLowerCase().includes(query)
+            );
+          } else {
+            const value = (record as any)[searchField];
+            return String(value || '').toLowerCase().includes(query);
+          }
         }
         return true;
       });
@@ -953,7 +983,7 @@ export default function Home() {
       });
       
       if (baseData.length === 0) {
-        toast({ variant: "destructive", title: "Export Failed", description: "No records found matching your specific filter criteria." });
+        toast({ variant: "destructive", title: "Abstract Export Failed", description: "No records found matching your specific filter criteria." });
         setIsExporting(false);
         return;
       }
@@ -1228,7 +1258,33 @@ export default function Home() {
                             <div className="flex items-center gap-2 flex-1 min-w-0">
                               <Select value={searchField} onValueChange={setSearchField}>
                                 <SelectTrigger className="w-[120px] h-9 text-xs font-bold uppercase shrink-0"><SelectValue placeholder="In" /></SelectTrigger>
-                                <SelectContent><SelectItem value="all">All Fields</SelectItem><SelectItem value="date">Date</SelectItem><SelectItem value="arpNo">ARP No#</SelectItem><SelectItem value="pin">PIN</SelectItem><SelectItem value="acctName">Account</SelectItem><SelectItem value="address">Address</SelectItem><SelectItem value="update">Update</SelectItem><SelectItem value="taxability">Taxability</SelectItem><SelectItem value="kind">Kind</SelectItem><SelectItem value="au">AU</SelectItem></SelectContent>
+                                <SelectContent>
+                                  {workflowMode === 'abstract' ? (
+                                    <>
+                                      <SelectItem value="all">All Fields</SelectItem>
+                                      <SelectItem value="arpNo">ARP No.</SelectItem>
+                                      <SelectItem value="date">Date</SelectItem>
+                                      <SelectItem value="acctName">Transfer (To)</SelectItem>
+                                      <SelectItem value="rollAddress">Reg. Address</SelectItem>
+                                      <SelectItem value="location">Location</SelectItem>
+                                      <SelectItem value="pin">PIN</SelectItem>
+                                      <SelectItem value="rollTctNo">TCT No.</SelectItem>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <SelectItem value="all">All Fields</SelectItem>
+                                      <SelectItem value="date">Date</SelectItem>
+                                      <SelectItem value="arpNo">ARP No#</SelectItem>
+                                      <SelectItem value="pin">PIN</SelectItem>
+                                      <SelectItem value="acctName">Account</SelectItem>
+                                      <SelectItem value="address">Address</SelectItem>
+                                      <SelectItem value="update">Update</SelectItem>
+                                      <SelectItem value="taxability">Taxability</SelectItem>
+                                      <SelectItem value="kind">Kind</SelectItem>
+                                      <SelectItem value="au">AU</SelectItem>
+                                    </>
+                                  )}
+                                </SelectContent>
                               </Select>
                               <div className="relative flex-1 min-w-0">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder={`Search property records...`} className="pl-9 text-sm h-9 w-full" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
@@ -1260,7 +1316,17 @@ export default function Home() {
                             )}
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
                               <SelectTrigger className="w-[160px] h-9 text-xs font-bold uppercase shrink-0"><Filter className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="Status" /></SelectTrigger>
-                              <SelectContent><SelectItem value="all">All</SelectItem>{dynamicStatusOptions.sort().map(opt => (<SelectItem key={opt} value={opt}>{opt}</SelectItem>))}</SelectContent>
+                              <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                {workflowMode === 'abstract' ? (
+                                  <>
+                                    <SelectItem value="Linked">Linked Records</SelectItem>
+                                    <SelectItem value="No Match">Unlinked Records</SelectItem>
+                                  </>
+                                ) : (
+                                  dynamicStatusOptions.sort().map(opt => (<SelectItem key={opt} value={opt}>{opt}</SelectItem>))
+                                )}
+                              </SelectContent>
                             </Select>
                             <div className="flex gap-2 items-center shrink-0">
                               <ImportManager 
