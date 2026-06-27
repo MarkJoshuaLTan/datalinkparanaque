@@ -1004,7 +1004,7 @@ export default function Home() {
              </TooltipProvider>
           </div>
           {deferredPrompt && <Button variant="ghost" size="icon" onClick={handleInstallClick} className="hover:bg-muted"><Download className="w-5 h-5" /></Button>}
-          <Button variant="ghost" size="icon" toggleFullScreen={toggleFullScreen} className="hover:bg-muted">{isFullScreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}</Button>
+          <Button variant="ghost" size="icon" onClick={toggleFullScreen} className="hover:bg-muted">{isFullScreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}</Button>
           <ModeToggle />
           <TooltipProvider>
             <Tooltip>
@@ -1024,7 +1024,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="flex-1 flex-col flex overflow-hidden">
+      <div className-1 flex-col flex overflow-hidden>
           <main className="flex-1 flex flex-col p-6 overflow-hidden gap-4 min-h-0">
             <Tabs value={viewMode} onValueChange={(val: any) => { setViewMode(val); setStatusFilter('all'); }} className="flex-1 flex flex-col min-h-0">
               {workflowMode === 'idle' && viewMode !== 'audit' ? (
