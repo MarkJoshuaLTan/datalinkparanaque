@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback, useRef } from 'react';
@@ -293,7 +292,7 @@ export default function Home() {
   });
   
   const defaultExportColumns = {
-    "TYPE": true, "DATE": true, "ARP NO#": true, "PIN": true, "PREVIOUS": true, "NEW ARP NO#": true, "UPDATE": true, "TAXABILITY": true,
+    "DATE": true, "ARP NO#": true, "PIN": true, "PREVIOUS": true, "NEW ARP NO#": true, "UPDATE": true, "TAXABILITY": true,
     "ACCTNAME": true, "ADDRESS": true, "LOCATION": true, "KIND": true,
     "AU": true, "LAND AREA": true, "UNIT VALUE (2028)": true, "MARKET VALUE (2028)": true,
     "ASSESSED VALUE (2028)": true, "YEARLY TAX (2028 CAP)": true,
@@ -476,13 +475,8 @@ export default function Home() {
         return true;
       });
 
-      // Fixed Multi-Level Sort for Abstract Mode: Date (ASC) then ARP (ASC)
-      return base.sort((a, b) => {
-        const dateA = parseRecordDate(a.date)?.getTime() || 0;
-        const dateB = parseRecordDate(b.date)?.getTime() || 0;
-        if (dateA !== dateB) return dateA - dateB;
-        return (a.arpNo || '').localeCompare(b.arpNo || '');
-      });
+      // Temporarily disabled sorting for Date validation verification
+      return base;
     }
 
     const baseData = viewMode === 'results' 
@@ -940,13 +934,7 @@ export default function Home() {
         return true;
       });
 
-      // Apply Fixed Multi-Level Sort: Date (ASC) then ARP (ASC)
-      baseData.sort((a, b) => {
-        const dateA = parseRecordDate(a.date)?.getTime() || 0;
-        const dateB = parseRecordDate(b.date)?.getTime() || 0;
-        if (dateA !== dateB) return dateA - dateB;
-        return (a.arpNo || '').localeCompare(b.arpNo || '');
-      });
+      // Verification Step: Temporarily disabled fixed sorting to check raw order carry-forward assignment
       
       if (baseData.length === 0) {
         toast({ variant: "destructive", title: "Export Failed", description: "No records found matching your specific filter criteria." });
@@ -954,12 +942,10 @@ export default function Home() {
         return;
       }
 
-      // Mapping with Date first and visual suppression for Excel logic as per user image request
-      let lastDate = "";
+      // Mapping with Date verification - showing all dates
       const abstractData = baseData.map(j => {
         const currentDate = j.date || "";
-        const dateToShow = currentDate === lastDate ? "" : currentDate;
-        lastDate = currentDate;
+        const dateToShow = currentDate; // Verification: Show every assigned date
 
         const kind = (j.kind || "").trim().toUpperCase();
         
@@ -1480,4 +1466,3 @@ export default function Home() {
     </div>
   );
 }
-

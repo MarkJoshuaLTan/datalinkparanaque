@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, memo, useMemo } from 'react';
@@ -333,16 +332,10 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
 
   const visibleData = data.slice(0, displayLimit);
 
-  // Apply visual date suppression for the Abstract preview as per user image request
+  // Verification Mode: Showing all dates to verify carry-forward assignment
   const abstractVisibleRows = useMemo(() => {
     if (workflowMode !== 'abstract') return visibleData;
-    let lastDate = "";
-    return visibleData.map(row => {
-      const currentDate = row.date || "";
-      const displayDate = currentDate === lastDate ? "" : currentDate;
-      lastDate = currentDate;
-      return { ...row, displayDate };
-    });
+    return visibleData.map(row => ({ ...row, displayDate: row.date }));
   }, [visibleData, workflowMode]);
 
   const hasMore = data.length > displayLimit;
@@ -378,7 +371,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
         <div className="px-4 py-2 bg-blue-500/10 border-b flex items-center gap-2">
           <Info className="w-3.5 h-3.5 text-blue-600" />
           <p className="text-[10px] font-bold text-blue-700 uppercase tracking-widest">
-            Relational Preview: Showing Journal transactions enriched with Assessment Roll parcel details.
+            Relational Preview: Showing Journal transactions enriched with Assessment Roll parcel details. (Date Carry-Forward Active)
           </p>
         </div>
       )}

@@ -173,13 +173,20 @@ const parseAssessmentRollPositional = (raw: any[][], fileName: string, isExempt:
 
 /**
  * Specialized parser for the 14-column Journal positional format.
+ * Implements Date Carry-Forward: If a row has a blank date, it inherits the date from the row above.
  */
 const parseJournalPositional = (raw: any[][], fileName: string): LandRecord[] => {
+  let lastSeenDate = "";
   return raw.map((row) => {
+    const currentDateRaw = String(row[0] || '').trim();
+    if (currentDateRaw !== "") {
+      lastSeenDate = currentDateRaw;
+    }
+    
     const uniqueId = `${fileName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     return {
       id: uniqueId,
-      date: String(row[0] || '').trim(),
+      date: lastSeenDate,
       arpNo: String(row[1] || '').trim(),
       pin: String(row[2] || '').trim(),
       update: String(row[3] || '').trim(),
