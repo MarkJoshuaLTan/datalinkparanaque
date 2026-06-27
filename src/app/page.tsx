@@ -292,7 +292,7 @@ export default function Home() {
   });
   
   const defaultExportColumns = {
-    "DATE": true, "ARP NO#": true, "PIN": true, "PREVIOUS": true, "NEW ARP NO#": true, "UPDATE": true, "TAXABILITY": true,
+    "ARP NO#": true, "DATE": true, "PREVIOUS": true, "NEW ARP NO#": true, "UPDATE": true, "TAXABILITY": true,
     "ACCTNAME": true, "ADDRESS": true, "LOCATION": true, "KIND": true,
     "AU": true, "LAND AREA": true, "UNIT VALUE (2028)": true, "MARKET VALUE (2028)": true,
     "ASSESSED VALUE (2028)": true, "YEARLY TAX (2028 CAP)": true,
@@ -301,7 +301,7 @@ export default function Home() {
   };
   const [exportColumns, setExportColumns] = useState<Record<string, boolean>>(defaultExportColumns);
 
-  // Helper to parse messy date strings from Excel for multi-level sorting
+  // Helper to parse date strings for multi-level sorting
   const parseRecordDate = (dateStr: string) => {
     if (!dateStr) return null;
     const cleaned = dateStr.trim();
@@ -318,7 +318,6 @@ export default function Home() {
   const joinedAbstractData = useMemo(() => {
     if (workflowMode !== 'abstract') return [];
     
-    // Journal entries are the primary rows for the abstract preview
     const journals = journalData.length > 0 ? journalData : rawData.filter(r => r.sourceFile?.toLowerCase().includes('journal'));
     const rolls = rawData.filter(r => !r.sourceFile?.toLowerCase().includes('journal'));
     
@@ -327,7 +326,7 @@ export default function Home() {
 
     const normalizedExemptPins = new Set(Array.from(exemptPins).map(p => normalizePin(p)));
 
-    // Mapping and Sorting
+    // Mapping
     const joined = journals.map(j => {
       const pinNorm = normalizePin(j.pin);
       const rollMatch = rollLookup.get(pinNorm) || null;
@@ -350,7 +349,7 @@ export default function Home() {
     });
 
     // Multi-level sort: Date Ascending, then ARP Ascending
-    return joined.sort((a, b) => {
+    const sorted = [...joined].sort((a, b) => {
        const dateA = parseRecordDate(a.date) || new Date(0);
        const dateB = parseRecordDate(b.date) || new Date(0);
        if (dateA.getTime() !== dateB.getTime()) {
@@ -358,6 +357,15 @@ export default function Home() {
        }
        return (a.arpNo || "").localeCompare(b.arpNo || "", undefined, { numeric: true });
     });
+
+    // Visual Grouping logic: Blank out repeated dates
+    let lastDate = "";
+    return sorted.map(record => {
+      const currentDate = record.date || "";
+      const displayDate = currentDate === lastDate ? "" : currentDate;
+      lastDate = currentDate;
+      return { ...record, displayDate };
+    }) as any[];
   }, [workflowMode, journalData, rawData, exemptPins]);
 
   const stats = useMemo(() => {
@@ -477,22 +485,12 @@ export default function Home() {
   const filteredDisplayData = useMemo(() => {
     if (workflowMode === 'abstract' && viewMode === 'results') {
       const query = searchQuery.toLowerCase();
-      let base = joinedAbstractData.filter(record => {
+      return joinedAbstractData.filter(record => {
         if (query) {
            return record.acctName?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || record.rollTctNo?.toLowerCase().includes(query) || record.rollOwner?.toLowerCase().includes(query);
         }
         return true;
       });
-
-      // Visual Grouping logic for the table:
-      // Blank out repeated dates for a clean presentation
-      let lastDate = "";
-      return base.map(record => {
-        const currentDate = record.date || "";
-        const displayDate = currentDate === lastDate ? "" : currentDate;
-        lastDate = currentDate;
-        return { ...record, displayDate };
-      }) as any[];
     }
 
     const baseData = viewMode === 'results' 
@@ -890,7 +888,7 @@ export default function Home() {
       const fmt = (val: number) => `₱${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
 
       const headerMapping: Record<string, string> = { 
-        isComparisonInjected: "TYPE", date: "DATE", arpNo: "ARP NO#", pin: "PIN", previous: "PREVIOUS",
+        arpNo: "ARP NO#", date: "DATE", previous: "PREVIOUS",
         newArpNo: "NEW ARP NO#", update: "UPDATE", taxability: "TAXABILITY", acctName: "ACCTNAME", 
         address: "ADDRESS", location: "LOCATION", kind: "KIND", au: "AU", landArea: "LAND AREA", 
         unitValue2028: "UNIT VALUE (2028)", marketValue2028: "MARKET VALUE (2028)", assessedValue2028: "ASSESSED VALUE (2028)", 
@@ -903,8 +901,7 @@ export default function Home() {
         const row: any = {};
         Object.entries(headerMapping).forEach(([key, label]) => { 
           if (settings.columns[label]) {
-            if (label === "TYPE") row[label] = record.statusLabel === 'DUPLICATE' ? "DUP" : "REF";
-            else if (label === "UNIT VALUE") row[label] = processedData.length > 0 ? record.unitValue2029 : record.unitValue2028;
+            if (label === "UNIT VALUE") row[label] = processedData.length > 0 ? record.unitValue2029 : record.unitValue2028;
             else if (label === "MARKET VALUE") row[label] = processedData.length > 0 ? record.marketValue2029 : record.marketValue2028;
             else if (label === "ASSESSED VALUE") row[label] = processedData.length > 0 ? record.assessedValue2029 : record.assessedValue2028;
             else if (label === "YEARLY TAX") row[label] = processedData.length > 0 ? record.yearlyTax2029 : record.yearlyTax2028;
@@ -950,7 +947,7 @@ export default function Home() {
         return true;
       });
 
-      // Multi-level sort: Date Ascending, then ARP Ascending
+      // Sorting
       baseData.sort((a, b) => {
          const dateA = parseRecordDate(a.date) || new Date(0);
          const dateB = parseRecordDate(b.date) || new Date(0);

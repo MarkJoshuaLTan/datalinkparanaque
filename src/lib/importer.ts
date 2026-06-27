@@ -174,36 +174,48 @@ const parseAssessmentRollPositional = (raw: any[][], fileName: string, isExempt:
 /**
  * Specialized parser for the 14-column Journal positional format.
  * Implements Date Carry-Forward: If a row has a blank date, it inherits the date from the row above.
+ * Processes the entire sheet to maintain vertical context.
  */
 const parseJournalPositional = (raw: any[][], fileName: string): LandRecord[] => {
   let lastSeenDate = "";
-  return raw.map((row) => {
+  const records: LandRecord[] = [];
+  
+  raw.forEach((row) => {
+    // Column 1 (Index 0) is typically the Date
     const currentDateRaw = String(row[0] || '').trim();
-    if (currentDateRaw !== "") {
+    
+    // Update the active date if the current cell is not blank and not a header
+    if (currentDateRaw !== "" && !currentDateRaw.toLowerCase().includes('date')) {
       lastSeenDate = currentDateRaw;
     }
     
-    const uniqueId = `${fileName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    return {
-      id: uniqueId,
-      date: lastSeenDate,
-      arpNo: String(row[1] || '').trim(),
-      pin: String(row[2] || '').trim(),
-      update: String(row[3] || '').trim(),
-      acctName: String(row[4] || '').trim(),
-      location: String(row[5] || '').trim(),
-      kind: String(row[6] || '').trim(),
-      au: String(row[7] || '').trim(),
-      landArea: parseNum(row[8]),
-      marketValue: parseNum(row[9]),
-      assessedValue: parseNum(row[10]),
-      taxability: 'T',
-      unitValue: 0,
-      isCleanup: false,
-      sourceFile: fileName,
-      rawRow: row
-    };
+    // Column 3 (Index 2) is the PIN. If it contains a dash, treat it as a data row.
+    const pin = String(row[2] || '').trim();
+    if (pin.includes('-')) {
+      const uniqueId = `${fileName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      records.push({
+        id: uniqueId,
+        date: lastSeenDate, // Use the carry-forward date
+        arpNo: String(row[1] || '').trim(),
+        pin: pin,
+        update: String(row[3] || '').trim(),
+        acctName: String(row[4] || '').trim(),
+        location: String(row[5] || '').trim(),
+        kind: String(row[6] || '').trim(),
+        au: String(row[7] || '').trim(),
+        landArea: parseNum(row[8]),
+        marketValue: parseNum(row[9]),
+        assessedValue: parseNum(row[10]),
+        taxability: 'T',
+        unitValue: 0,
+        isCleanup: false,
+        sourceFile: fileName,
+        rawRow: row
+      });
+    }
   });
+  
+  return records;
 };
 
 export const parseFile = async (
@@ -225,7 +237,6 @@ export const parseFile = async (
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
 
-        // positional parsing requires header: 1 and raw: false to get formatted strings (for dates etc)
         if (workflowMode === 'roll') {
           const json = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: "" }) as any[][];
           const pinIdx = importMode === 'exempt' ? 5 : 6;
@@ -234,9 +245,9 @@ export const parseFile = async (
           resolve({ data: mappedData, count: dataRows.length });
         } else if (workflowMode === 'journal' || importMode === 'journal') {
           const json = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: "" }) as any[][];
-          const dataRows = json.filter(row => row.length >= 14 && String(row[2] || '').includes('-'));
-          const mappedData = parseJournalPositional(dataRows, file.name);
-          resolve({ data: mappedData, count: dataRows.length });
+          // Use the carry-forward aware parser on the full sheet
+          const mappedData = parseJournalPositional(json, file.name);
+          resolve({ data: mappedData, count: mappedData.length });
         } else {
           const json = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: "" }) as any[];
           const rawCount = json.length;
