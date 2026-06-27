@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback, useRef } from 'react';
@@ -176,7 +177,7 @@ const ImportManager = ({ mode, manifest, onAdd, onDelete }: { mode: 'raw' | 'exe
           <span className="text-[10px] font-black uppercase tracking-widest">{mode === 'raw' ? "Raw File Manager" : mode === 'exempt' ? "Exempt File Manager" : "Journal File Manager"}</span>
         </div>
         <Button variant="ghost" size="sm" onClick={onAdd} className="h-7 px-2 text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white">
-          <Plus className="w-3 h-3 mr-1" /> Add File
+          <Plus className="w-3 shadow-sm h-3 mr-1" /> Add File
         </Button>
       </div>
       <ScrollArea className="h-[250px]">
@@ -953,13 +954,18 @@ export default function Home() {
         return;
       }
 
-      // Mapping with ARP No. as the first column
+      // Mapping with Date first and visual suppression for Excel logic as per user image request
+      let lastDate = "";
       const abstractData = baseData.map(j => {
+        const currentDate = j.date || "";
+        const dateToShow = currentDate === lastDate ? "" : currentDate;
+        lastDate = currentDate;
+
         const kind = (j.kind || "").trim().toUpperCase();
         
         return {
-          "col1": j.arpNo || "",
-          "col2": j.date || "", 
+          "col1": dateToShow,
+          "col2": j.arpNo || "", 
           "col3": j.rollOwner || "", 
           "col4": j.acctName || "", 
           "col5": j.rollAddress || "", 
@@ -976,8 +982,8 @@ export default function Home() {
       });
 
       const headers = [
-        "ARP No.",
         "Date of Conveyance/Transfer",
+        "ARP No.",
         "Ownership Transfer From",
         "Ownership Transfer To",
         "Address of New Owner",
@@ -1474,3 +1480,4 @@ export default function Home() {
     </div>
   );
 }
+

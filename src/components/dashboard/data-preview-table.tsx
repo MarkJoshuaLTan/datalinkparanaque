@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useMemo } from 'react';
 import { 
   Table, 
   TableBody, 
@@ -64,9 +64,8 @@ const RecordRow = memo(({
         <TableCell className="text-center font-black p-3 border-r bg-muted/5 text-muted-foreground font-mono">
           {index + 1}
         </TableCell>
-        <TableCell className="whitespace-nowrap p-3 font-bold">{row.date || '---'}</TableCell>
-        <TableCell className="font-mono p-3 font-black text-primary">{row.pin || '---'}</TableCell>
-        <TableCell className="max-w-[180px] truncate uppercase font-black p-3 text-foreground" title={row.acctName}>{row.acctName || '---'}</TableCell>
+        <TableCell className="whitespace-nowrap p-3 font-bold">{abstractRow.displayDate || ''}</TableCell>
+        <TableCell className="font-mono p-3 font-black text-primary">{row.arpNo || '---'}</TableCell>
         
         {/* Relational Mapping Columns for Join Preview */}
         <TableCell className={cn(
@@ -77,12 +76,13 @@ const RecordRow = memo(({
         </TableCell>
 
         <TableCell className={cn(
-          "max-w-[250px] truncate uppercase p-3 font-bold border-l",
+          "max-w-[180px] truncate uppercase p-3 font-bold border-l",
           abstractRow.isJoined ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50/10" : "text-red-400 italic opacity-50"
-        )} title={abstractRow.rollAddress}>
-          {abstractRow.rollAddress || 'NOT FOUND'}
+        )} title={row.acctName}>
+          {row.acctName || '---'}
         </TableCell>
 
+        <TableCell className="max-w-[250px] truncate uppercase p-3 text-muted-foreground italic border-l">{abstractRow.rollAddress || '---'}</TableCell>
         <TableCell className="max-w-[150px] truncate uppercase p-3 text-muted-foreground italic border-l">{row.location || '---'}</TableCell>
 
         <TableCell className={cn(
@@ -283,6 +283,7 @@ const RecordRow = memo(({
     prevProps.row.duplicateWithReference === nextProps.row.duplicateWithReference &&
     prevProps.row.au === nextProps.row.au &&
     prevProps.row.kind === nextProps.row.kind &&
+    (prevProps.row as any).displayDate === (nextProps.row as any).displayDate &&
     prevProps.isProcessed === nextProps.isProcessed &&
     prevProps.index === nextProps.index &&
     prevProps.showLabels === nextProps.showLabels &&
@@ -331,6 +332,19 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
   }
 
   const visibleData = data.slice(0, displayLimit);
+
+  // Apply visual date suppression for the Abstract preview as per user image request
+  const abstractVisibleRows = useMemo(() => {
+    if (workflowMode !== 'abstract') return visibleData;
+    let lastDate = "";
+    return visibleData.map(row => {
+      const currentDate = row.date || "";
+      const displayDate = currentDate === lastDate ? "" : currentDate;
+      lastDate = currentDate;
+      return { ...row, displayDate };
+    });
+  }, [visibleData, workflowMode]);
+
   const hasMore = data.length > displayLimit;
   const nextBatchSize = Math.min(BATCH_SIZE, data.length - displayLimit);
 
@@ -379,13 +393,13 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
               <TableRow className="hover:bg-transparent border-b-2">
                 <TableHead className="w-14 text-center font-black bg-card border-r">#</TableHead>
                 <TableHead className="min-w-[120px] font-black uppercase bg-card">Conveyance Date</TableHead>
-                <TableHead className="min-w-[200px] font-black uppercase bg-card">PIN (Index)</TableHead>
-                <TableHead className="min-w-[200px] font-black uppercase bg-card">New Owner (To)</TableHead>
+                <TableHead className="min-w-[150px] font-black uppercase bg-card border-l">ARP No. (NEW)</TableHead>
                 <TableHead className="min-w-[200px] font-black uppercase bg-blue-50 dark:bg-blue-950 border-l border-blue-100 dark:border-blue-900">Prev. Owner (From)</TableHead>
-                <TableHead className="min-w-[250px] font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">Registered Address</TableHead>
+                <TableHead className="min-w-[200px] font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">New Owner (To)</TableHead>
+                <TableHead className="min-w-[250px] font-black uppercase bg-card border-l">Registered Address</TableHead>
                 <TableHead className="min-w-[200px] font-black uppercase bg-card border-l">Transaction Loc.</TableHead>
-                <TableHead className="min-w-[100px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">Lot #</TableHead>
-                <TableHead className="min-w-[120px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">TCT #</TableHead>
+                <TableHead className="min-w-[100px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-blue-900">Lot #</TableHead>
+                <TableHead className="min-w-[120px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-blue-900">TCT #</TableHead>
                 <TableHead className="min-w-[50px] text-center font-black uppercase bg-card border-l">L</TableHead>
                 <TableHead className="min-w-[50px] text-center font-black uppercase bg-card border-l">B</TableHead>
                 <TableHead className="min-w-[120px] text-right font-black uppercase bg-card border-l">Area (sqm)</TableHead>
@@ -420,7 +434,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
             )}
           </TableHeader>
           <TableBody>
-            {visibleData.map((row, i) => (
+            {abstractVisibleRows.map((row, i) => (
               <RecordRow 
                 key={row.id} 
                 row={row} 
