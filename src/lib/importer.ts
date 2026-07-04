@@ -60,6 +60,7 @@ export const HEADER_ALIASES = {
   sellingPrice: ['sellingprice', 'consideration', 'amount', 'considerationamount'],
   salesValue: ['salesvalue', 'salesvaluepsqm', 'valuepsqm'],
   docFileNo: ['documentfileno', 'docfileno', 'docno', 'fileno'],
+  notary: ['notary', 'notarypublic', 'notaryname', 'atty'],
   notarialDate: ['notarialdate', 'notarizeddate']
 };
 
@@ -92,8 +93,6 @@ function expandTdNumbers(tdString: string): string[] {
   const first = segments[0];
   const results = [first];
   
-  // Extract base prefix and the numeric part
-  // e.g. E-003-52121 -> prefix: E-003-, numeric: 52121
   const match = first.match(/^(.*-)(\d+)$/);
   if (!match) return segments;
   
@@ -120,7 +119,6 @@ function expandTdNumbers(tdString: string): string[] {
 
 /**
  * Maps JSON data to LandRecord objects using robust fuzzy header detection.
- * Supports Date Carry-Forward and Multi-TD Sales Expansion.
  */
 export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exempt' | 'journal' | 'sales' = 'raw'): LandRecord[] => {
   let lastSeenDate = "";
@@ -192,6 +190,7 @@ export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exe
       sellingPrice: parseNum(getValue('sellingPrice')),
       salesValue: parseNum(getValue('salesValue')),
       docFileNo: getValue('docFileNo'),
+      notary: getValue('notary'),
       notarialDate: getValue('notarialDate'),
       isCleanup: false,
       cleanupReason: "",
@@ -206,7 +205,6 @@ export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exe
         id: uniqueId,
         arpNo: arp,
         newArpNo: index === 0 ? getValue('newArpNo') : "",
-        // Price linking logic: First gets price, others get reference TD
         sellingPrice: index === 0 ? baseRecord.sellingPrice : 0,
         sellingPriceRef: index === 0 ? "" : expandedArps[0]
       };

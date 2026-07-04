@@ -323,27 +323,16 @@ export default function Home() {
   const saveSession = useCallback(() => {
     if (!isClient) return;
     try {
-      // Tiered storage attempt to prevent QuotaExceededError
-      const attemptSave = (options: { skipReports?: boolean; skipRawRow?: boolean } = {}) => {
-        const payload = {
-          rules, exportColumns, locationSettings, options, taxRates, showSummary,
-          rawFileManifest, exemptFileManifest, journalFileManifest, salesFileManifest,
-          workflowMode, abstractStep, viewMode, sortBy, importedFileName,
-          processingReports: options.skipReports ? [] : processingReports.slice(0, 10).map(r => ({ ...r, records: undefined }))
-        };
-
-        const slimPayload = JSON.stringify(payload);
-        localStorage.setItem(LOCAL_STORAGE_KEY, slimPayload);
+      const payload = {
+        rules, exportColumns, locationSettings, options, taxRates, showSummary,
+        rawFileManifest, exemptFileManifest, journalFileManifest, salesFileManifest,
+        workflowMode, abstractStep, viewMode, sortBy, importedFileName,
+        processingReports: processingReports.slice(0, 10).map(r => ({ ...r, records: [] }))
       };
-
-      try {
-        attemptSave();
-      } catch (err) {
-        // Attempt 2: Minimalist save - drop original source row objects
-        attemptSave({ skipReports: false, skipRawRow: true });
-      }
+      const slimPayload = JSON.stringify(payload);
+      localStorage.setItem(LOCAL_STORAGE_KEY, slimPayload);
     } catch (err) {
-      console.warn("Storage warning: Workspace context saved, but large data arrays excluded to protect browser memory.");
+      console.warn("Storage warning: Session metadata persisted, but large datasets skipped for browser memory protection.");
     }
   }, [isClient, rules, exportColumns, locationSettings, options, taxRates, showSummary, rawFileManifest, exemptFileManifest, journalFileManifest, salesFileManifest, workflowMode, abstractStep, viewMode, sortBy, importedFileName, processingReports]);
 
@@ -428,7 +417,9 @@ export default function Home() {
         rollTctNo: rollMatch?.tctNo || '---',
         isJoined: !!rollMatch,
         sellingPrice: considerationValue,
-        notarialDate: salesMatch?.notarialDate || ''
+        notarialDate: salesMatch?.notarialDate || '',
+        docFileNo: salesMatch?.docFileNo || '',
+        notary: salesMatch?.notary || ''
       };
     });
 
@@ -816,10 +807,28 @@ export default function Home() {
       if (baseData.length === 0) { toast({ variant: "destructive", title: "Abstract Export Failed", description: "No records found matching your specific filter criteria." }); setIsExporting(false); return; }
       const abstractData = baseData.map(j => {
         const kind = (j.kind || "").trim().toUpperCase();
-        return { "col1": j.arpNo || "", "col2": j.date || "", "col3": "", "col4": j.acctName || "", "col5": (j as any).rollAddress || "", "col6": j.location || "", "col7": "", "col8": j.sellingPrice || "", "col9": (kind === 'L' || kind === 'LAND') ? 'x' : "", "col10": (kind === 'B' || kind === 'BUILDING') ? 'x' : "", "col11": j.landArea || 0, "col12": (j as any).rollLotNo || "", "col13": "", "col14": (j as any).rollTctNo || "" };
+        return { 
+          "col1": j.arpNo || "", 
+          "col2": j.date || "", 
+          "col3": j.notarialDate || "",
+          "col4": "", 
+          "col5": j.acctName || "", 
+          "col6": (j as any).rollAddress || "", 
+          "col7": j.location || "", 
+          "col8": j.docFileNo || "",
+          "col9": (j as any).notary || "",
+          "col10": "", 
+          "col11": j.sellingPrice || "", 
+          "col12": (kind === 'L' || kind === 'LAND') ? 'x' : "", 
+          "col13": (kind === 'B' || kind === 'BUILDING') ? 'x' : "", 
+          "col14": j.landArea || 0, 
+          "col15": (j as any).rollLotNo || "", 
+          "col16": "", 
+          "col17": (j as any).rollTctNo || "" 
+        };
       });
-      const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet([["ABSTRACT OF REGISTERED REAL PROPERTY TRANSACTION"], ["PARAÑAQUE CITY - REAL PROPERTY DATA DIVISION"], ["EXPORT DATE:", new Date().toLocaleString()], [], ["ARP No.", "Date of Conveyance/Transfer", "Ownership Transfer From", "Ownership Transfer To", "Address of New Owner", "Location of Property", "Mode of Conveyance", "Amount of Consideration", "Property Conveyed (L)", "Property Conveyed (B)", "Area Land/Bldg.", "Lot No.", "Title No. Previous", "Title No. New"]]);
-      XLSX.utils.sheet_add_json(ws, abstractData, { origin: -1, skipHeader: true }); ws['!cols'] = [{ wch: 20 }, { wch: 12 }, { wch: 15 }, { wch: 25 }, { wch: 30 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 4 }, { wch: 4 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 20 }];
+      const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet([["ABSTRACT OF REGISTERED REAL PROPERTY TRANSACTION"], ["PARAÑAQUE CITY - REAL PROPERTY DATA DIVISION"], ["EXPORT DATE:", new Date().toLocaleString()], [], ["ARP No.", "DATE OF TRANSFER", "NOTARIAL DATE", "Ownership Transfer From", "Ownership Transfer To", "Address of New Owner", "Location of Property", "DOCUMENT FILE No.", "NOTARY / AGENT", "Mode of Conveyance", "Amount of Consideration", "Property Conveyed (L)", "Property Conveyed (B)", "Area Land/Bldg.", "Lot No.", "Title No. Previous", "Title No. New"]]);
+      XLSX.utils.sheet_add_json(ws, abstractData, { origin: -1, skipHeader: true }); ws['!cols'] = [{ wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 4 }, { wch: 4 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 20 }];
       XLSX.utils.book_append_sheet(wb, ws, "AbstractReport"); XLSX.writeFile(wb, `AbstractReport-${new Date().toISOString().split('T')[0]}.xlsx`);
       showSuccessToast(`Exported ${abstractData.length} Abstract entries successfully.`);
     } catch (error: any) { toast({ variant: "destructive", title: "Abstract Export Failed", description: error.message }); }
@@ -985,7 +994,7 @@ export default function Home() {
              <div className="pt-4 grid grid-cols-2 gap-4">
                 <Button onClick={() => rawFileInputRef.current?.click()} className="h-16 bg-primary hover:bg-emerald-700 font-black uppercase text-xs tracking-widest gap-3"><Files className="w-5 h-5" /> Select Records</Button>
                 <Button onClick={() => journalFileInputRef.current?.click()} className="h-16 bg-amber-600 hover:bg-amber-700 font-black uppercase text-xs tracking-widest gap-3"><FileText className="w-5 h-5" /> Select Journal</Button>
-                {salesFileManifest.length > 0 && <Button onClick={() => salesFileInputRef.current?.click()} className="h-16 bg-emerald-600 hover:bg-emerald-700 font-black uppercase text-xs tracking-widest gap-3"><Tag className="w-5 h-5" /> Select Sales</Button>}
+                <Button onClick={() => salesFileInputRef.current?.click()} className="h-16 bg-emerald-600 hover:bg-emerald-700 font-black uppercase text-xs tracking-widest gap-3"><Tag className="w-5 h-5" /> Select Sales</Button>
                 <Button onClick={() => exemptFileInputRef.current?.click()} variant="outline" className="h-16 border-blue-500/30 text-blue-600 hover:bg-blue-50 font-black uppercase text-xs tracking-widest gap-3"><ShieldOff className="w-5 h-5" /> Select Exempt</Button>
              </div>
           </div>

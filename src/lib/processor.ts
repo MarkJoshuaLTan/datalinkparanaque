@@ -50,9 +50,10 @@ export interface LandRecord {
 
   // Sales Data Specific Fields
   sellingPrice?: number;
-  sellingPriceRef?: string; // New: References the primary TD for multi-item sales
+  sellingPriceRef?: string; 
   salesValue?: number;
   docFileNo?: string;
+  notary?: string;
   notarialDate?: string;
 
   // Year-Specific Data
@@ -232,7 +233,6 @@ export function processRecords(
   cleanupCount: number;
   report: ProcessingReport;
 } {
-  const rawRecordsSnapshot = records.map(r => ({ ...r }));
   const arpCounts = new Map<string, number>();
   records.forEach(r => { if (r.arpNo) arpCounts.set(r.arpNo, (arpCounts.get(r.arpNo) || 0) + 1); });
 
@@ -473,7 +473,7 @@ export function processRecords(
     totalMarketValue2028: finalProcessed.reduce((sum, r) => sum + (r.marketValue2028 || 0), 0),
     totalAssessedValue2028: finalProcessed.reduce((sum, r) => sum + (r.assessedValue2028 || 0), 0),
     totalYearlyTax2028: finalProcessed.reduce((sum, r) => sum + (r.yearlyTax2028 || 0), 0),
-    records: rawRecordsSnapshot
+    records: [] // DO NOT STORE LARGE DATASETS IN REPORTS (QUOTA PROTECTION)
   };
 
   return { processed: finalProcessed, allWithDuplicateMarkers: result, duplicatesRemoved: duplicatesCount, cleanupCount, report };
