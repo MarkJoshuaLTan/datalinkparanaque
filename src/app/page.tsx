@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback, useRef } from 'react';
@@ -240,6 +241,8 @@ export default function Home() {
   const [workflowMode, setWorkflowMode] = useState<'idle' | 'standard' | 'abstract'>('idle');
   const [abstractStep, setAbstractStep] = useState<'roll' | 'journal' | 'ready'>('roll');
 
+  const isAbstract = workflowMode === 'abstract';
+
   // --- 1.1 MANIFEST STATE ---
   const [rawFileManifest, setRawFileManifest] = useState<{ name: string, count: number }[]>([]);
   const [exemptFileManifest, setExemptFileManifest] = useState<{ name: string, count: number, pins: string[] }[]>([]);
@@ -289,8 +292,6 @@ export default function Home() {
   // --- 5. ANALYTICS & DIAGNOSTIC STATE ---
   const [explainType, setExplainType] = useState<string | null>(null);
   const [expandedChart, setExpandedChart] = useState<'usage' | 'barangay' | 'update' | 'market' | null>(null);
-
-  const isAbstract = workflowMode === 'abstract';
 
   // --- 6. ENGINE OPTIONS ---
   const [options, setOptions] = useState({
@@ -348,10 +349,6 @@ export default function Home() {
       const rollMatch = rollLookup.get(pinNorm) || null;
       const salesMatch = salesLookup.get(cleanKey(j.arpNo)) || null;
       
-      const rollOwnerRaw = (rollMatch?.acctName || "").trim().toUpperCase();
-      const journalOwnerRaw = (j.acctName || "").trim().toUpperCase();
-      
-      const ownersMatch = rollOwnerRaw !== "" && journalOwnerRaw !== "" && rollOwnerRaw === journalOwnerRaw;
       const isExempt = normalizedExemptPins.has(pinNorm);
 
       let considerationValue: string | number = 0;
@@ -362,7 +359,7 @@ export default function Home() {
       return {
         ...j,
         taxability: isExempt ? 'E' : 'T',
-        rollOwner: ownersMatch ? "" : (rollMatch?.acctName || '---'),
+        rollOwner: rollMatch?.acctName || '---',
         rollAddress: rollMatch?.address || '---',
         rollLotNo: rollMatch?.lotNo || '---',
         rollTctNo: rollMatch?.tctNo || '---',
@@ -746,32 +743,44 @@ export default function Home() {
         return true;
       });
       if (baseData.length === 0) { toast({ variant: "destructive", title: "Abstract Export Failed", description: "No records found matching your specific filter criteria." }); setIsExporting(false); return; }
+      
       const abstractData = baseData.map(j => {
         const kind = (j.kind || "").trim().toUpperCase();
         return { 
-          "col1": j.arpNo || "", 
-          "col2": j.date || "", // Date of Conveyance
-          "col3": j.dateOfTransfer || "", // Date of Transfer
-          "col4": j.notarialDate || "",
-          "col5": "", 
-          "col6": j.acctName || "", 
-          "col7": (j as any).rollAddress || "", 
-          "col8": j.location || "", 
-          "col9": j.docFileNo || "",
-          "col10": (j as any).notary || "",
-          "col11": "", 
-          "col12": j.sellingPrice || "", 
-          "col13": (kind === 'L' || kind === 'LAND') ? 'x' : "", 
-          "col14": (kind === 'B' || kind === 'BUILDING') ? 'x' : "", 
-          "col15": j.landArea || 0, 
-          "col16": (j as any).rollLotNo || "", 
-          "col17": "", 
-          "col18": (j as any).rollTctNo || "" 
+          "ARP NO.": j.arpNo || "", 
+          "DATE OF CONVEYANCE/TRANSFER": j.date || "",
+          "OWNERSHIP TRANSFER FROM": (j as any).rollOwner || "", 
+          "OWNERSHIP TRANSFER TO": j.acctName || "", 
+          "ADDRESS OF NEW OWNER": (j as any).rollAddress || "", 
+          "LOCATION OF PROPERTY": j.location || "", 
+          "MODE OF CONVEYANCE": "", 
+          "AMOUNT OF CONSIDERATION": j.sellingPrice || "", 
+          "PROPERTY CONVEYED (L)": (kind === 'L' || kind === 'LAND') ? 'x' : "", 
+          "PROPERTY CONVEYED (B)": (kind === 'B' || kind === 'BUILDING') ? 'x' : "", 
+          "AREA (LAND/BLDG.)": j.landArea || 0, 
+          "LOT NO.": (j as any).rollLotNo || "", 
+          "TITLE NO. (PREVIOUS)": (j as any).rollTctNo || "", 
+          "TITLE NO. (NEW)": "", 
+          "NOTARIAL DATE": j.notarialDate || "", 
+          "DOCUMENT FILE NO.": j.docFileNo || "",
+          "NOTARY / AGENT": (j as any).notary || ""
         };
       });
-      const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet([["ABSTRACT OF REGISTERED REAL PROPERTY TRANSACTION"], ["PARAÑAQUE CITY - REAL PROPERTY DATA DIVISION"], ["EXPORT DATE:", new Date().toLocaleString()], [], ["ARP No.", "DATE OF CONVEYANCE", "DATE OF TRANSFER", "NOTARIAL DATE", "Ownership Transfer From", "Ownership Transfer To", "Address of New Owner", "Location of Property", "DOCUMENT FILE No.", "NOTARY / AGENT", "Mode of Conveyance", "Amount of Consideration", "Property Conveyed (L)", "Property Conveyed (B)", "Area Land/Bldg.", "Lot No.", "Title No. Previous", "Title No. New"]]);
-      XLSX.utils.sheet_add_json(ws, abstractData, { origin: -1, skipHeader: true }); ws['!cols'] = [{ wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 4 }, { wch: 4 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 20 }];
-      XLSX.utils.book_append_sheet(wb, ws, "AbstractReport"); XLSX.writeFile(wb, `AbstractReport-${new Date().toISOString().split('T')[0]}.xlsx`);
+
+      const wb = XLSX.utils.book_new(); 
+      const headers = ["ARP NO.", "DATE OF CONVEYANCE/TRANSFER", "OWNERSHIP TRANSFER FROM", "OWNERSHIP TRANSFER TO", "ADDRESS OF NEW OWNER", "LOCATION OF PROPERTY", "MODE OF CONVEYANCE", "AMOUNT OF CONSIDERATION", "PROPERTY CONVEYED (L)", "PROPERTY CONVEYED (B)", "AREA (LAND/BLDG.)", "LOT NO.", "TITLE NO. (PREVIOUS)", "TITLE NO. (NEW)", "NOTARIAL DATE", "DOCUMENT FILE NO.", "NOTARY / AGENT"];
+      const ws = XLSX.utils.aoa_to_sheet([
+        ["ABSTRACT OF REGISTERED REAL PROPERTY TRANSACTION"], 
+        ["PARAÑAQUE CITY - REAL PROPERTY DATA DIVISION"], 
+        ["EXPORT DATE:", new Date().toLocaleString()], 
+        [], 
+        headers
+      ]);
+      
+      XLSX.utils.sheet_add_json(ws, abstractData, { origin: -1, skipHeader: true }); 
+      ws['!cols'] = headers.map(() => ({ wch: 22 })); 
+      XLSX.utils.book_append_sheet(wb, ws, "AbstractReport"); 
+      XLSX.writeFile(wb, `AbstractReport-${new Date().toISOString().split('T')[0]}.xlsx`);
       showSuccessToast(`Exported ${abstractData.length} Abstract entries successfully.`);
     } catch (error: any) { toast({ variant: "destructive", title: "Abstract Export Failed", description: error.message }); }
     finally { setIsExporting(false); }
@@ -862,8 +871,30 @@ export default function Home() {
 
                   <div className="mb-4 flex items-center justify-between bg-card p-3 rounded-3xl shadow-2xl border border-white/10 shrink-0 transition-all duration-700 ease-in-out px-6">
                     <div className="flex items-center gap-4">
-                      {workflowMode === 'standard' && (<TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="outline" onClick={() => setIsExportSettingsOpen(true)} size="sm" className={cn("font-black uppercase tracking-widest border-primary/30 text-primary hover:bg-muted transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]")} disabled={isExporting}><FileDown className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> {isExporting ? "Generating..." : "Export Data"}</Button></TooltipTrigger><TooltipContent>Standard Report Export</TooltipContent></Tooltip></TooltipProvider>)}
-                      {workflowMode === 'abstract' && (<TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="outline" onClick={() => setIsAbstractExportModalOpen(true)} size="sm" className={cn("font-black uppercase tracking-widest transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]", canAbstractExport ? "border-blue-500/30 text-blue-600 hover:bg-blue-50" : "opacity-30 border-muted text-muted-foreground")} disabled={isExporting || !canAbstractExport}><ArrowRightLeft className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> Abstract Export</Button></TooltipTrigger><TooltipContent>{canAbstractExport ? "Generate Abstract of Transactions (Roll + Journal Join)" : "Requires both Assessment Roll and Journal data staged"}</TooltipContent></Tooltip></TooltipProvider>)}
+                      {workflowMode === 'standard' && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="outline" onClick={() => setIsExportSettingsOpen(true)} size="sm" className={cn("font-black uppercase tracking-widest border-primary/30 text-primary hover:bg-muted transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]")} disabled={isExporting}>
+                                <FileDown className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> {isExporting ? "Generating..." : "Export Data"}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Standard Report Export</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                      {workflowMode === 'abstract' && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="outline" onClick={() => setIsAbstractExportModalOpen(true)} size="sm" className={cn("font-black uppercase tracking-widest transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]", canAbstractExport ? "border-blue-500/30 text-blue-600 hover:bg-blue-50" : "opacity-30 border-muted text-muted-foreground")} disabled={isExporting || !canAbstractExport}>
+                                <ArrowRightLeft className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> Abstract Export
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>{canAbstractExport ? "Generate Abstract of Transactions (Roll + Journal Join)" : "Requires both Assessment Roll and Journal data staged"}</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
                       <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="sm" onClick={() => setIsClearConfirmOpen(true)} className="font-black uppercase text-[10px] tracking-widest text-muted-foreground hover:text-red-600 hover:bg-muted transition-all flex items-center gap-2"><Trash2 className="w-4 h-4" /> Clear Session</Button></TooltipTrigger><TooltipContent>Reset Session Data</TooltipContent></Tooltip></TooltipProvider>
                     </div>
                     <div className="flex gap-4 items-center">
