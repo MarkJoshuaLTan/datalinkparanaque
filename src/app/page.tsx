@@ -301,12 +301,28 @@ export default function Home() {
   });
   
   const defaultExportColumns = {
-    "ARP NO#": true, "DATE": true, "PREVIOUS": true, "NEW ARP NO#": true, "UPDATE": true, "TAXABILITY": true,
-    "ACCTNAME": true, "ADDRESS": true, "LOCATION": true, "KIND": true,
-    "AU": true, "LAND AREA": true, "UNIT VALUE (2028)": true, "MARKET VALUE (2028)": true,
-    "ASSESSED VALUE (2028)": true, "YEARLY TAX (2028 CAP)": true,
-    "UNIT VALUE": true, "MARKET VALUE": true,
-    "ASSESSED VALUE": true, "YEARLY TAX": true
+    "TYPE": true,
+    "DATE": true,
+    "ARP NO#": true,
+    "PIN": true,
+    "PREVIOUS": true,
+    "NEW ARP NO#": true,
+    "UPDATE": true,
+    "TAXABILITY": true,
+    "ACCTNAME": true,
+    "ADDRESS": true,
+    "LOCATION": true,
+    "KIND": true,
+    "AU": true,
+    "LAND AREA": true,
+    "UNIT VALUE (2028)": true,
+    "MARKET VALUE (2028)": true,
+    "ASSESSED VALUE (2028)": true,
+    "YEARLY TAX (2028 CAP)": true,
+    "UNIT VALUE": true,
+    "MARKET VALUE": true,
+    "ASSESSED VALUE": true,
+    "YEARLY TAX": true
   };
   const [exportColumns, setExportColumns] = useState<Record<string, boolean>>(defaultExportColumns);
 
@@ -717,10 +733,58 @@ export default function Home() {
       const taxableRecords = finalOutputList.filter(r => r.taxability === 'T'); const exemptRecords = finalOutputList.filter(r => r.taxability === 'E');
       const sum = (recs: LandRecord[], field: keyof LandRecord) => recs.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
       const fmt = (val: number) => `₱${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
-      const headerMapping: Record<string, string> = { arpNo: "ARP NO#", date: "DATE", previous: "PREVIOUS", newArpNo: "NEW ARP NO#", update: "UPDATE", taxability: "TAXABILITY", acctName: "ACCTNAME", address: "ADDRESS", location: "LOCATION", kind: "KIND", au: "AU", landArea: "LAND AREA", unitValue2028: "UNIT VALUE (2028)", marketValue2028: "MARKET VALUE (2028)", assessedValue2028: "ASSESSED VALUE (2028)", yearlyTax2028: "YEARLY TAX (2028 CAP)", unitValue: "UNIT VALUE", marketValue: "MARKET VALUE", assessedValue: "ASSESSED VALUE", yearlyTax: "YEARLY TAX" };
+      
+      const headerMapping: Record<string, string> = { 
+        duplicateWithReference: "TYPE",
+        date: "DATE", 
+        arpNo: "ARP NO#", 
+        pin: "PIN",
+        previous: "PREVIOUS", 
+        newArpNo: "NEW ARP NO#", 
+        update: "UPDATE", 
+        taxability: "TAXABILITY", 
+        acctName: "ACCTNAME", 
+        address: "ADDRESS", 
+        location: "LOCATION", 
+        kind: "KIND", 
+        au: "AU", 
+        landArea: "LAND AREA", 
+        unitValue2028: "UNIT VALUE (2028)", 
+        marketValue2028: "MARKET VALUE (2028)", 
+        assessedValue2028: "ASSESSED VALUE (2028)", 
+        yearlyTax2028: "YEARLY TAX (2028 CAP)", 
+        unitValue: "UNIT VALUE", 
+        marketValue: "MARKET VALUE", 
+        assessedValue: "ASSESSED VALUE", 
+        yearlyTax: "YEARLY TAX" 
+      };
+
       const activeHeaders = Object.values(headerMapping).filter(h => settings.columns[h]);
-      const formattedExport = finalOutputList.map(record => { const row: any = {}; Object.entries(headerMapping).forEach(([key, label]) => { if (settings.columns[label]) { if (label === "UNIT VALUE") row[label] = processedData.length > 0 ? record.unitValue2029 : record.unitValue2028; else if (label === "MARKET VALUE") row[label] = processedData.length > 0 ? record.marketValue2029 : record.marketValue2028; else if (label === "ASSESSED VALUE") row[label] = processedData.length > 0 ? record.assessedValue2029 : record.assessedValue2028; else if (label === "YEARLY TAX") row[label] = processedData.length > 0 ? record.yearlyTax2029 : record.yearlyTax2028; else row[label] = record[key as keyof LandRecord]; } }); return row; });
-      const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet([["DATA LINK PARAÑAQUE - SMART EXPORT"], ["EXPORT DATE:", new Date().toLocaleString()], ["TOTAL RECORDS:", finalOutputList.length.toLocaleString()], [], ["SUMMARY TAXABLE PROPERTIES"], [], ["CURRENT (2028)"], ["TOTAL MARKET VALUE (2028):", fmt(sum(taxableRecords, 'marketValue2028'))], ["TOTAL ASSESSED VALUE (2028):", fmt(sum(taxableRecords, 'assessedValue2028'))], ["TOTAL YEARLY TAX (2028 capped at 6%):", fmt(sum(taxableRecords, 'yearlyTax2028'))], [], ["RPVARA (2029)"], ["TOTAL MARKET VALUE (2029):", fmt(sum(taxableRecords, 'marketValue2029'))], ["TOTAL ASSESSED VALUE (2029):", fmt(sum(taxableRecords, 'assessedValue2029'))], ["TOTAL YEARLY TAX (2029):", fmt(sum(taxableRecords, 'yearlyTax2029'))], [], ["SUMMARY EXEMPTED PROPERTIES"], [], ["CURRENT (2028)"], ["TOTAL MARKET VALUE (2028):", fmt(sum(exemptRecords, 'marketValue2028'))], ["TOTAL ASSESSED VALUE (2028):", fmt(sum(exemptRecords, 'assessedValue2028'))], [], ["RPVARA (2029)"], ["TOTAL MARKET VALUE (2029):", fmt(sum(exemptRecords, 'marketValue2029'))], ["TOTAL ASSESSED VALUE (2029):", fmt(sum(exemptRecords, 'assessedValue2029'))], [], activeHeaders]);
+      
+      const formattedExport = finalOutputList.map(record => { 
+        const row: any = {}; 
+        Object.entries(headerMapping).forEach(([key, label]) => { 
+          if (settings.columns[label]) { 
+            if (label === "TYPE") {
+              row[label] = record.isComparisonInjected ? "VALID" : (record.duplicateWithReference === 'REF' ? 'VALID' : record.duplicateWithReference || "VALID");
+            } else if (label === "UNIT VALUE") {
+              row[label] = processedData.length > 0 ? record.unitValue2029 : record.unitValue2028; 
+            } else if (label === "MARKET VALUE") {
+              row[label] = processedData.length > 0 ? record.marketValue2029 : record.marketValue2028; 
+            } else if (label === "ASSESSED VALUE") {
+              row[label] = processedData.length > 0 ? record.assessedValue2029 : record.assessedValue2028; 
+            } else if (label === "YEARLY TAX") {
+              row[label] = processedData.length > 0 ? record.yearlyTax2029 : record.yearlyTax2028; 
+            } else {
+              row[label] = record[key as keyof LandRecord]; 
+            }
+          } 
+        }); 
+        return row; 
+      });
+
+      const wb = XLSX.utils.book_new(); 
+      const ws = XLSX.utils.aoa_to_sheet([["DATA LINK PARAÑAQUE - SMART EXPORT"], ["EXPORT DATE:", new Date().toLocaleString()], ["TOTAL RECORDS:", finalOutputList.length.toLocaleString()], [], ["SUMMARY TAXABLE PROPERTIES"], [], ["CURRENT (2028)"], ["TOTAL MARKET VALUE (2028):", fmt(sum(taxableRecords, 'marketValue2028'))], ["TOTAL ASSESSED VALUE (2028):", fmt(sum(taxableRecords, 'assessedValue2028'))], ["TOTAL YEARLY TAX (2028 capped at 6%):", fmt(sum(taxableRecords, 'yearlyTax2028'))], [], ["RPVARA (2029)"], ["TOTAL MARKET VALUE (2029):", fmt(sum(taxableRecords, 'marketValue2029'))], ["TOTAL ASSESSED VALUE (2029):", fmt(sum(taxableRecords, 'assessedValue2029'))], ["TOTAL YEARLY TAX (2029):", fmt(sum(taxableRecords, 'yearlyTax2029'))], [], ["SUMMARY EXEMPTED PROPERTIES"], [], ["CURRENT (2028)"], ["TOTAL MARKET VALUE (2028):", fmt(sum(exemptRecords, 'marketValue2028'))], ["TOTAL ASSESSED VALUE (2028):", fmt(sum(exemptRecords, 'assessedValue2028'))], [], ["RPVARA (2029)"], ["TOTAL MARKET VALUE (2029):", fmt(sum(exemptRecords, 'marketValue2029'))], ["TOTAL ASSESSED VALUE (2029):", fmt(sum(exemptRecords, 'assessedValue2029'))], [], activeHeaders]);
       XLSX.utils.sheet_add_json(ws, formattedExport, { origin: -1, skipHeader: true }); ws['!cols'] = activeHeaders.map(() => ({ wch: 22 })); XLSX.utils.book_append_sheet(wb, ws, "ExportResults");
       const allAvailableCodes = Array.from(new Set(previewData.map(r => r.update?.trim().toUpperCase() || 'NONE'))).filter(Boolean);
       const codesPart = settings.updateCodes.length === allAvailableCodes.length ? "ALL" : settings.updateCodes.join("-");
