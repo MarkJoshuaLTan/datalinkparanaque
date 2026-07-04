@@ -56,7 +56,11 @@ export const HEADER_ALIASES = {
   date: [
     'date', 'effectivity', 'date effectivity', 'eff date', 
     'revision date', 'date of effectivity'
-  ]
+  ],
+  lotNo: ['lot no', 'lot #', 'lot no.', 'lot', 'lot number'],
+  blkNo: ['blk no', 'blk #', 'blk no.', 'block', 'blk', 'block number'],
+  tctNo: ['tct no', 'tct #', 'tct no.', 'tct', 'title no', 'title #', 'title number', 't.c.t.'],
+  rollType: ['roll type', 'roll', 'type', 'status']
 };
 
 const parseNum = (val: any) => {
@@ -69,8 +73,14 @@ const parseNum = (val: any) => {
   return 0;
 };
 
-export const mapRawToRecords = (raw: any[], fileName: string): LandRecord[] => {
-  return raw.map((item, index) => {
+/**
+ * Maps JSON data to LandRecord objects using header aliases.
+ * Supports Date Carry-Forward for Journal-style logs.
+ */
+export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exempt' | 'journal' = 'raw'): LandRecord[] => {
+  let lastSeenDate = "";
+
+  return raw.map((item) => {
     const norm: any = {};
     Object.keys(item).forEach(key => {
       const cleanKey = key.trim().toLowerCase();
@@ -85,9 +95,20 @@ export const mapRawToRecords = (raw: any[], fileName: string): LandRecord[] => {
       return "";
     };
 
+    // Date Carry-Forward Logic for Journals
+    let dateValue = String(getValue('date')).trim();
+    if (mode === 'journal' || fileName.toLowerCase().includes('journal')) {
+      if (dateValue !== "") {
+        lastSeenDate = dateValue;
+      } else {
+        dateValue = lastSeenDate;
+      }
+    }
+
     let kind = String(getValue('kind')).trim();
     let au = String(getValue('au')).trim();
     
+    // Handle combined K-AU format (e.g. "L-RESI")
     const kau = String(norm['k-au'] || norm['k/au'] || '').trim();
     if (kau && kau.includes('-')) {
       const parts = kau.split('-');
@@ -101,15 +122,19 @@ export const mapRawToRecords = (raw: any[], fileName: string): LandRecord[] => {
 
     return {
       id: uniqueId,
-      date: String(getValue('date')).trim(),
+      date: dateValue,
       arpNo: arpNo,
       pin: pin,
       previous: String(getValue('previous')).trim(),
       update: String(getValue('update')).trim(),
-      taxability: 'T',
+      taxability: mode === 'exempt' ? 'E' : 'T',
       acctName: String(getValue('acctName')).trim(),
       address: String(getValue('address')).trim(),
       location: String(norm['location'] || '').trim(),
+      lotNo: String(getValue('lotNo')).trim(),
+      blkNo: String(getValue('blkNo')).trim(),
+      tctNo: String(getValue('tctNo')).trim(),
+      rollType: String(getValue('rollType')).trim(),
       kind: kind,
       au: au,
       landArea: parseNum(getValue('landArea')),
@@ -123,99 +148,6 @@ export const mapRawToRecords = (raw: any[], fileName: string): LandRecord[] => {
       rawRow: item
     };
   });
-};
-
-/**
- * Specialized parser for the Assessment Roll positional format.
- * Adjusts mapping based on whether the "Rec #" column is present (Exempt files omit it).
- */
-const parseAssessmentRollPositional = (raw: any[][], fileName: string, isExempt: boolean): LandRecord[] => {
-  return raw.map((row) => {
-    const offset = isExempt ? -1 : 0;
-    const kau = String(row[11 + offset] || '').trim();
-    let kind = '';
-    let au = '';
-    if (kau.includes('-')) {
-      const parts = kau.split('-');
-      kind = parts[0]?.trim() || '';
-      au = parts[1]?.trim() || '';
-    }
-
-    const uniqueId = `${fileName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-    return {
-      id: uniqueId,
-      date: String(row[7 + offset] || '').trim(),
-      arpNo: String(row[9 + offset] || '').trim(),
-      pin: String(row[6 + offset] || '').trim(),
-      previous: String(row[10 + offset] || '').trim(),
-      update: '', 
-      taxability: isExempt ? 'E' : 'T',
-      acctName: String(row[1 + offset] || '').trim(),
-      address: String(row[2 + offset] || '').trim(),
-      lotNo: String(row[3 + offset] || '').trim(),
-      blkNo: String(row[4 + offset] || '').trim(),
-      tctNo: String(row[5 + offset] || '').trim(),
-      rollType: String(row[8 + offset] || '').trim(),
-      location: '', 
-      kind: kind,
-      au: au,
-      landArea: parseNum(row[12 + offset]),
-      marketValue: parseNum(row[13 + offset]),
-      assessedValue: parseNum(row[15 + offset]),
-      unitValue: 0, 
-      isCleanup: false,
-      sourceFile: fileName,
-      rawRow: row
-    };
-  });
-};
-
-/**
- * Specialized parser for the 14-column Journal positional format.
- * Implements Date Carry-Forward: If a row has a blank date, it inherits the date from the row above.
- * Processes the entire sheet to maintain vertical context.
- */
-const parseJournalPositional = (raw: any[][], fileName: string): LandRecord[] => {
-  let lastSeenDate = "";
-  const records: LandRecord[] = [];
-  
-  raw.forEach((row) => {
-    // Column 1 (Index 0) is typically the Date
-    const currentDateRaw = String(row[0] || '').trim();
-    
-    // Update the active date if the current cell is not blank and not a header
-    if (currentDateRaw !== "" && !currentDateRaw.toLowerCase().includes('date')) {
-      lastSeenDate = currentDateRaw;
-    }
-    
-    // Column 3 (Index 2) is the PIN. If it contains a dash, treat it as a data row.
-    const pin = String(row[2] || '').trim();
-    if (pin.includes('-')) {
-      const uniqueId = `${fileName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      records.push({
-        id: uniqueId,
-        date: lastSeenDate, // Use the carry-forward date
-        arpNo: String(row[1] || '').trim(),
-        pin: pin,
-        update: String(row[3] || '').trim(),
-        acctName: String(row[4] || '').trim(),
-        location: String(row[5] || '').trim(),
-        kind: String(row[6] || '').trim(),
-        au: String(row[7] || '').trim(),
-        landArea: parseNum(row[8]),
-        marketValue: parseNum(row[9]),
-        assessedValue: parseNum(row[10]),
-        taxability: 'T',
-        unitValue: 0,
-        isCleanup: false,
-        sourceFile: fileName,
-        rawRow: row
-      });
-    }
-  });
-  
-  return records;
 };
 
 export const parseFile = async (
@@ -237,23 +169,21 @@ export const parseFile = async (
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
 
-        if (workflowMode === 'roll') {
-          const json = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: "" }) as any[][];
-          const pinIdx = importMode === 'exempt' ? 5 : 6;
-          const dataRows = json.filter(row => row.length >= 16 && String(row[pinIdx] || '').includes('-'));
-          const mappedData = parseAssessmentRollPositional(dataRows, file.name, importMode === 'exempt');
-          resolve({ data: mappedData, count: dataRows.length });
-        } else if (workflowMode === 'journal' || importMode === 'journal') {
-          const json = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: "" }) as any[][];
-          // Use the carry-forward aware parser on the full sheet
-          const mappedData = parseJournalPositional(json, file.name);
-          resolve({ data: mappedData, count: mappedData.length });
-        } else {
-          const json = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: "" }) as any[];
-          const rawCount = json.length;
-          const mappedData = mapRawToRecords(json, file.name);
-          resolve({ data: mappedData, count: rawCount });
-        }
+        // Using sheet_to_json with defval ensures we get a consistent object array for header detection
+        const json = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: "" }) as any[];
+        
+        // Filter out rows that are completely empty or represent noise (must have PIN or ARP to be valid)
+        const validJson = json.filter(row => {
+          const rowValues = Object.values(row).join('').trim();
+          return rowValues.length > 0;
+        });
+
+        const mappedData = mapRawToRecords(validJson, file.name, importMode);
+        
+        // Final sanity filter: only include records that look like property data
+        const finalRecords = mappedData.filter(r => (r.pin && r.pin.includes('-')) || (r.arpNo && r.arpNo.length > 5));
+
+        resolve({ data: finalRecords, count: finalRecords.length });
       } catch (error) {
         reject(error);
       }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -101,7 +100,7 @@ export function ImportZone({ onDataImported, mode = 'raw', workflowMode = 'stand
         toast({
           variant: "destructive",
           title: "Empty Data",
-          description: "No property records found in the selected files."
+          description: "No property records found in the selected files. Ensure headers are named correctly."
         });
         setIsLoading(false);
         setFileStatuses({});
@@ -120,7 +119,7 @@ export function ImportZone({ onDataImported, mode = 'raw', workflowMode = 'stand
       toast({
         variant: "destructive",
         title: "Import Error",
-        description: error.message || "Could not read one or more spreadsheets. Ensure formatting is correct."
+        description: error.message || "Could not read one or more spreadsheets. Ensure headers (PIN, ARP, Date) are identifiable."
       });
     }
   };
@@ -292,7 +291,7 @@ export function ImportZone({ onDataImported, mode = 'raw', workflowMode = 'stand
                     <DialogHeader className="text-left">
                       <DialogTitle className="text-2xl font-black uppercase text-foreground">Standard Excel Format Guide</DialogTitle>
                       <DialogDescription className="font-bold text-muted-foreground text-base">
-                        Ensure your spreadsheet columns align with the header layout shown below. Click the image to toggle zoom.
+                        Ensure your spreadsheet columns align with the header layout shown below. The engine detects columns by name automatically.
                       </DialogDescription>
                     </DialogHeader>
                   </div>
@@ -391,10 +390,10 @@ export function ImportZone({ onDataImported, mode = 'raw', workflowMode = 'stand
           </div>
           <p className="text-sm text-muted-foreground font-semibold leading-relaxed">
             {mode === 'raw' 
-              ? (workflowMode === 'roll' ? "Assessment Rolls must strictly adhere to the 17-column positional format. Ensure your PINs are accurately placed in column 7." : "Spreadsheets must adhere to the official Parañaque City Real Property data structure. The engine identifies, validates, and cross-references critical fields using intelligent mapping.")
+              ? (workflowMode === 'roll' ? "Assessment Rolls no longer require a strict column count. The engine detects 'PIN', 'ARP No', 'Lot No', and 'TCT No' automatically based on header names." : "Spreadsheets must contain identifiable headers. The engine identifies, validates, and cross-references critical fields using intelligent alias mapping.")
               : mode === 'journal' 
-              ? "Journal logs must strictly adhere to the 14-column positional format. The engine extracts the Date from column 1 and PIN from column 3 for longitudinal analysis."
-              : "Upload a list of property records that should be treated as Exempt. For Assessment Roll files, ensure the 'Rec #' column is removed (16-column format). The engine extracts the 'PIN' from the 6th column."}
+              ? "Journal logs use header-based detection. The engine extracts 'Date' and 'PIN' to perform longitudinal analysis. If a row has a blank date, it automatically inherits the date from the row above."
+              : "Upload a list of property records that should be treated as Exempt. Ensure headers like 'PIN' are present. The engine automatically indexes these for the Relational Join workflow."}
           </p>
         </div>
       </Card>
