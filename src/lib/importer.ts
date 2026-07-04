@@ -10,7 +10,11 @@ export const HEADER_ALIASES = {
   arpNo: [
     'arp no#', 'arp no', 'arp', 'arp number', 'current arp', 
     'current', 'td no', 'td number', 'td no.', 'arp. no.', 
-    'tax declaration', 'tax declaration no', 'current td'
+    'tax declaration', 'tax declaration no', 'current td',
+    'arp no. new', 'new arp no', 'new arp no#', 'new arp', 'new td', 'new td no.', 'arp no (new)'
+  ],
+  newArpNo: [
+    'new arp no', 'arp no new', 'new arp', 'new td no', 'f-arp', 'new arp no#', 'new td'
   ],
   acctName: [
     'acctname', 'account name', 'owner', 'owner name', 
@@ -84,7 +88,8 @@ export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exe
     const norm: any = {};
     Object.keys(item).forEach(key => {
       const cleanKey = key.trim().toLowerCase();
-      norm[cleanKey] = String(item[key]).trim();
+      const rawValue = item[key];
+      norm[cleanKey] = (rawValue === null || rawValue === undefined) ? "" : String(rawValue).trim();
     });
 
     const getValue = (field: keyof typeof HEADER_ALIASES) => {
@@ -118,12 +123,14 @@ export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exe
     
     const pin = String(getValue('pin')).trim();
     const arpNo = String(getValue('arpNo')).trim();
+    const specificNewArp = String(getValue('newArpNo')).trim();
     const uniqueId = `${fileName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     return {
       id: uniqueId,
       date: dateValue,
       arpNo: arpNo,
+      newArpNo: specificNewArp || "",
       pin: pin,
       previous: String(getValue('previous')).trim(),
       update: String(getValue('update')).trim(),
