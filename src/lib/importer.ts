@@ -53,7 +53,7 @@ export const HEADER_ALIASES = {
     'date', 'effectivity', 'dateeffectivity', 'effdate', 'revisiondate', 'dateofeffectivity', 'dateofconveyance'
   ],
   dateOfTransfer: [
-    'dateoftransfer', 'transferdate', 'dateofsale', 'transfer'
+    'dateoftransfer', 'transferdate', 'dateofsale', 'transfer', 'dateoftranser'
   ],
   lotNo: ['lotno', 'lot', 'lotnumber'],
   blkNo: ['blkno', 'block', 'blk', 'blocknumber'],
@@ -62,8 +62,11 @@ export const HEADER_ALIASES = {
   // Sales specific
   sellingPrice: ['sellingprice', 'consideration', 'amount', 'considerationamount'],
   salesValue: ['salesvalue', 'salesvaluepsqm', 'valuepsqm'],
-  docFileNo: ['documentfileno', 'docfileno', 'docno', 'fileno'],
-  notary: ['notary', 'notarypublic', 'notaryname', 'atty', 'agent'],
+  docFileNo: ['documentfileno', 'docfileno', 'docno', 'fileno', 'documentfilenumber'],
+  notary: [
+    'notary', 'notarypublic', 'notaryname', 'atty', 'agent', 'notaryagent', 
+    'attyagent', 'documentfileno1', 'documentfilenumber1' // Fallback for dual-column headers
+  ],
   notarialDate: ['notarialdate', 'notarizeddate']
 };
 
