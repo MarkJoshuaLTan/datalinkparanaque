@@ -127,21 +127,39 @@ export function normalizePin(pin: string): string {
 }
 
 /**
- * Normalizes a name string for comparison by:
- * 1. Converting to uppercase
- * 2. Removing titles and common prefixes (SPS, DR, MR, etc.)
- * 3. Stripping punctuation
- * 4. Removing single-letter middle initials
- * 5. Deduplicating and sorting words alphabetically to handle reordering
+ * Normalizes an owner name for matching based on the requested performance strategy.
+ * 1. Handles reordering of "LASTNAME, FIRSTNAME"
+ * 2. Strips common titles and noise prefixes
+ * 3. Removes punctuation and middle initials
+ * 4. Returns unique alphabetical tokens
  */
 export function normalizeNameForMatch(name: string): string {
   if (!name) return "";
-  let cleaned = name.toUpperCase()
-    .replace(/\b(SPS\.?|SPOUSES?|MR\.?|MRS\.?|MS\.?|DR\.?|ATTY\.?|ENGR?\.?|MD|PHD|OF|THE|CO|INC|CORP|CORPORATION)\b/g, '')
-    .replace(/[.,\/#!$%\^&*;:{}=\-_`~()]/g, ' ')
-    .replace(/\s+/g, ' ')
+  
+  let processed = name.toUpperCase();
+  
+  // 1. Detect and handle "LASTNAME, FIRSTNAME" format
+  if (processed.includes(',')) {
+    const commaParts = processed.split(',').map(p => p.trim());
+    if (commaParts.length >= 2) {
+      // Move parts after comma to front (Firstname Lastname)
+      processed = commaParts.slice(1).join(' ') + ' ' + commaParts[0];
+    }
+  }
+
+  // 2. Remove titles, punctuation, and middle initials
+  // We use word boundaries \b to ensure we don't accidentally cut names (like "Ms" in "Ms. Sams")
+  const titles = ['SPS', 'SPOUSES', 'MR', 'MRS', 'MS', 'DR', 'ATTY', 'ENGR', 'MD', 'PHD', 'OF', 'THE', 'CO', 'INC', 'CORP', 'CORPORATION'];
+  const titlesRegex = new RegExp(`\\b(${titles.join('|')})\\b\\.?,?`, 'g');
+
+  const cleaned = processed
+    .replace(titlesRegex, '')
+    .replace(/[.,\/#!$%\^&*;:{}=\-_`~()]/g, ' ') // Strip punctuation
+    .replace(/\b[A-Z]\b/g, ' ') // Remove single character middle initials
+    .replace(/\s+/g, ' ') // Collapse spaces
     .trim();
     
+  // 3. Extract unique tokens longer than 1 character and sort them to be ordering-agnostic
   const words = cleaned.split(' ').filter(w => w.length > 1);
   return Array.from(new Set(words)).sort().join(' ');
 }

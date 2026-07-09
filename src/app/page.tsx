@@ -422,59 +422,70 @@ export default function Home() {
     });
   }, [workflowMode, journalData, rawData, exemptPins, salesData, cancelledData]);
 
-  // Joined data for Building Permits with advanced fuzzy name matching and ONE-TO-MANY expansion
+  // Optimized Building Permit Join Logic with Progressive Matching Strategy
   const joinedPermitData = useMemo(() => {
     if (workflowMode !== 'building-permit') return [];
     
     const rolls = rawData;
-    const pinLookup = new Map<string, LandRecord>();
-    const arpLookup = new Map<string, LandRecord>();
-    const nameLookup = new Map<string, LandRecord[]>();
+    const pinLookup = new Map<string, LandRecord[]>();
+    const arpLookup = new Map<string, LandRecord[]>();
+    const exactNameLookup = new Map<string, LandRecord[]>();
+    
+    // Performance Index: word -> Set of unique normalized names in the roll
+    const rollWordIndex = new Map<string, Set<string>>();
+    // Unique normalized name -> Roll records mapping
+    const normNameToRollRecords = new Map<string, LandRecord[]>();
 
     rolls.forEach(r => { 
-      if (r.pin) pinLookup.set(normalizePin(r.pin), r); 
+      if (r.pin) {
+        const pNorm = normalizePin(r.pin);
+        const existing = pinLookup.get(pNorm) || [];
+        existing.push(r);
+        pinLookup.set(pNorm, existing);
+      }
       if (r.arpNo) {
-        const cleanArp = r.arpNo.trim();
-        if (cleanArp) arpLookup.set(cleanArp, r);
+        const aNorm = r.arpNo.trim();
+        const existing = arpLookup.get(aNorm) || [];
+        existing.push(r);
+        arpLookup.set(aNorm, existing);
       }
       if (r.acctName) {
         const normName = normalizeNameForMatch(r.acctName);
         if (normName) {
-          const existing = nameLookup.get(normName) || [];
+          // Store for exact matching pass
+          const existing = exactNameLookup.get(normName) || [];
           existing.push(r);
-          nameLookup.set(normName, existing);
+          exactNameLookup.set(normName, existing);
+          
+          // Store for fuzzy indexing pass
+          const records = normNameToRollRecords.get(normName) || [];
+          records.push(r);
+          normNameToRollRecords.set(normName, records);
+
+          // Tokenize for the inverted word index
+          const tokens = normName.split(' ');
+          tokens.forEach(t => {
+            if (!rollWordIndex.has(t)) rollWordIndex.set(t, new Set());
+            rollWordIndex.get(t)!.add(normName);
+          });
         }
       }
     });
 
-    const uniqueRollNames = Array.from(nameLookup.keys());
-
     return permitData.flatMap(p => {
       const pinNorm = normalizePin(p.pin);
       const cleanPermitArp = (p.arpNo || "").trim();
-      const normPermitOwner = normalizeNameForMatch(p.barangayName || ""); // BARANGAY in permit log = Owner name
+      const normPermitOwner = normalizeNameForMatch(p.barangayName || ""); // Permit owner name is stored in barangayName field
       
-      // 1. Attempt EXACT matches (PIN/ARP)
-      const exactMatch = (pinNorm ? pinLookup.get(pinNorm) : null) || 
-                         (cleanPermitArp ? arpLookup.get(cleanPermitArp) : null);
+      // PASS 1: Attempt EXACT matches (PIN/ARP/Full Normalized Name)
+      const exactMatches = (pinNorm ? pinLookup.get(pinNorm) : null) || 
+                           (cleanPermitArp ? arpLookup.get(cleanPermitArp) : null) ||
+                           (normPermitOwner ? exactNameLookup.get(normPermitOwner) : null);
       
-      if (exactMatch) {
-        return [{
+      if (exactMatches && exactMatches.length > 0) {
+        return exactMatches.map(match => ({
           ...p,
-          isJoined: true,
-          rollArp: exactMatch.arpNo || '---',
-          rollAddress: exactMatch.address || '---',
-          rollArea: exactMatch.landArea || 0,
-          rollUpdate: exactMatch.update || '---'
-        }];
-      }
-
-      // 2. Attempt EXACT NORMALIZED name match (fast pass)
-      const nameMatches = normPermitOwner ? nameLookup.get(normPermitOwner) : null;
-      if (nameMatches && nameMatches.length > 0) {
-        return nameMatches.map(match => ({
-          ...p,
-          id: `${p.id}-${match.arpNo}`,
+          id: `${p.id}-${match.arpNo}-${match.pin}`,
           isJoined: true,
           rollArp: match.arpNo || '---',
           rollAddress: match.address || '---',
@@ -483,26 +494,46 @@ export default function Home() {
         }));
       }
 
-      // 3. Attempt FUZZY matching (Jaro-Winkler)
+      // PASS 2: Progressive Fuzzy Matching with Pre-Filter
       if (normPermitOwner) {
+        const pTokens = normPermitOwner.split(' ');
+        const candidateOverlapCounts = new Map<string, number>();
+
+        // Step 3: Fast Pre-Filter (Check exact word overlap)
+        pTokens.forEach(token => {
+          const matchingRollNames = rollWordIndex.get(token);
+          if (matchingRollNames) {
+            matchingRollNames.forEach(rollName => {
+              candidateOverlapCounts.set(rollName, (candidateOverlapCounts.get(rollName) || 0) + 1);
+            });
+          }
+        });
+
+        // Collect high-probability candidates (those with at least 2 matching "important" words)
+        const candidates: string[] = [];
+        candidateOverlapCounts.forEach((count, rollName) => {
+          if (count >= 2) candidates.push(rollName);
+        });
+
+        // Step 4: Perform fuzzy check ONLY on potential matches
         let bestMatchName = null;
         let maxScore = 0;
-        
-        for (const rollName of uniqueRollNames) {
-          const score = getJaroWinklerSimilarity(normPermitOwner, rollName);
+
+        for (const candidateName of candidates) {
+          const score = getJaroWinklerSimilarity(normPermitOwner, candidateName);
           if (score > maxScore) {
             maxScore = score;
-            bestMatchName = rollName;
+            bestMatchName = candidateName;
           }
-          if (maxScore >= 1.0) break; // Perfect match found in normalized space
+          if (maxScore >= 1.0) break; 
         }
-        
-        // Use 90% threshold for high confidence automatic linking
+
+        // Step 5: Similarity Threshold Check
         if (maxScore >= 0.90 && bestMatchName) {
-          const fuzzyMatches = nameLookup.get(bestMatchName)!;
+          const fuzzyMatches = normNameToRollRecords.get(bestMatchName)!;
           return fuzzyMatches.map(match => ({
             ...p,
-            id: `${p.id}-${match.arpNo}`,
+            id: `${p.id}-${match.arpNo}-${match.pin}`,
             isJoined: true,
             rollArp: match.arpNo || '---',
             rollAddress: match.address || '---',
@@ -1277,7 +1308,7 @@ export default function Home() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isRunProcessorDialogOpen} onOpenChange={setIsRunProcessorDialogOpen}>
+      <Dialog open={isRunProcessorDialogOpen} onOpenChange={isRunProcessorDialogOpen}>
         <DialogContent className="sm:max-w-md bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl"><DialogHeader><DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2"><Cpu className="w-5 h-5 text-primary" /> Run Batch Processor</DialogTitle><DialogDescription className="text-sm font-bold text-muted-foreground leading-relaxed">The engine will now perform a multi-pass validation sequence including system cleanup, deduplication, and financial calibration.</DialogDescription></DialogHeader><div className="py-4"><CalibrationSidebar options={options} setOptions={setOptions} rules={rules} setRules={setRules} /></div><DialogFooter className="gap-3"><Button variant="ghost" onClick={() => setIsRunProcessorDialogOpen(false)} className="font-black uppercase text-xs h-10 px-6">Cancel</Button><Button onClick={() => { setIsRunProcessorDialogOpen(false); runProcess(); }} className="bg-primary hover:bg-emerald-700 text-white font-black uppercase text-xs h-10 px-8 shadow-lg shadow-primary/20">Execute Engine</Button></DialogFooter></DialogContent>
       </Dialog>
 
