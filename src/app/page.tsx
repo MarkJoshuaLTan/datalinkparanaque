@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback, useRef } from 'react';
@@ -1139,12 +1138,6 @@ export default function Home() {
           if (end && recDate > end) return false;
         }
         
-        const brgy = (record.barangayName || "UNMAPPED").trim().toUpperCase();
-        if (!settings.barangays.includes(brgy)) return false;
-
-        const occ = (record.useOfOccupancy || "UNKNOWN").trim().toUpperCase();
-        if (!settings.occupancies.includes(occ)) return false;
-
         return true;
       });
 
