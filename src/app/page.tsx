@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback, useRef } from 'react';
@@ -65,7 +66,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { ImportZone } from '@/components/dashboard/import-zone';
+import { ImportZone, type ImportResult } from '@/components/dashboard/import-zone';
 import { CalibrationSidebar } from '@/components/dashboard/calibration-sidebar';
 import { DataPreviewTable } from '@/components/dashboard/data-preview-table';
 import { LandRecord, CalibrationRule, processRecords, TaxRateMap, ProcessingReport, RecordStatusType, normalizePin, getModeOfConveyance, normalizeNameForMatch, getJaroWinklerSimilarity } from '@/lib/processor';
@@ -206,7 +207,7 @@ const ImportManager = ({ mode, manifest, onAdd, onDelete }: { mode: 'raw' | 'exe
                 <div className="flex items-center gap-3 min-w-0">
                   <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
                   <div className="min-w-0">
-                    <p className="text-[11px] font-black uppercase truncate pr-2">{file.name}</p>
+                    <p className="text-[11px] font-black uppercase truncate pr-2" title={file.name}>{file.name}</p>
                     <p className="text-[9px] font-bold text-muted-foreground uppercase">{file.count} Records</p>
                   </div>
                 </div>
@@ -647,7 +648,7 @@ export default function Home() {
     const errors = active.filter(r => r.statusLabel !== 'VALID').length;
     const isProcessed = processedData.length > 0;
     const mvField = isProcessed ? 'marketValue2029' : 'marketValue2028';
-    const avField = isProcessed ? 'assessedValue2028' : 'assessedValue2028';
+    const avField = isProcessed ? 'assessedValue2029' : 'assessedValue2028';
     const ytField = isProcessed ? 'yearlyTax2029' : 'yearlyTax2028';
 
     return { 
@@ -858,66 +859,110 @@ export default function Home() {
     });
   };
 
-  const handleDataImported = (imported: LandRecord[], fileName: string, rawCount: number, mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'roll' | 'cancelled' | 'permits' = 'raw') => {
-    let latestRawData = rawData;
-    let latestJournalData = journalData;
-    let latestSalesData = salesData;
-    let latestCancelledData = cancelledData;
-    let latestPermitData = permitData;
+  const handleDataImported = (importResults: ImportResult[], mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'roll' | 'cancelled' | 'permits' = 'raw') => {
+    let latestRawData = [...rawData];
+    let latestJournalData = [...journalData];
+    let latestSalesData = [...salesData];
+    let latestCancelledData = [...cancelledData];
+    let latestPermitData = [...permitData];
     let latestExemptPins = new Set(exemptPins);
+    
+    const newManifestEntries: { name: string, count: number }[] = [];
+    const newExemptManifestEntries: { name: string, count: number, pins: string[] }[] = [];
+    
+    const incomingRecords: LandRecord[] = [];
+
+    importResults.forEach(res => {
+      const { data: imported, fileName, rawCount } = res;
+      incomingRecords.push(...imported);
+
+      if (mode === 'exempt') {
+        const pinsFromThisFile = new Set<string>();
+        imported.forEach(r => { if (r.pin) { const pin = r.pin.trim(); latestExemptPins.add(pin); pinsFromThisFile.add(pin); } });
+        newExemptManifestEntries.push({ name: fileName, count: imported.length, pins: Array.from(pinsFromThisFile) });
+      } else if (mode === 'journal') {
+        latestJournalData = [...latestJournalData.filter(r => r.sourceFile !== fileName), ...imported];
+        newManifestEntries.push({ name: fileName, count: rawCount });
+      } else if (mode === 'sales') {
+        latestSalesData = [...latestSalesData.filter(r => r.sourceFile !== fileName), ...imported];
+        newManifestEntries.push({ name: fileName, count: rawCount });
+      } else if (mode === 'cancelled') {
+        latestCancelledData = [...latestCancelledData.filter(r => r.sourceFile !== fileName), ...imported];
+        newManifestEntries.push({ name: fileName, count: rawCount });
+      } else if (mode === 'permits') {
+        latestPermitData = [...latestPermitData.filter(r => r.sourceFile !== fileName), ...imported];
+        newManifestEntries.push({ name: fileName, count: rawCount });
+      } else {
+        latestRawData = [...latestRawData.filter(r => r.sourceFile !== fileName), ...imported];
+        newManifestEntries.push({ name: fileName, count: rawCount });
+      }
+    });
 
     if (mode === 'exempt') {
-      const pinsFromThisFile = new Set<string>();
-      imported.forEach(r => { if (r.pin) { const pin = r.pin.trim(); latestExemptPins.add(pin); pinsFromThisFile.add(pin); } });
       setExemptPins(new Set(latestExemptPins));
-      setExemptFileManifest(prev => [...prev, { name: fileName, count: imported.length, pins: Array.from(pinsFromThisFile) }]);
+      setExemptFileManifest(prev => {
+        const names = new Set(newExemptManifestEntries.map(e => e.name));
+        return [...prev.filter(f => !names.has(f.name)), ...newExemptManifestEntries];
+      });
     } else if (mode === 'journal') {
-      latestJournalData = [...journalData.filter(r => r.sourceFile !== fileName), ...imported];
-      setJournalFileManifest(prev => [...prev.filter(f => f.name !== fileName), { name: fileName, count: rawCount }]);
+      setJournalFileManifest(prev => {
+        const names = new Set(newManifestEntries.map(e => e.name));
+        return [...prev.filter(f => !names.has(f.name)), ...newManifestEntries];
+      });
       setJournalData(latestJournalData);
     } else if (mode === 'sales') {
-      latestSalesData = [...salesData.filter(r => r.sourceFile !== fileName), ...imported];
-      setSalesFileManifest(prev => [...prev.filter(f => f.name !== fileName), { name: fileName, count: rawCount }]);
+      setSalesFileManifest(prev => {
+        const names = new Set(newManifestEntries.map(e => e.name));
+        return [...prev.filter(f => !names.has(f.name)), ...newManifestEntries];
+      });
       setSalesData(latestSalesData);
     } else if (mode === 'cancelled') {
-      latestCancelledData = [...cancelledData.filter(r => r.sourceFile !== fileName), ...imported];
-      setCancelledFileManifest(prev => [...prev.filter(f => f.name !== fileName), { name: fileName, count: rawCount }]);
+      setCancelledFileManifest(prev => {
+        const names = new Set(newManifestEntries.map(e => e.name));
+        return [...prev.filter(f => !names.has(f.name)), ...newManifestEntries];
+      });
       setCancelledData(latestCancelledData);
     } else if (mode === 'permits') {
-      latestPermitData = [...permitData.filter(r => r.sourceFile !== fileName), ...imported];
-      setPermitFileManifest(prev => [...prev.filter(f => f.name !== fileName), { name: fileName, count: rawCount }]);
+      setPermitFileManifest(prev => {
+        const names = new Set(newManifestEntries.map(e => e.name));
+        return [...prev.filter(f => !names.has(f.name)), ...newManifestEntries];
+      });
       setPermitData(latestPermitData);
     } else {
-      latestRawData = [...rawData.filter(r => r.sourceFile !== fileName), ...imported];
-      setRawFileManifest(prev => [...prev.filter(f => f.name !== fileName), { name: fileName, count: rawCount }]);
+      setRawFileManifest(prev => {
+        const names = new Set(newManifestEntries.map(e => e.name));
+        return [...prev.filter(f => !names.has(f.name)), ...newManifestEntries];
+      });
       setRawData(latestRawData);
     }
     
     const combined = [...latestRawData, ...latestJournalData, ...latestSalesData, ...latestCancelledData, ...latestPermitData];
-    if (mode !== 'exempt') setImportedFileName(fileName);
+    const topFileName = importResults.length > 1 ? `Batch (${importResults.length} Files)` : importResults[0].fileName;
+    if (mode !== 'exempt') setImportedFileName(topFileName);
     
     if (workflowMode === 'abstract') {
       if (abstractStep === 'roll' && (mode === 'raw' || mode === 'roll')) { setAbstractStep('journal'); toast({ title: "Roll Staged", description: "Assessment Roll loaded. Now, please upload the corresponding Journal file." }); }
-      else if (abstractStep === 'journal' && mode === 'journal') { setAbstractStep('ready'); setShowDetailedResults(true); const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, fileName, latestExemptPins); setPreviewData(allWithDuplicateMarkers); toast({ title: "Data Staged", description: "Roll and Journal joined. Report ready for Abstract Export." }); }
+      else if (abstractStep === 'journal' && mode === 'journal') { setAbstractStep('ready'); setShowDetailedResults(true); const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, topFileName, latestExemptPins); setPreviewData(allWithDuplicateMarkers); toast({ title: "Data Staged", description: "Roll and Journal joined. Report ready for Abstract Export." }); }
       else if (abstractStep === 'ready' || (isAbstract && (mode === 'exempt' || mode === 'sales' || mode === 'cancelled'))) {
         setShowDetailedResults(true);
-        const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, fileName, latestExemptPins);
+        const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, topFileName, latestExemptPins);
         setPreviewData(allWithDuplicateMarkers);
       }
     } else if (workflowMode === 'building-permit') {
       if (permitStep === 'roll' && (mode === 'raw' || mode === 'roll')) { setPermitStep('permits'); toast({ title: "Roll Staged", description: "Assessment Roll loaded. Now, please upload the Building Permit log." }); }
-      else if (permitStep === 'permits' && mode === 'permits') { setPermitStep('ready'); setShowDetailedResults(true); const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, fileName, latestExemptPins); setPreviewData(allWithDuplicateMarkers); toast({ title: "Permit Data Staged", description: "Assessment Roll and Permit Log linked successfully." }); }
+      else if (permitStep === 'permits' && mode === 'permits') { setPermitStep('ready'); setShowDetailedResults(true); const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, topFileName, latestExemptPins); setPreviewData(allWithDuplicateMarkers); toast({ title: "Permit Data Staged", description: "Assessment Roll and Permit Log linked successfully." }); }
       else if (permitStep === 'ready') {
         setShowDetailedResults(true);
-        const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, fileName, latestExemptPins);
+        const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, topFileName, latestExemptPins);
         setPreviewData(allWithDuplicateMarkers);
       }
     } else {
       if (mode !== 'exempt') setShowDetailedResults(true);
-      if (processedData.length > 0) { runProcessWithData(combined, combined.length, fileName, true, latestExemptPins); }
-      else { const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, fileName, latestExemptPins); setPreviewData(allWithDuplicateMarkers); if (mode !== 'exempt' && mode !== 'cancelled') setShowDetailedResults(true); }
+      if (processedData.length > 0) { runProcessWithData(combined, combined.length, topFileName, true, latestExemptPins); }
+      else { const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, topFileName, latestExemptPins); setPreviewData(allWithDuplicateMarkers); if (mode !== 'exempt' && mode !== 'cancelled') setShowDetailedResults(true); }
     }
-    toast({ title: mode === 'exempt' ? "Exempt Data Integrated" : mode === 'journal' ? "Journal Data Integrated" : mode === 'sales' ? "Sales Data Integrated" : mode === 'cancelled' ? "Cancelled Reference Integrated" : mode === 'permits' ? "Permit Data Integrated" : "Data Loaded", description: mode === 'exempt' ? `${imported.length} records integrated and indexed as Exempt reference.` : `${rawCount} records from ${fileName} imported successfully.` });
+    const totalRecordsImported = incomingRecords.length;
+    toast({ title: mode === 'exempt' ? "Exempt Data Integrated" : mode === 'journal' ? "Journal Data Integrated" : mode === 'sales' ? "Sales Data Integrated" : mode === 'cancelled' ? "Cancelled Reference Integrated" : mode === 'permits' ? "Permit Data Integrated" : "Data Loaded", description: mode === 'exempt' ? `${totalRecordsImported} records integrated and indexed as Exempt reference.` : `${totalRecordsImported} records from ${importResults.length} file(s) imported successfully.` });
   };
 
   const deleteFile = (fileName: string, mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'roll' | 'cancelled' | 'permits') => {
@@ -933,7 +978,7 @@ export default function Home() {
   const handleDirectImport = async (e: React.ChangeEvent<HTMLInputElement>, mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'roll' | 'cancelled' | 'permits') => {
     const files = e.target.files; if (!files || files.length === 0) return;
     setIsDirectImporting(true); setDirectImportProgress({ current: 0, total: files.length, mode });
-    const allRecords: LandRecord[] = []; let totalRawCount = 0; const fileNames: string[] = [];
+    const allResults: ImportResult[] = [];
     try {
       for (let i = 0; i < files.length; i++) {
         setDirectImportProgress(prev => ({ ...prev, current: i }));
@@ -941,9 +986,14 @@ export default function Home() {
                         workflowMode === 'building-permit' ? (mode === 'permits' ? 'permits' : 'roll') :
                         workflowMode;
         const result = await parseFile(files[i], workflow as any, mode as any);
-        allRecords.push(...result.data); totalRawCount += result.count; fileNames.push(files[i].name); await delay(400);
+        allResults.push({
+          data: result.data,
+          fileName: files[i].name,
+          rawCount: result.count
+        });
+        await delay(400);
       }
-      handleDataImported(allRecords, fileNames.length > 1 ? `Batch (${fileNames.length} Files)` : fileNames[0], totalRawCount, mode as any);
+      handleDataImported(allResults, mode as any);
     } catch (err: any) { toast({ variant: "destructive", title: "Import Error", description: err.message || "Failed to parse one or more files." }); }
     finally { setIsDirectImporting(false); if (e.target) e.target.value = ''; }
   };
@@ -1192,12 +1242,12 @@ export default function Home() {
 
   return (
     <div className="h-screen bg-background flex flex-col font-body overflow-hidden" suppressHydrationWarning>
-      <input type="file" ref={rawFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'raw')} />
-      <input type="file" ref={exemptFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'exempt')} />
-      <input type="file" ref={journalFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'journal')} />
-      <input type="file" ref={salesFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'sales')} />
-      <input type="file" ref={cancelledFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'cancelled')} />
-      <input type="file" ref={permitFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'permits')} />
+      <input type="file" id="raw-file-input" ref={rawFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'raw')} />
+      <input type="file" id="exempt-file-input" ref={exemptFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'exempt')} />
+      <input type="file" id="journal-file-input" ref={journalFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'journal')} />
+      <input type="file" id="sales-file-input" ref={salesFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'sales')} />
+      <input type="file" id="cancelled-file-input" ref={cancelledFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'cancelled')} />
+      <input type="file" id="permit-file-input" ref={permitFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'permits')} />
 
       <header className="bg-card/80 backdrop-blur-lg border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-lg shrink-0 z-50">
         <TooltipProvider>

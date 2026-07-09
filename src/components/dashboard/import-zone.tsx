@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -39,8 +40,14 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { parseFile, mapRawToRecords } from '@/lib/importer';
 
+export interface ImportResult {
+  data: LandRecord[];
+  fileName: string;
+  rawCount: number;
+}
+
 interface ImportZoneProps {
-  onDataImported: (data: LandRecord[], fileName: string, rawCount: number, mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'cancelled' | 'permits') => void;
+  onDataImported: (results: ImportResult[], mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'cancelled' | 'permits') => void;
   mode?: 'raw' | 'exempt' | 'journal' | 'sales' | 'cancelled' | 'permits';
   workflowMode?: 'standard' | 'roll' | 'journal' | 'sales' | 'cancelled' | 'permits';
 }
@@ -76,9 +83,7 @@ export function ImportZone({ onDataImported, mode = 'raw', workflowMode = 'stand
     });
     setFileStatuses(initialStatuses);
 
-    const allRecords: LandRecord[] = [];
-    let totalRawCount = 0;
-    const fileNames: string[] = [];
+    const importResults: ImportResult[] = [];
 
     try {
       for (let i = 0; i < stagedFiles.length; i++) {
@@ -86,20 +91,20 @@ export function ImportZone({ onDataImported, mode = 'raw', workflowMode = 'stand
         const file = stagedFiles[i];
         
         const result = await parseFile(file, workflowMode, mode);
-        allRecords.push(...result.data);
-        totalRawCount += result.count;
-        fileNames.push(file.name);
+        importResults.push({
+          data: result.data,
+          fileName: file.name,
+          rawCount: result.count
+        });
         
         await new Promise(resolve => setTimeout(resolve, 600));
         
         setFileStatuses(prev => ({ ...prev, [i]: 'done' }));
       }
 
-      const summaryFileName = fileNames.length > 1 
-        ? `Batch (${fileNames.length} Files)` 
-        : fileNames[0];
+      const totalRecords = importResults.reduce((sum, r) => sum + r.data.length, 0);
 
-      if (allRecords.length === 0) {
+      if (totalRecords === 0) {
         toast({
           variant: "destructive",
           title: "Empty Data",
@@ -112,7 +117,7 @@ export function ImportZone({ onDataImported, mode = 'raw', workflowMode = 'stand
 
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      onDataImported(allRecords, summaryFileName, totalRawCount, mode);
+      onDataImported(importResults, mode);
       setIsLoading(false);
       setStagedFiles([]); 
       setFileStatuses({});
@@ -168,7 +173,7 @@ export function ImportZone({ onDataImported, mode = 'raw', workflowMode = 'stand
         ref={cardRef}
         className={cn(
           "relative border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center text-center group outline-none overflow-hidden",
-          isDragging ? (mode === 'raw' ? "border-primary bg-primary/5 scale-[0.99]" : mode === 'journal' ? "border-amber-500 bg-amber-500/5 scale-[0.99]" : mode === 'sales' ? "border-emerald-500 bg-emerald-500/5 scale-[0.99]" : mode === 'cancelled' ? "border-red-500 bg-red-500/5 scale-[0.99]" : mode === 'permits' ? "border-orange-500 bg-orange-500/5 scale-[0.99]" : "border-blue-500 bg-blue-500/5 scale-[0.99]") : "border-muted-foreground/20 hover:border-primary/50",
+          isDragging ? (mode === 'raw' ? "border-primary bg-primary/5 scale-[0.99]" : mode === 'journal' ? "border-amber-500 bg-amber-500/5 scale-[0.99]" : mode === 'sales' ? "border-emerald-500 bg-emerald-500/10 scale-[0.99]" : mode === 'cancelled' ? "border-red-500 bg-red-500/5 scale-[0.99]" : mode === 'permits' ? "border-orange-500 bg-orange-500/5 scale-[0.99]" : "border-blue-500 bg-blue-500/5 scale-[0.99]") : "border-muted-foreground/20 hover:border-primary/50",
           stagedFiles.length > 0 ? "p-10" : "p-16"
         )}
         onDragOver={(e) => { e.preventDefault(); if (!isLoading) setIsDragging(true); }}
