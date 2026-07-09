@@ -42,7 +42,8 @@ import {
   Unlink2,
   FileX,
   Construction,
-  HardHat
+  HardHat,
+  AlertCircle
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -436,6 +437,9 @@ export default function Home() {
     // Unique normalized name -> Roll records mapping
     const normNameToRollRecords = new Map<string, LandRecord[]>();
 
+    // Generic words that shouldn't trigger a "Match" by themselves (Noise reduction)
+    const genericTokens = new Set(['DEVELOPMENT', 'REALTY', 'HOLDINGS', 'CORPORATION', 'INC', 'CORP', 'CO', 'AND', 'ESTATE', 'PHILS', 'PHILIPPINES']);
+
     rolls.forEach(r => { 
       if (r.pin) {
         const pNorm = normalizePin(r.pin);
@@ -452,17 +456,14 @@ export default function Home() {
       if (r.acctName) {
         const normName = normalizeNameForMatch(r.acctName);
         if (normName) {
-          // Store for exact matching pass
           const existing = exactNameLookup.get(normName) || [];
           existing.push(r);
           exactNameLookup.set(normName, existing);
           
-          // Store for fuzzy indexing pass
           const records = normNameToRollRecords.get(normName) || [];
           records.push(r);
           normNameToRollRecords.set(normName, records);
 
-          // Tokenize for the inverted word index
           const tokens = normName.split(' ');
           tokens.forEach(t => {
             if (!rollWordIndex.has(t)) rollWordIndex.set(t, new Set());
@@ -477,7 +478,7 @@ export default function Home() {
       const cleanPermitArp = (p.arpNo || "").trim();
       const normPermitOwner = normalizeNameForMatch(p.barangayName || ""); // Permit owner name is stored in barangayName field
       
-      // PASS 1: Attempt EXACT matches (PIN/ARP/Full Normalized Name)
+      // PASS 1: Attempt EXACT matches
       const exactMatches = (pinNorm ? pinLookup.get(pinNorm) : null) || 
                            (cleanPermitArp ? arpLookup.get(cleanPermitArp) : null) ||
                            (normPermitOwner ? exactNameLookup.get(normPermitOwner) : null);
@@ -487,6 +488,7 @@ export default function Home() {
           ...p,
           id: `${p.id}-${match.arpNo}-${match.pin}`,
           isJoined: true,
+          isPotentialMatch: false,
           rollArp: match.arpNo || '---',
           rollAddress: match.address || '---',
           rollArea: match.landArea || 0,
@@ -494,28 +496,32 @@ export default function Home() {
         }));
       }
 
-      // PASS 2: Progressive Fuzzy Matching with Pre-Filter
+      // PASS 2: Progressive Fuzzy Matching with Confidence Scoring
       if (normPermitOwner) {
         const pTokens = normPermitOwner.split(' ');
         const candidateOverlapCounts = new Map<string, number>();
+        const candidateHasUniqueMatch = new Map<string, boolean>();
 
-        // Step 3: Fast Pre-Filter (Check exact word overlap)
         pTokens.forEach(token => {
           const matchingRollNames = rollWordIndex.get(token);
           if (matchingRollNames) {
             matchingRollNames.forEach(rollName => {
               candidateOverlapCounts.set(rollName, (candidateOverlapCounts.get(rollName) || 0) + 1);
+              if (!genericTokens.has(token)) {
+                candidateHasUniqueMatch.set(rollName, true);
+              }
             });
           }
         });
 
-        // Collect high-probability candidates (those with at least 2 matching "important" words)
         const candidates: string[] = [];
         candidateOverlapCounts.forEach((count, rollName) => {
-          if (count >= 2) candidates.push(rollName);
+          // Accuracy Requirement: Must have at least 2 matching words, AND at least one word must be "Unique" (not REALTY/DEVELOPMENT/etc)
+          if (count >= 2 && candidateHasUniqueMatch.get(rollName)) {
+            candidates.push(rollName);
+          }
         });
 
-        // Step 4: Perform fuzzy check ONLY on potential matches
         let bestMatchName = null;
         let maxScore = 0;
 
@@ -525,21 +531,36 @@ export default function Home() {
             maxScore = score;
             bestMatchName = candidateName;
           }
-          if (maxScore >= 1.0) break; 
         }
 
-        // Step 5: Similarity Threshold Check
-        if (maxScore >= 0.90 && bestMatchName) {
-          const fuzzyMatches = normNameToRollRecords.get(bestMatchName)!;
-          return fuzzyMatches.map(match => ({
-            ...p,
-            id: `${p.id}-${match.arpNo}-${match.pin}`,
-            isJoined: true,
-            rollArp: match.arpNo || '---',
-            rollAddress: match.address || '---',
-            rollArea: match.landArea || 0,
-            rollUpdate: match.update || '---'
-          }));
+        // CONFIDENCE THRESHOLDS
+        // Accurate Match: Score >= 0.96
+        // Potential Match: Score >= 0.88 but < 0.96
+        if (bestMatchName) {
+           const matches = normNameToRollRecords.get(bestMatchName)!;
+           if (maxScore >= 0.96) {
+             return matches.map(match => ({
+               ...p,
+               id: `${p.id}-${match.arpNo}-${match.pin}`,
+               isJoined: true,
+               isPotentialMatch: false,
+               rollArp: match.arpNo || '---',
+               rollAddress: match.address || '---',
+               rollArea: match.landArea || 0,
+               rollUpdate: match.update || '---'
+             }));
+           } else if (maxScore >= 0.88) {
+             return matches.map(match => ({
+               ...p,
+               id: `${p.id}-${match.arpNo}-${match.pin}`,
+               isJoined: true,
+               isPotentialMatch: true, // Marked for human review
+               rollArp: match.arpNo || '---',
+               rollAddress: match.address || '---',
+               rollArea: match.landArea || 0,
+               rollUpdate: match.update || '---'
+             }));
+           }
         }
       }
       
@@ -1303,7 +1324,7 @@ export default function Home() {
             </DialogHeader>
             <Button variant="ghost" size="icon" onClick={() => setExpandedChart(null)} className="rounded-full"><X className="w-5 h-5" /></Button>
           </div>
-          <div className="flex-1 p-10 flex flex-col items-center justify-center overflow-hidden"><ChartContainer config={expandedChart === 'market' ? { value: { label: "Value", color: "hsl(var(--primary))" } } : { value: { label: "Count", color: "hsl(var(--primary))" } }} className="w-full h-full max-h-[500px]">{expandedChart === 'market' ? (<PieChart><PieChart><Pie data={analyticsData.marketChart} cx="50%" cy="50%" innerRadius={100} outerRadius={160} paddingAngle={8} dataKey="value" stroke="none" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}>{analyticsData.marketChart.map((entry, index) => <Cell key={`cell-exp-m-${index}`} fill={COLORS[index % COLORS.length]} />)}</Pie><ChartTooltip content={<ChartTooltipContent />} /><Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ paddingTop: '40px', fontSize: '12px', fontWeight: 'bold' }}/></PieChart></PieChart>) : (<BarChart data={expandedChart === 'usage' ? analyticsData.auChart : expandedChart === 'barangay' ? analyticsData.barangayChart : analyticsData.updateChart} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}><CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.05} /><XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} angle={-45} textAnchor="end" interval={0} tick={{ fill: 'hsl(var(--muted-foreground))', fontWeight: 'bold' }} /><YAxis fontSize={12} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} /><ChartTooltip content={<ChartTooltipContent />} /><Bar dataKey="value" radius={[8, 8, 0, 0]}>{(expandedChart === 'usage' ? analyticsData.auChart : expandedChart === 'barangay' ? analyticsData.barangayChart : analyticsData.updateChart).map((entry, index) => (<Cell key={`cell-exp-${index}`} fill={COLORS[(index + (expandedChart === 'barangay' ? 4 : expandedChart === 'update' ? 2 : 0)) % COLORS.length]} />))}</Bar></BarChart>)}</ChartContainer></div>
+          <div className="flex-1 p-10 flex flex-col items-center justify-center overflow-hidden"><ChartContainer config={expandedChart === 'market' ? { value: { label: "Value", color: "hsl(var(--primary))" } } : { value: { label: "Count", color: "hsl(var(--primary))" } }} className="w-full h-full max-h-[500px]">{expandedChart === 'market' ? (<PieChart><Pie data={analyticsData.marketChart} cx="50%" cy="50%" innerRadius={100} outerRadius={160} paddingAngle={8} dataKey="value" stroke="none" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}>{analyticsData.marketChart.map((entry, index) => <Cell key={`cell-exp-m-${index}`} fill={COLORS[index % COLORS.length]} />)}</Pie><ChartTooltip content={<ChartTooltipContent />} /><Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ paddingTop: '40px', fontSize: '12px', fontWeight: 'bold' }}/></PieChart>) : (<BarChart data={expandedChart === 'usage' ? analyticsData.auChart : expandedChart === 'barangay' ? analyticsData.barangayChart : analyticsData.updateChart} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}><CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.05} /><XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} angle={-45} textAnchor="end" interval={0} tick={{ fill: 'hsl(var(--muted-foreground))', fontWeight: 'bold' }} /><YAxis fontSize={12} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} /><ChartTooltip content={<ChartTooltipContent />} /><Bar dataKey="value" radius={[8, 8, 0, 0]}>{(expandedChart === 'usage' ? analyticsData.auChart : expandedChart === 'barangay' ? analyticsData.barangayChart : analyticsData.updateChart).map((entry, index) => (<Cell key={`cell-exp-${index}`} fill={COLORS[(index + (expandedChart === 'barangay' ? 4 : expandedChart === 'update' ? 2 : 0)) % COLORS.length]} />))}</Bar></BarChart>)}</ChartContainer></div>
           <div className="p-6 border-t bg-muted/20 flex justify-center shrink-0"><Button onClick={() => setExpandedChart(null)} className="font-black uppercase text-xs tracking-widest bg-slate-800 hover:bg-slate-900 h-12 px-12">Close Visualization</Button></div>
         </DialogContent>
       </Dialog>

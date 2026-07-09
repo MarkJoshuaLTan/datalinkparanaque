@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, memo, useMemo } from 'react';
@@ -13,7 +14,7 @@ import { LandRecord, getModeOfConveyance } from '@/lib/processor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Plus, AlertTriangle, Loader2, Info, Link2, Unlink2, HardHat } from 'lucide-react';
+import { Plus, AlertTriangle, Loader2, Info, Link2, Unlink2, HardHat, AlertCircle } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -164,7 +165,8 @@ const RecordRow = memo(({
       <TableRow 
         className={cn(
           "border-b transition-all duration-200 hover:bg-muted/30",
-          !permitRow.isJoined && "bg-orange-50/30 dark:bg-orange-950/20"
+          !permitRow.isJoined && "bg-orange-50/30 dark:bg-red-950/20",
+          permitRow.isPotentialMatch && "bg-amber-500/5"
         )}
       >
         <TableCell className="text-center font-black p-3 border-r bg-muted/5 text-muted-foreground font-mono">
@@ -207,9 +209,15 @@ const RecordRow = memo(({
 
         <TableCell className="text-center p-3 border-l">
           {permitRow.isJoined ? (
-            <Badge className="bg-emerald-600 text-white font-black text-[9px] tracking-widest gap-1 uppercase">
-              <Link2 className="w-3" /> Matched
-            </Badge>
+            permitRow.isPotentialMatch ? (
+              <Badge variant="outline" className="bg-amber-500 text-white font-black text-[9px] tracking-widest gap-1 uppercase border-none shadow-md">
+                <AlertCircle className="w-3" /> Potential Match
+              </Badge>
+            ) : (
+              <Badge className="bg-emerald-600 text-white font-black text-[9px] tracking-widest gap-1 uppercase">
+                <Link2 className="w-3" /> Matched
+              </Badge>
+            )
           ) : (
             <Badge variant="outline" className="font-black text-[9px] tracking-widest gap-1 uppercase opacity-60">
               <Unlink2 className="w-3" /> Unlinked
@@ -432,7 +440,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
         <div className="px-4 py-2 bg-orange-500/10 border-b flex items-center gap-2">
           <HardHat className="w-3.5 h-3.5 text-orange-600" />
           <p className="text-[10px] font-bold text-orange-700 uppercase tracking-widest">
-            Building Permit Preview: Linking orange permit logs with the Assessment Roll reference roll.
+            Building Permit Preview: Linking orange permit logs with the Assessment Roll reference roll. Use 'Potential Match' labels to verify accuracy.
           </p>
         </div>
       )}
