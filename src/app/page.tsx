@@ -430,7 +430,7 @@ export default function Home() {
     const errors = active.filter(r => r.statusLabel !== 'VALID').length;
     const isProcessed = processedData.length > 0;
     const mvField = isProcessed ? 'marketValue2029' : 'marketValue2028';
-    const avField = isProcessed ? 'assessedValue2029' : 'assessedValue2028';
+    const avField = isProcessed ? 'assessedValue2028' : 'assessedValue2028';
     const ytField = isProcessed ? 'yearlyTax2029' : 'yearlyTax2028';
 
     return { 
@@ -817,11 +817,11 @@ export default function Home() {
         return { 
           "ARP NO.": j.arpNo || "", 
           "DATE OF CONVEYANCE/TRANSFER": j.date || "",
-          "OWNERSHIP TRANSFER FROM": (j as any).rollOwner || "", 
+          "OWNERSHIP TRANSFER FROM": "", 
           "OWNERSHIP TRANSFER TO": j.acctName || "", 
           "ADDRESS OF NEW OWNER": (j as any).rollAddress || "", 
           "LOCATION OF PROPERTY": j.location || "", 
-          "MODE OF CONVEYANCE": getModeOfConveyance(j.update), 
+          "MODE OF CONVEYANCE": "DEED OF SALE", 
           "AMOUNT OF CONSIDERATION": j.sellingPrice || "", 
           "PROPERTY CONVEYED (L)": (kind === 'L' || kind === 'LAND') ? 'x' : "", 
           "PROPERTY CONVEYED (B)": (kind === 'B' || kind === 'BUILDING') ? 'x' : "", 
