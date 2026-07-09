@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, memo, useMemo } from 'react';
@@ -10,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { LandRecord } from '@/lib/processor';
+import { LandRecord, getModeOfConveyance } from '@/lib/processor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -77,6 +76,11 @@ const RecordRow = memo(({
 
         <TableCell className="max-w-[250px] truncate uppercase p-3 text-muted-foreground italic border-l">{abstractRow.rollAddress || '---'}</TableCell>
         <TableCell className="max-w-[150px] truncate uppercase p-3 text-muted-foreground italic border-l">{row.location || '---'}</TableCell>
+
+        {/* Mode of Conveyance based on Update Code */}
+        <TableCell className="p-3 text-center border-l font-bold text-xs uppercase text-foreground">
+          {getModeOfConveyance(row.update)}
+        </TableCell>
 
         <TableCell className={cn(
           "p-3 font-mono text-center border-l",
@@ -305,6 +309,7 @@ const RecordRow = memo(({
     prevProps.row.notarialDate === nextProps.row.notarialDate &&
     prevProps.row.docFileNo === nextProps.row.docFileNo &&
     prevProps.row.notary === nextProps.row.notary &&
+    prevProps.row.update === nextProps.row.update &&
     prevProps.isProcessed === nextProps.isProcessed &&
     prevProps.index === nextProps.index &&
     prevProps.showLabels === nextProps.showLabels &&
@@ -393,7 +398,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
 
       <div className="flex-1 overflow-auto border-t scrollbar-custom">
         <Table 
-          className="text-[13px] min-w-[2800px] select-none border-separate border-spacing-0"
+          className="text-[13px] min-w-[3000px] select-none border-separate border-spacing-0"
           wrapperClassName="overflow-visible" 
         >
           <TableHeader className="bg-card sticky top-0 z-20 shadow-sm">
@@ -405,6 +410,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
                 <TableHead className="min-w-[250px] font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-emerald-900">OWNERSHIP TRANSFER (TO)</TableHead>
                 <TableHead className="min-w-[250px] font-black uppercase bg-card border-l">REGISTERED ADDRESS</TableHead>
                 <TableHead className="min-w-[200px] font-black uppercase bg-card border-l">TRANSACTION LOC.</TableHead>
+                <TableHead className="min-w-[150px] text-center font-black uppercase bg-card border-l">MODE OF CONVEYANCE</TableHead>
                 <TableHead className="min-w-[100px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-blue-900">LOT #</TableHead>
                 <TableHead className="min-w-[120px] text-center font-black uppercase bg-emerald-50 dark:bg-emerald-950 border-l border-emerald-100 dark:border-blue-900">TCT #</TableHead>
                 <TableHead className="min-w-[50px] text-center font-black uppercase bg-card border-l">L</TableHead>

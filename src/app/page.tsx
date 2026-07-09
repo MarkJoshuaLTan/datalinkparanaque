@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback, useRef } from 'react';
@@ -65,7 +64,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ImportZone } from '@/components/dashboard/import-zone';
 import { CalibrationSidebar } from '@/components/dashboard/calibration-sidebar';
 import { DataPreviewTable } from '@/components/dashboard/data-preview-table';
-import { LandRecord, CalibrationRule, processRecords, TaxRateMap, ProcessingReport, RecordStatusType, normalizePin } from '@/lib/processor';
+import { LandRecord, CalibrationRule, processRecords, TaxRateMap, ProcessingReport, RecordStatusType, normalizePin, getModeOfConveyance } from '@/lib/processor';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import * as XLSX from 'xlsx';
 import { BarangayConfig, initialLocationSettings } from '@/lib/locations';
@@ -141,7 +140,7 @@ const defaultTaxRates: TaxRateMap = {
 type ProcessingStep = 'idle' | 'cleanup' | 'dedupe' | 'calibrate' | 'complete';
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const ImportManager = ({ mode, manifest, onAdd, onDelete }: { mode: 'raw' | 'exempt' | 'journal' | 'sales', manifest: any[], onAdd: () => void, onDelete: (name: string) => void }) => (
+const ImportManager = ({ mode, manifest, onAdd, onDelete }: { mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'roll', manifest: any[], onAdd: () => void, onDelete: (name: string) => void }) => (
   <Popover>
     <TooltipProvider>
       <Tooltip>
@@ -257,7 +256,7 @@ export default function Home() {
   const [isClearing, setIsClearing] = useState(false);
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   const [isDirectImporting, setIsDirectImporting] = useState(false);
-  const [directImportProgress, setDirectImportProgress] = useState({ current: 0, total: 0, mode: 'raw' as 'raw' | 'exempt' | 'journal' | 'sales' });
+  const [directImportProgress, setDirectImportProgress] = useState({ current: 0, total: 0, mode: 'raw' as 'raw' | 'exempt' | 'journal' | 'sales' | 'roll' });
   const [viewMode, setViewMode] = useState<'results' | 'archive' | 'analytics' | 'audit'>('results');
   const [showDetailedResults, setShowDetailedResults] = useState(false);
   const [showSummary, setShowSummary] = useState(true);
@@ -639,7 +638,7 @@ export default function Home() {
     });
   };
 
-  const handleDataImported = (imported: LandRecord[], fileName: string, rawCount: number, mode: 'raw' | 'exempt' | 'journal' | 'sales' = 'raw') => {
+  const handleDataImported = (imported: LandRecord[], fileName: string, rawCount: number, mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'roll' = 'raw') => {
     const updatedExemptPins = new Set(exemptPins);
     if (mode === 'exempt') {
       const pinsFromThisFile = new Set<string>();
@@ -661,7 +660,7 @@ export default function Home() {
     if (mode !== 'exempt') setImportedFileName(fileName);
     
     if (workflowMode === 'abstract') {
-      if (abstractStep === 'roll' && mode === 'raw') { setAbstractStep('journal'); toast({ title: "Roll Staged", description: "Assessment Roll loaded. Now, please upload the corresponding Journal file." }); }
+      if (abstractStep === 'roll' && (mode === 'raw' || mode === 'roll')) { setAbstractStep('journal'); toast({ title: "Roll Staged", description: "Assessment Roll loaded. Now, please upload the corresponding Journal file." }); }
       else if (abstractStep === 'journal' && mode === 'journal') { setAbstractStep('ready'); setShowDetailedResults(true); const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, fileName, updatedExemptPins); setPreviewData(allWithDuplicateMarkers); toast({ title: "Data Staged", description: "Roll and Journal joined. Report ready for Abstract Export." }); }
     } else {
       if (mode !== 'exempt') setShowDetailedResults(true);
@@ -671,15 +670,15 @@ export default function Home() {
     toast({ title: mode === 'exempt' ? "Exempt Data Integrated" : mode === 'journal' ? "Journal Data Integrated" : mode === 'sales' ? "Sales Data Integrated" : "Data Loaded", description: mode === 'exempt' ? `${imported.length} records integrated and indexed as Exempt reference.` : `${rawCount} records from ${fileName} imported successfully.` });
   };
 
-  const deleteFile = (fileName: string, mode: 'raw' | 'exempt' | 'journal' | 'sales') => {
-    if (mode === 'raw') { setRawData(prev => prev.filter(r => r.sourceFile !== fileName)); setRawFileManifest(prev => prev.filter(f => f.name !== fileName)); }
+  const deleteFile = (fileName: string, mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'roll') => {
+    if (mode === 'raw' || mode === 'roll') { setRawData(prev => prev.filter(r => r.sourceFile !== fileName)); setRawFileManifest(prev => prev.filter(f => f.name !== fileName)); }
     else if (mode === 'journal') { setJournalData(prev => prev.filter(r => r.sourceFile !== fileName)); setJournalFileManifest(prev => prev.filter(f => f.name !== fileName)); }
     else if (mode === 'sales') { setSalesData(prev => prev.filter(r => r.sourceFile !== fileName)); setSalesFileManifest(prev => prev.filter(f => f.name !== fileName)); }
     else { const newExemptFiles = exemptFileManifest.filter(f => f.name !== fileName); setExemptFileManifest(newExemptFiles); const newExemptPins = new Set<string>(); newExemptFiles.forEach(f => f.pins.forEach(pin => newExemptPins.add(pin))); setExemptPins(newExemptPins); }
     setProcessedData([]); toast({ title: "File Removed", description: `${fileName} has been removed from the session.` });
   };
 
-  const handleDirectImport = async (e: React.ChangeEvent<HTMLInputElement>, mode: 'raw' | 'exempt' | 'journal' | 'sales') => {
+  const handleDirectImport = async (e: React.ChangeEvent<HTMLInputElement>, mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'roll') => {
     const files = e.target.files; if (!files || files.length === 0) return;
     setIsDirectImporting(true); setDirectImportProgress({ current: 0, total: files.length, mode });
     const allRecords: LandRecord[] = []; let totalRawCount = 0; const fileNames: string[] = [];
@@ -687,10 +686,10 @@ export default function Home() {
       for (let i = 0; i < files.length; i++) {
         setDirectImportProgress(prev => ({ ...prev, current: i }));
         const workflow = workflowMode === 'abstract' ? (mode === 'journal' ? 'journal' : mode === 'sales' ? 'sales' : 'roll') : workflowMode;
-        const result = await parseFile(files[i], workflow, mode);
+        const result = await parseFile(files[i], workflow, mode as any);
         allRecords.push(...result.data); totalRawCount += result.count; fileNames.push(files[i].name); await delay(400);
       }
-      handleDataImported(allRecords, fileNames.length > 1 ? `Batch (${fileNames.length} Files)` : fileNames[0], totalRawCount, mode);
+      handleDataImported(allRecords, fileNames.length > 1 ? `Batch (${fileNames.length} Files)` : fileNames[0], totalRawCount, mode as any);
     } catch (err: any) { toast({ variant: "destructive", title: "Import Error", description: err.message || "Failed to parse one or more files." }); }
     finally { setIsDirectImporting(false); if (e.target) e.target.value = ''; }
   };
@@ -822,7 +821,7 @@ export default function Home() {
           "OWNERSHIP TRANSFER TO": j.acctName || "", 
           "ADDRESS OF NEW OWNER": (j as any).rollAddress || "", 
           "LOCATION OF PROPERTY": j.location || "", 
-          "MODE OF CONVEYANCE": "DEED OF SALE", 
+          "MODE OF CONVEYANCE": getModeOfConveyance(j.update), 
           "AMOUNT OF CONSIDERATION": j.sellingPrice || "", 
           "PROPERTY CONVEYED (L)": (kind === 'L' || kind === 'LAND') ? 'x' : "", 
           "PROPERTY CONVEYED (B)": (kind === 'B' || kind === 'BUILDING') ? 'x' : "", 
@@ -980,7 +979,7 @@ export default function Home() {
       <Dialog open={!!explainType} onOpenChange={(open) => !open && setExplainType(null)}>
         <DialogContent className="sm:max-w-xl bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl">
           <DialogHeader><DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2"><Lightbulb className="w-5 h-5 text-primary" /> {workflowMode === 'abstract' ? (explainType === 'usage' ? 'Asset Class Profile' : explainType === 'barangay' ? 'Geographic Hotspots' : explainType === 'update' ? 'Join Efficiency Analysis' : 'Fiscal Profile Distribution') : (explainType === 'usage' ? 'Property Usage Analysis' : explainType === 'barangay' ? 'Geographic Distribution' : explainType === 'update' ? 'Transaction Code Insights' : 'Financial Concentration Analysis')}</DialogTitle><DialogDescription className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Automated diagnostic report based on current session data.</DialogDescription></DialogHeader>
-          <div className="py-6 space-y-6"><div className="p-5 rounded-2xl bg-muted/20 border border-white/5 space-y-4"><p className="text-sm font-bold leading-relaxed text-foreground/80">{workflowMode === 'abstract' ? (explainType === 'usage' ? "Shows the distribution of transferred assets. 'L' (Land) vs 'B' (Building) markers help determine the primary nature of real estate movements within this Abstract period. Ensure that classification markers align with the Assessment Roll reference." : explainType === 'barangay' ? "Identifies locations with the highest transaction frequency from the Journal logs. Higher volume in specific areas indicates active development zones or high-demand sectors in Parañaque." : explainType === 'update' ? "Analyzes the matching efficiency between the Journal and the Assessment Roll. A high 'NO MATCH' rate suggests potential data discrepancies, missing parcel records in the reference roll, or non-standard PIN formats in the source Journal." : "Visualizes the ratio of taxable revenue-generating transactions versus exempted transfers (government, religious, or charitable). This helps in projecting future fiscal impact resulting from current transfers.") : (explainType === 'usage' ? "The system identifies that RESI (Residential) and COMM (Commercial) types dominate the current batch. This suggests a high concentration of taxable assets in developed zones. Ensure that assessment levels (20% for RESI, 50% for COMM) are correctly applied in the Configuration Panel." : explainType === 'barangay' ? "The geographic distribution highlights key hotspots across Parañaque. Higher record counts in specific barangays often correlate with recent subdivision updates or large-scale land developments. Cross-reference this with the 'Update Code' chart to identify if these are primarily NEW or TR (Transfer) transactions." : explainType === 'update' ? "The distribution of update codes (e.g., NEW, TR, RC) provides a longitudinal view of property movements. A high percentage of TR codes indicates an active real estate market, while RC (Re-assessment) suggests a batch update cycle is in progress." : "This pie chart visualizes the total fiscal weight of each property classification. If a small percentage of 'INDU' (Industrial) properties accounts for a large portion of the pie, it indicates high-value individual assets. This helps in prioritizing audit resources for high-impact properties.")}</p></div><div className="flex items-start gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10"><Info className="w-5 h-5 text-primary shrink-0 mt-0.5" /><p className="text-[11px] font-bold text-muted-foreground leading-relaxed uppercase">This insight is generated using the Parañaque Smart Logic engine. Manual verification of these trends is recommended during official reporting.</p></div></div>
+          <div className="py-6 space-y-6"><div className="p-5 rounded-2xl bg-muted/20 border border-white/5 space-y-4"><p className="text-sm font-bold leading-relaxed text-foreground/80">{workflowMode === 'abstract' ? (explainType === 'usage' ? "Shows the distribution of transferred assets. 'L' (Land) vs 'B' (Building) markers help determine the primary nature of real estate movements within this Abstract period. Ensure that classification markers align with the Assessment Roll reference." : explainType === 'usage' ? "Identifies locations with the highest transaction frequency from the Journal logs. Higher volume in specific areas indicates active development zones or high-demand sectors in Parañaque." : explainType === 'update' ? "Analyzes the matching efficiency between the Journal and the Assessment Roll. A high 'NO MATCH' rate suggests potential data discrepancies, missing parcel records in the reference roll, or non-standard PIN formats in the source Journal." : "Visualizes the ratio of taxable revenue-generating transactions versus exempted transfers (government, religious, or charitable). This helps in projecting future fiscal impact resulting from current transfers.") : (explainType === 'usage' ? "The system identifies that RESI (Residential) and COMM (Commercial) types dominate the current batch. This suggests a high concentration of taxable assets in developed zones. Ensure that assessment levels (20% for RESI, 50% for COMM) are correctly applied in the Configuration Panel." : explainType === 'barangay' ? "The geographic distribution highlights key hotspots across Parañaque. Higher record counts in specific barangays often correlate with recent subdivision updates or large-scale land developments. Cross-reference this with the 'Update Code' chart to identify if these are primarily NEW or TR (Transfer) transactions." : explainType === 'update' ? "The distribution of update codes (e.g., NEW, TR, RC) provides a longitudinal view of property movements. A high percentage of TR codes indicates an active real estate market, while RC (Re-assessment) suggests a batch update cycle is in progress." : "This pie chart visualizes the total fiscal weight of each property classification. If a small percentage of 'INDU' (Industrial) properties accounts for a large portion of the pie, it indicates high-value individual assets. This helps in prioritizing audit resources for high-impact properties.")}</p></div><div className="flex items-start gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10"><Info className="w-5 h-5 text-primary shrink-0 mt-0.5" /><p className="text-[11px] font-bold text-muted-foreground leading-relaxed uppercase">This insight is generated using the Parañaque Smart Logic engine. Manual verification of these trends is recommended during official reporting.</p></div></div>
           <DialogFooter><Button onClick={() => setExplainType(null)} className="bg-primary hover:bg-emerald-700 font-black uppercase text-xs tracking-widest px-8">Acknowledge</Button></DialogFooter>
         </DialogContent>
       </Dialog>

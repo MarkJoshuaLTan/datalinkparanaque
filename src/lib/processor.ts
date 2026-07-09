@@ -119,6 +119,23 @@ export function normalizePin(pin: string): string {
   return pin.replace(/\D/g, '');
 }
 
+/**
+ * Determines the Mode of Conveyance based on the Update Code.
+ * - TR or TRANSFER -> DEED OF SALE
+ * - DC -> NEW
+ * - Others -> UPDATE
+ */
+export function getModeOfConveyance(updateCode?: string): string {
+  const code = (updateCode || "").trim().toUpperCase();
+  if (code === "TR" || code === "TRANSFER") {
+    return "DEED OF SALE";
+  }
+  if (code === "DC") {
+    return "NEW";
+  }
+  return "UPDATE";
+}
+
 function lotMatchesPattern(lot: string, pattern: string): boolean {
   const lotNum = parseInt(lot, 10);
   if (isNaN(lotNum)) return false;
