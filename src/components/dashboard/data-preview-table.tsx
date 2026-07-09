@@ -66,8 +66,10 @@ const RecordRow = memo(({
         <TableCell className="font-mono p-3 font-black text-primary">{row.arpNo || '---'}</TableCell>
         <TableCell className="whitespace-nowrap p-3 font-bold">{row.date || ''}</TableCell>
         
-        {/* OWNERSHIP TRANSFER FROM (BLANK) */}
-        <TableCell className="p-3 bg-muted/5 border-l"></TableCell>
+        {/* OWNERSHIP TRANSFER FROM (MAP FROM CANCELLED FILE) */}
+        <TableCell className="p-3 bg-muted/5 border-l font-bold text-red-700/80 uppercase truncate max-w-[220px]">
+          {abstractRow.cancelledOwner || ''}
+        </TableCell>
 
         {/* Relational Mapping Columns for Join Preview */}
         <TableCell className={cn(
@@ -117,8 +119,10 @@ const RecordRow = memo(({
           {abstractRow.rollLotNo || '---'}
         </TableCell>
 
-        {/* TITLE NO. (PREVIOUS) - BLANK */}
-        <TableCell className="p-3 bg-muted/5 border-l"></TableCell>
+        {/* TITLE NO. (PREVIOUS) - FROM CANCELLED FILE */}
+        <TableCell className="p-3 bg-muted/5 border-l text-center font-mono font-bold text-red-600/80">
+          {abstractRow.cancelledTctNo || ''}
+        </TableCell>
 
         <TableCell className={cn(
           "p-3 font-mono text-center border-l",
@@ -382,7 +386,7 @@ export function DataPreviewTable({ data, isProcessed = false, onRowClick, showLa
         <div className="px-4 py-2 bg-blue-500/10 border-b flex items-center gap-2">
           <Info className="w-3.5 h-3.5 text-blue-600" />
           <p className="text-[10px] font-bold text-blue-700 uppercase tracking-widest">
-            Relational Preview: Showing Journal transactions enriched with Assessment Roll parcel details.
+            Relational Preview: Showing Journal transactions enriched with Assessment Roll parcel details and Cancelled references.
           </p>
         </div>
       )}

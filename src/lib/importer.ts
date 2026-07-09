@@ -15,7 +15,7 @@ export const HEADER_ALIASES = {
     'taxdeclarationno', 'currenttd', 'oldarp', 'previousarp', 'taxdecno'
   ],
   newArpNo: [
-    'newarpno', 'arpnonew', 'newarp', 'newtdno', 'farp', 'newtd', 'arpno(new)', 'targetarp', 'arpno.new', 'arpno.new'
+    'newarpno', 'arpnonew', 'newarp', 'newtdno', 'farp', 'newtd', 'arpno(new)', 'targetarp', 'arpno.new'
   ],
   acctName: [
     'acctname', 'accountname', 'owner', 'ownername', 'ownersname', 'account', 
@@ -126,7 +126,7 @@ function expandTdNumbers(tdString: string): string[] {
 /**
  * Maps JSON data to LandRecord objects using robust fuzzy header detection.
  */
-export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exempt' | 'journal' | 'sales' = 'raw'): LandRecord[] => {
+export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'cancelled' = 'raw'): LandRecord[] => {
   let lastSeenDate = "";
 
   return raw.flatMap((item) => {
@@ -159,7 +159,7 @@ export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exe
     }
 
     const arpRaw = getValue('arpNo');
-    const expandedArps = mode === 'sales' ? expandTdNumbers(arpRaw) : [arpRaw];
+    const expandedArps = (mode === 'sales' || mode === 'cancelled') ? expandTdNumbers(arpRaw) : [arpRaw];
     
     let kind = getValue('kind');
     let au = getValue('au');
@@ -221,8 +221,8 @@ export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exe
 
 export const parseFile = async (
   file: File, 
-  workflowMode: 'standard' | 'roll' | 'journal' | 'sales' = 'standard',
-  importMode: 'raw' | 'exempt' | 'journal' | 'sales' = 'raw'
+  workflowMode: 'standard' | 'roll' | 'journal' | 'sales' | 'cancelled' = 'standard',
+  importMode: 'raw' | 'exempt' | 'journal' | 'sales' | 'cancelled' = 'raw'
 ): Promise<{ data: LandRecord[], count: number }> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -250,7 +250,8 @@ export const parseFile = async (
         const finalRecords = mappedData.filter(r => 
           (r.pin && r.pin.includes('-')) || 
           (r.arpNo && r.arpNo.length > 5) ||
-          (importMode === 'sales' && r.arpNo)
+          (importMode === 'sales' && r.arpNo) ||
+          (importMode === 'cancelled' && r.pin)
         );
 
         resolve({ data: finalRecords, count: finalRecords.length });
