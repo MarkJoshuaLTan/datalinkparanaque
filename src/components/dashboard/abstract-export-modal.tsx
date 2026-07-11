@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -60,7 +61,7 @@ export function AbstractExportModal({
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedMatchRules, setSelectedMatchRules] = useState<('Linked' | 'Unlinked')[]>(['Linked', 'Unlinked']);
-  const [selectedKinds, setSelectedKinds] = useState<string[]>(['L', 'B']);
+  const [selectedKinds, setSelectedKinds] = useState<string[]>(['L', 'B', 'M']);
   const [selectedTaxabilities, setSelectedTaxabilities] = useState<('T' | 'E')[]>([]);
   const [selectedUpdateCodes, setSelectedUpdateCodes] = useState<string[]>([]);
 
@@ -108,7 +109,10 @@ export function AbstractExportModal({
         if (end && recDate > end) return false;
       }
       const kind = (record.kind || '').trim().toUpperCase();
-      if (!selectedKinds.includes(kind)) return false;
+      // Logic for kind matching (supports prefixes L, B, M)
+      const isMatch = selectedKinds.some(k => kind.startsWith(k));
+      if (!isMatch && selectedKinds.length > 0) return false;
+      
       if (!selectedTaxabilities.includes(record.taxability)) return false;
       const code = (record.update || '').trim().toUpperCase();
       if (!selectedUpdateCodes.includes(code)) return false;
@@ -219,18 +223,22 @@ export function AbstractExportModal({
                     <Building2 className="w-4 h-4" /> Classification
                   </h3>
                   <div className="flex gap-3">
-                    <Button variant="link" onClick={() => setSelectedKinds(['L', 'B'])} className="text-[10px] font-black uppercase text-muted-foreground h-auto p-0 hover:text-blue-600">All</Button>
+                    <Button variant="link" onClick={() => setSelectedKinds(['L', 'B', 'M'])} className="text-[10px] font-black uppercase text-muted-foreground h-auto p-0 hover:text-blue-600">All</Button>
                     <Button variant="link" onClick={() => setSelectedKinds([])} className="text-[10px] font-black uppercase text-muted-foreground h-auto p-0 hover:text-blue-600">Clear</Button>
                   </div>
                 </div>
-                <Card className="p-5 bg-muted/10 border-white/5 shadow-inner rounded-2xl grid grid-cols-2 gap-4">
+                <Card className="p-5 bg-muted/10 border-white/5 shadow-inner rounded-2xl grid grid-cols-3 gap-4">
                   <div className="flex items-center gap-3">
                     <Checkbox id="abs-k-land" checked={selectedKinds.includes('L')} onCheckedChange={() => toggleKind('L')} />
                     <Label htmlFor="abs-k-land" className="text-xs font-bold uppercase cursor-pointer">Land (L)</Label>
                   </div>
                   <div className="flex items-center gap-3">
                     <Checkbox id="abs-k-bldg" checked={selectedKinds.includes('B')} onCheckedChange={() => toggleKind('B')} />
-                    <Label htmlFor="abs-k-bldg" className="text-xs font-bold uppercase cursor-pointer">Building (B)</Label>
+                    <Label htmlFor="abs-k-bldg" className="text-xs font-bold uppercase cursor-pointer">Bldg (B)</Label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Checkbox id="abs-k-mach" checked={selectedKinds.includes('M')} onCheckedChange={() => toggleKind('M')} />
+                    <Label htmlFor="abs-k-mach" className="text-xs font-bold uppercase cursor-pointer">Mach (M)</Label>
                   </div>
                 </Card>
               </section>
