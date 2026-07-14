@@ -172,9 +172,10 @@ const ImportManager = ({ mode, manifest, onAdd, onDelete }: { mode: 'raw' | 'exe
                   mode === 'raw' ? "border-primary/30 text-primary hover:bg-primary/10" :
                     mode === 'exempt' ? "border-blue-500/30 text-blue-600 hover:bg-blue-50/10" :
                       mode === 'journal' ? "border-amber-500/30 text-amber-600 hover:bg-amber-500/10" :
-                        mode === 'sales' ? "border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10" :
-                          mode === 'permits' ? "border-orange-500/30 text-orange-600 hover:bg-orange-500/10" :
-                            "border-red-500/30 text-red-600 hover:bg-red-500/10"
+                        mode === 'sales' ? "border-emerald-500/30 text-emerald-600 hover:bg-amber-500/10" :
+                          mode === 'permits' ? "border-orange-500/30 text-orange-600 hover:bg-amber-500/10" :
+                            mode === 'three-year-sales' ? "border-violet-500/30 text-violet-600 hover:bg-violet-500/10" :
+                              "border-red-500/30 text-red-600 hover:bg-red-500/10"
                 )}
               >
                 {mode === 'raw' ? <BookUser className="w-4 h-4" /> :
@@ -675,6 +676,12 @@ export default function Home() {
     });
   }, [workflowMode, permitData, rawData]);
 
+  // --- Three-Year Report join: Roll × Sales on arpNo key ---
+  const joinedThreeYearData = useMemo((): ThreeYearReportRow[] => {
+    if (workflowMode !== 'three-year-report') return [];
+    return buildThreeYearReportData(rawData, threeYearSalesData);
+  }, [workflowMode, rawData, threeYearSalesData]);
+
   const stats = useMemo(() => {
     const isAbstractLocal = workflowMode === 'abstract';
     const isBuildingPermitLocal = workflowMode === 'building-permit';
@@ -1140,7 +1147,18 @@ export default function Home() {
   const handleArchiveRecord = useCallback((record: LandRecord) => { handleSaveRecord({ ...record, isManualArchive: true }, true); toast({ title: "Record Archived", description: "The record has been moved to the Archive tab." }); }, [handleSaveRecord]);
   const handleUnarchiveRecord = useCallback((record: LandRecord) => { handleSaveRecord({ ...record, isManualArchive: false }, true); toast({ title: "Record Restored", description: "The record has been moved back to the Results tab." }); }, [handleSaveRecord]);
 
-  const handleRowClick = useCallback((record: LandRecord) => { if (workflowMode === 'abstract' || workflowMode === 'building-permit') return; setSelectedRecord(record); if (record.statusLabel === 'DUPLICATE') { const validPeer = previewData.find(p => p.pin === record.pin && !p.isDuplicate && !p.isCleanup && !p.isManualArchive); setSelectedRecord({ ...record, duplicateWithReference: validPeer?.arpNo || "N/A" }); setComparisonRecord(validPeer || null); } else { setComparisonRecord(null); } }, [previewData, workflowMode]);
+  const handleRowClick = useCallback((record: LandRecord) => { 
+    if (workflowMode === 'abstract' || workflowMode === 'building-permit' || workflowMode === 'three-year-report') return;
+
+    setSelectedRecord(record); 
+    if (record.statusLabel === 'DUPLICATE') { 
+      const validPeer = previewData.find(p => p.pin === record.pin && !p.isDuplicate && !p.isCleanup && !p.isManualArchive); 
+      setSelectedRecord({ ...record, duplicateWithReference: validPeer?.arpNo || "N/A" }); 
+      setComparisonRecord(validPeer || null); 
+    } else { 
+      setComparisonRecord(null); 
+    } 
+  }, [previewData, workflowMode]);
 
   const handleFinalExport = async (settings: ExportFinalSettings) => {
     setIsExporting(true); setIsExportSettingsOpen(false);
