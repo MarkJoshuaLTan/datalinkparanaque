@@ -248,50 +248,50 @@ const RecordRow = memo(({
         onClick={() => onRowClick(row)}
         className={cn(
           "border-b transition-all duration-200 hover:bg-muted/30 cursor-pointer",
-          !reportRow.isJoined && "bg-orange-50/30 dark:bg-red-950/20"
+          !reportRow.isJoined && "bg-red-50/50 dark:bg-red-950/30"
         )}
       >
-        <TableCell className="text-center font-black p-3 border-r bg-muted/5 text-muted-foreground font-mono">
+        <TableCell className={cn("text-center font-black p-3 border-r font-mono", !reportRow.isJoined ? "bg-red-50/50 text-red-500" : "bg-muted/5 text-muted-foreground")}>
           {index + 1}
         </TableCell>
-        <TableCell className="text-center font-bold p-3 border-l text-sm uppercase text-emerald-700">
+        <TableCell className={cn("text-center font-bold p-3 border-l text-sm uppercase", !reportRow.isJoined ? "text-red-600" : "text-emerald-700")}>
           {!reportRow.isJoined ? '---' : (reportRow.kindGroup === 'Land' ? 'Land' : (reportRow.kindGroup === 'Building' ? 'Building' : `${reportRow.kind || ''}-${reportRow.au || ''}`.replace(/^-|-$/, '') || 'Other/Unmapped'))}
         </TableCell>
-        <TableCell className="font-bold uppercase p-3 border-l truncate max-w-[200px]">
+        <TableCell className={cn("font-bold uppercase p-3 border-l truncate max-w-[200px]", !reportRow.isJoined && "text-red-600")}>
           {reportRow.acctName || '---'}
         </TableCell>
-        <TableCell className="font-mono p-3 border-l text-primary font-black">
+        <TableCell className={cn("font-mono p-3 border-l font-black", !reportRow.isJoined ? "text-red-600" : "text-primary")}>
           {reportRow.arpNo || '---'}
         </TableCell>
-        <TableCell className="p-3 border-l uppercase text-muted-foreground truncate max-w-[250px] text-xs">
+        <TableCell className={cn("p-3 border-l uppercase truncate max-w-[250px] text-xs", !reportRow.isJoined ? "text-red-500" : "text-muted-foreground")}>
           {reportRow.rollAddress || reportRow.location || '---'}
         </TableCell>
-        <TableCell className="p-3 border-l uppercase font-bold text-xs text-center">
+        <TableCell className={cn("p-3 border-l uppercase font-bold text-xs text-center", !reportRow.isJoined && "text-red-600")}>
           {reportRow.salesClassification || '---'}
         </TableCell>
-        <TableCell className="p-3 border-l uppercase text-center text-muted-foreground">
+        <TableCell className={cn("p-3 border-l uppercase text-center", !reportRow.isJoined ? "text-red-400" : "text-muted-foreground")}>
           ---
         </TableCell>
-        <TableCell className="text-right font-mono p-3 font-black border-l">
+        <TableCell className={cn("text-right font-mono p-3 font-black border-l", !reportRow.isJoined && "text-red-600")}>
           {reportRow.landArea ? reportRow.landArea.toLocaleString() : (reportRow.rollArea?.toLocaleString() || '0')}
         </TableCell>
         
-        <TableCell className="text-right font-mono p-3 font-black border-l text-emerald-600">
+        <TableCell className={cn("text-right font-mono p-3 font-black border-l", !reportRow.isJoined ? "text-red-600" : "text-emerald-600")}>
           {reportRow.sellingPrice ? `₱${reportRow.sellingPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '---'}
         </TableCell>
 
-        <TableCell className="text-right font-mono p-3 font-black border-l text-emerald-600">
+        <TableCell className={cn("text-right font-mono p-3 font-black border-l", !reportRow.isJoined ? "text-red-600" : "text-emerald-600")}>
           {reportRow.salesValue ? `₱${reportRow.salesValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '---'}
         </TableCell>
 
         {/* Sales Values */}
-        <TableCell className="text-right font-mono p-3 font-black border-l bg-emerald-50/30 dark:bg-emerald-950/20 text-muted-foreground/30">
+        <TableCell className={cn("text-right font-mono p-3 font-black border-l", !reportRow.isJoined ? "bg-red-50/30 text-red-400" : "bg-emerald-50/30 dark:bg-emerald-950/20 text-muted-foreground/30")}>
           ---
         </TableCell>
-        <TableCell className="text-right font-mono p-3 font-black border-l bg-emerald-50/30 dark:bg-emerald-950/20 text-muted-foreground/30">
+        <TableCell className={cn("text-right font-mono p-3 font-black border-l", !reportRow.isJoined ? "bg-red-50/30 text-red-400" : "bg-emerald-50/30 dark:bg-emerald-950/20 text-muted-foreground/30")}>
           ---
         </TableCell>
-        <TableCell className="text-right font-mono p-3 font-black border-l bg-emerald-50/30 dark:bg-emerald-950/20 text-muted-foreground/30 border-r">
+        <TableCell className={cn("text-right font-mono p-3 font-black border-l border-r", !reportRow.isJoined ? "bg-red-50/30 text-red-400" : "bg-emerald-50/30 dark:bg-emerald-950/20 text-muted-foreground/30")}>
           ---
         </TableCell>
 
