@@ -157,6 +157,16 @@ export const buildThreeYearReportData = (
     if (!seen.has(fingerprint)) {
       seen.add(fingerprint);
       uniqueRows.push(row);
+    } else {
+      // If we see a duplicate but it has a selling price and the stored one doesn't, upgrade it
+      if (row.sellingPrice && row.sellingPrice > 0) {
+        const existingIndex = uniqueRows.findIndex(r => 
+          [normalizeArp(r.arpNo), (r.acctName || '').trim().toLowerCase(), (r.salesClassification || '').trim().toLowerCase(), (r.location || '').trim().toLowerCase()].join('||') === fingerprint
+        );
+        if (existingIndex >= 0 && (!uniqueRows[existingIndex].sellingPrice || uniqueRows[existingIndex].sellingPrice === 0)) {
+          uniqueRows[existingIndex] = { ...uniqueRows[existingIndex], sellingPrice: row.sellingPrice, salesValue: row.salesValue || uniqueRows[existingIndex].salesValue };
+        }
+      }
     }
   }
 

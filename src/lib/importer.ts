@@ -187,8 +187,8 @@ export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exe
       update: getValue('update'),
       taxability: (mode === 'exempt' ? 'E' : 'T') as 'T' | 'E',
       acctName: getValue('acctName'),
-      address: getValue('address'),
-      location: getValue('address') || deepLookup['location'] || '', 
+      address: getValue('address') + ' SP_DEBUG:[' + getValue('sellingPrice') + ']',
+      location: (getValue('address') || deepLookup['location'] || '') + ' SP_DEBUG:[' + getValue('sellingPrice') + '] SV_DEBUG:[' + getValue('salesValue') + ']',
       barangayName: getValue('barangayName'),
       lotNo: getValue('lotNo'),
       blkNo: getValue('blkNo'),
@@ -223,7 +223,7 @@ export const mapRawToRecords = (raw: any[], fileName: string, mode: 'raw' | 'exe
         id: uniqueId,
         arpNo: arp,
         newArpNo: index === 0 ? getValue('newArpNo') : "",
-        sellingPrice: index === 0 ? baseRecord.sellingPrice : 0,
+        sellingPrice: baseRecord.sellingPrice,
         sellingPriceRef: index === 0 ? "" : expandedArps[0]
       };
     });
