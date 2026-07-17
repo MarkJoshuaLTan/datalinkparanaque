@@ -75,6 +75,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import * as XLSX from 'xlsx-js-style';
 import { BarangayConfig, initialLocationSettings } from '@/lib/locations';
 import { ModeToggle } from '@/components/mode-toggle';
+import { useTheme } from 'next-themes';
 import { RecordDetailModal } from '@/components/dashboard/record-detail-modal';
 import { AboutModal } from '@/components/dashboard/about-modal';
 import { ProcessingReportModal } from '@/components/dashboard/processing-report-modal';
@@ -276,9 +277,21 @@ const ImportManager = ({ mode, manifest, onAdd, onDelete, onClearAll }: { mode: 
 };
 
 export default function Home() {
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const { toast } = useToast();
   const { showSuccessModal, showSuccessToast } = useNotification();
   const [isPending, startTransition] = useTransition();
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 1300);
+    return () => clearTimeout(timer);
+  }, []);
 
   // --- 1. DATA STATE ---
   const [rawData, setRawData] = useState<LandRecord[]>([]);
@@ -1516,6 +1529,44 @@ export default function Home() {
 
   return (
     <div className="h-screen bg-background flex flex-col font-body overflow-hidden" suppressHydrationWarning>
+      {/* Splash Screen Overlay */}
+      <div 
+        className={cn(
+          "fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-1000 ease-in-out",
+          showSplash ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        )}
+        style={{
+          '--background': '0 0% 96%',
+          '--foreground': '0 0% 10%',
+          backgroundColor: 'hsl(var(--background))',
+          color: 'hsl(var(--foreground))'
+        } as React.CSSProperties}
+      >
+        <div className="flex flex-col items-center justify-center">
+          <video
+            src="/video.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            controls={false}
+            className="w-[200px] h-[200px] md:w-[280px] md:h-[280px] object-contain mix-blend-multiply"
+            style={{
+              animation: 'floatLogo 6s ease-in-out infinite'
+            }}
+          />
+          <h1 className="text-5xl md:text-6xl font-black tracking-tighter leading-none mt-4 animate-in slide-in-from-bottom-8 fade-in duration-1000">
+            <span className="text-foreground">DataLink</span>
+            <span className="text-primary ml-2">Parañaque</span>
+          </h1>
+          <div className="mt-8 flex items-center justify-center space-x-2 animate-pulse">
+             <div className="w-2 h-2 rounded-full bg-primary/50"></div>
+             <div className="w-2 h-2 rounded-full bg-primary/80"></div>
+             <div className="w-2 h-2 rounded-full bg-primary"></div>
+          </div>
+        </div>
+      </div>
+
       <input type="file" id="raw-file-input" ref={rawFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'raw')} />
       <input type="file" id="exempt-file-input" ref={exemptFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'exempt')} />
       <input type="file" id="journal-file-input" ref={journalFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'journal')} />
@@ -1525,17 +1576,48 @@ export default function Home() {
       <input type="file" id="three-year-sales-file-input" ref={threeYearSalesFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'three-year-sales')} />
 
       <header className="bg-card/80 backdrop-blur-lg border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-lg shrink-0 z-50">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center gap-[5px] cursor-pointer hover:opacity-80 transition-all active:scale-95 group relative" onClick={() => setIsAboutOpen(true)}>
-                <div className="relative w-[86px] flex items-center h-full"><div className="absolute left-0 -translate-y-1/2 top-1/2"><Image src="/LOGO.png" alt="DataLink Logo" width={86} height={86} className="object-contain" /></div></div>
-                <div className="flex items-center" style={{ marginLeft: '5px' }}><h1 className="text-[32px] font-black tracking-tighter leading-none"><span className="text-foreground">DataLink</span><span className="text-primary ml-1.5">Parañaque</span></h1></div>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>About DataLink Parañaque</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex items-center gap-[5px]">
+          {mounted && (resolvedTheme === 'dark' || theme === 'dark') ? (
+            <img 
+              src="/favicon.png" 
+              alt="City Assessor Logo" 
+              className="w-[60px] h-[60px] object-contain mx-2 cursor-pointer hover:scale-110 transition-transform" 
+            />
+          ) : (
+            <video
+              src="/video.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls={false}
+              className="w-[76px] h-[76px] -my-2 object-contain mix-blend-multiply dark:mix-blend-plus-lighter cursor-pointer hover:scale-110 transition-transform"
+              onClick={(e) => {
+                const vid = e.currentTarget;
+                vid.playbackRate = 6;
+                if ((vid as any).spinTimeout) clearTimeout((vid as any).spinTimeout);
+                (vid as any).spinTimeout = setTimeout(() => {
+                  if (vid) vid.playbackRate = 1;
+                }, 1000);
+              }}
+            />
+          )}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-[5px] cursor-pointer hover:opacity-80 transition-all active:scale-95 group" onClick={() => setIsAboutOpen(true)}>
+                  <div className="flex items-center" style={{ marginLeft: '0px' }}>
+                    <h1 className="text-[32px] font-black tracking-tighter leading-none">
+                      <span className="text-foreground">DataLink</span>
+                      <span className="text-primary ml-1.5">Parañaque</span>
+                    </h1>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>About DataLink Parañaque</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <div className="flex items-center gap-1.5">
           {workflowMode !== 'idle' && <Button variant="ghost" onClick={() => clearWorkspace()} className="mr-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary gap-2"><ChevronLeft className="w-3.5 h-3.5" /> Switch Engine</Button>}
           {showDetailedResults && <div className="flex items-center gap-2 mr-3 px-4 border-r border-white/10"><TooltipProvider><Tooltip><TooltipTrigger asChild><div className="flex items-center gap-3"><Label htmlFor="summary-toggle" className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground cursor-pointer hover:text-primary transition-colors">Show Summary</Label><Switch id="summary-toggle" checked={showSummary} onCheckedChange={setShowSummary} className="data-[state=checked]:bg-primary scale-90" /></div></TooltipTrigger><TooltipContent>Toggle Dashboard KPI Overview</TooltipContent></Tooltip></TooltipProvider></div>}
@@ -1550,9 +1632,12 @@ export default function Home() {
         <main className="flex-1 flex flex-col p-6 overflow-hidden gap-4 min-h-0">
           <Tabs value={viewMode} onValueChange={(val: any) => { setViewMode(val); setStatusFilter('all'); }} className="flex-1 flex flex-col min-h-0">
             {workflowMode === 'idle' && viewMode !== 'audit' ? (
-              <div className="flex-1 flex flex-col items-center justify-center h-full py-12 scrollbar-vertical-custom overflow-y-auto">
-                <div className="text-center space-y-3 mb-16 shrink-0"><h2 className="text-6xl font-black uppercase tracking-tight text-foreground">Select Engine Workflow</h2><p className="text-muted-foreground font-bold uppercase tracking-widest text-sm">Choose the processing logic tailored to your source data format.</p></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full max-w-7xl mx-auto px-6 items-stretch">
+              <div className="flex-1 flex flex-col items-center justify-center h-full py-12 scrollbar-vertical-custom overflow-y-auto relative">
+                <div className="text-center space-y-3 mb-16 shrink-0 w-full relative">
+                  <h2 className="text-6xl font-black uppercase tracking-tight text-foreground relative">Select Engine Workflow</h2>
+                  <p className="text-muted-foreground font-bold uppercase tracking-widest text-sm relative">Choose the processing logic tailored to your source data format.</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full max-w-7xl mx-auto px-6 items-stretch relative z-10">
                   <Card className="p-10 border-white/10 bg-card hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer group shadow-2xl flex flex-col items-center text-center h-full" onClick={() => setWorkflowMode('standard')}><div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner"><Zap className="w-10 h-10 text-primary" /></div><h3 className="text-2xl font-black uppercase tracking-tight mb-4">Standard Processor</h3><p className="text-sm font-bold text-muted-foreground leading-relaxed mb-8">Best for general land record spreadsheets. Uses flexible header aliases.</p><Button className="w-full h-14 bg-primary hover:bg-emerald-700 font-black uppercase text-xs tracking-widest mt-auto">Launch Standard</Button></Card>
                   <Card className="p-10 border-white/10 bg-card hover:bg-blue-600/5 hover:border-blue-500/50 transition-all cursor-pointer group shadow-2xl flex flex-col items-center text-center h-full" onClick={() => { setWorkflowMode('abstract'); setAbstractStep('roll'); }}><div className="w-20 h-20 rounded-3xl bg-blue-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner"><ArrowRightLeft className="w-10 h-10 text-blue-600" /></div><h3 className="text-2xl font-black uppercase tracking-tight mb-4">Abstract of Transactions</h3><p className="text-sm font-bold text-muted-foreground leading-relaxed mb-8">Specialized mode for joining Journals with Assessment Rolls for transfer reports.</p><Button className="w-full h-14 bg-blue-600 hover:bg-blue-700 font-black uppercase text-xs tracking-widest mt-auto">Launch Abstract</Button></Card>
                   <Card className="p-10 border-white/10 bg-card hover:bg-orange-600/5 hover:border-orange-500/50 transition-all cursor-pointer group shadow-2xl flex flex-col items-center text-center h-full" onClick={() => { setWorkflowMode('building-permit'); setPermitStep('roll'); }}><div className="w-20 h-20 rounded-3xl bg-orange-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner"><Construction className="w-10 h-10 text-orange-600" /></div><h3 className="text-2xl font-black uppercase tracking-tight mb-4">Abstract of Building Permit</h3><p className="text-sm font-bold text-muted-foreground leading-relaxed mb-8">Specialized mode for processing building permit logs and assessments.</p><Button className="w-full h-14 bg-orange-600 hover:bg-orange-700 font-black uppercase text-xs tracking-widest mt-auto">Launch Permit Engine</Button></Card>
