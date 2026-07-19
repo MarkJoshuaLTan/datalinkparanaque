@@ -1555,15 +1555,9 @@ export default function Home() {
       {/* Splash Screen Overlay */}
       <div 
         className={cn(
-          "fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-1000 ease-in-out",
+          "fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-1000 ease-in-out bg-background dark:bg-[#141416]",
           showSplash ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
-        style={{
-          '--background': '0 0% 96%',
-          '--foreground': '0 0% 10%',
-          backgroundColor: 'hsl(var(--background))',
-          color: 'hsl(var(--foreground))'
-        } as React.CSSProperties}
       >
         <div className="flex flex-col items-center justify-center">
           <video
@@ -1574,9 +1568,24 @@ export default function Home() {
             playsInline
             controls={false}
             ref={(el) => { if (el) el.playbackRate = 1.5; }}
-            className="w-[200px] h-[200px] md:w-[280px] md:h-[280px] object-contain mix-blend-multiply"
+            className="w-[200px] h-[200px] md:w-[280px] md:h-[280px] object-contain mix-blend-multiply dark:hidden"
             style={{
               animation: 'floatLogo 4s ease-in-out infinite'
+            }}
+          />
+          <video
+            src="/darkmode.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            controls={false}
+            ref={(el) => { if (el) el.playbackRate = 1.5; }}
+            className="w-[200px] h-[200px] md:w-[280px] md:h-[280px] object-contain hidden dark:block"
+            style={{
+              animation: 'floatLogo 4s ease-in-out infinite',
+              WebkitMaskImage: 'radial-gradient(ellipse at center, black 70%, transparent 100%)',
+              maskImage: 'radial-gradient(ellipse at center, black 70%, transparent 100%)'
             }}
           />
           <h1 className="text-5xl md:text-6xl font-black tracking-tighter leading-none mt-4 animate-in slide-in-from-bottom-8 fade-in duration-1000">
@@ -1601,31 +1610,40 @@ export default function Home() {
 
       <header className="bg-card/80 backdrop-blur-lg border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-lg shrink-0 z-50">
         <div className="flex items-center gap-[5px]">
-          {mounted && (resolvedTheme === 'dark' || theme === 'dark') ? (
-            <img 
-              src="/favicon.png" 
-              alt="City Assessor Logo" 
-              className="w-[60px] h-[60px] object-contain mx-2 cursor-pointer hover:scale-110 transition-transform" 
-            />
-          ) : (
-            <video
-              src="/video.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              controls={false}
-              className="w-[76px] h-[76px] -my-2 object-contain mix-blend-multiply dark:mix-blend-plus-lighter cursor-pointer hover:scale-110 transition-transform"
-              onClick={(e) => {
-                const vid = e.currentTarget;
-                vid.playbackRate = 6;
-                if ((vid as any).spinTimeout) clearTimeout((vid as any).spinTimeout);
-                (vid as any).spinTimeout = setTimeout(() => {
-                  if (vid) vid.playbackRate = 1;
-                }, 1000);
-              }}
-            />
-          )}
+          <video
+            src="/video.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            controls={false}
+            className="w-[76px] h-[76px] -my-2 object-contain mix-blend-multiply cursor-pointer hover:scale-110 transition-transform dark:hidden"
+            onClick={(e) => {
+              const vid = e.currentTarget;
+              vid.playbackRate = 6;
+              if ((vid as any).spinTimeout) clearTimeout((vid as any).spinTimeout);
+              (vid as any).spinTimeout = setTimeout(() => {
+                if (vid) vid.playbackRate = 1;
+              }, 1000);
+            }}
+          />
+          <video
+            src="/darkmode.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            controls={false}
+            className="w-[76px] h-[76px] -my-2 object-contain cursor-pointer hover:scale-110 transition-transform hidden dark:block"
+            onClick={(e) => {
+              const vid = e.currentTarget;
+              vid.playbackRate = 6;
+              if ((vid as any).spinTimeout) clearTimeout((vid as any).spinTimeout);
+              (vid as any).spinTimeout = setTimeout(() => {
+                if (vid) vid.playbackRate = 1;
+              }, 1000);
+            }}
+          />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
