@@ -842,7 +842,14 @@ export default function Home() {
       totalMarketValue: filteredValid.reduce((sum, r) => sum + (r[mvField as keyof LandRecord] as number || 0), 0),
       totalAssessedValue: filteredValid.reduce((sum, r) => sum + (r[avField as keyof LandRecord] as number || 0), 0),
       totalYearlyTax: filteredValid.reduce((sum, r) => sum + (r[ytField as keyof LandRecord] as number || 0), 0),
-      totalErrors: errors
+      totalErrors: errors,
+      // Year breakdowns for popover display
+      totalMarketValue2028: filteredValid.reduce((sum, r) => sum + (r.marketValue2028 || 0), 0),
+      totalMarketValue2029: filteredValid.reduce((sum, r) => sum + (r.marketValue2029 || 0), 0),
+      totalAssessedValue2028: filteredValid.reduce((sum, r) => sum + (r.assessedValue2028 || 0), 0),
+      totalAssessedValue2029: filteredValid.reduce((sum, r) => sum + (r.assessedValue2029 || 0), 0),
+      totalYearlyTax2028: filteredValid.reduce((sum, r) => sum + (r.yearlyTax2028 || 0), 0),
+      totalYearlyTax2029: filteredValid.reduce((sum, r) => sum + (r.yearlyTax2029 || 0), 0),
     };
   }, [previewData, rawData, journalData, permitData, threeYearSalesData, taxViewMode, processedData.length, workflowMode, joinedAbstractData, joinedPermitData, joinedThreeYearData]);
 
@@ -1365,9 +1372,216 @@ export default function Home() {
         return row;
       });
 
+      const fmtPct = (val: number) => `${Number((val * 100).toFixed(2))}%`;
+
+      const leftSummaryRows: any[][] = [
+        ["DATA LINK PARAÑAQUE - SMART EXPORT"],
+        ["EXPORT DATE:", new Date().toLocaleString()],
+        ["TOTAL RECORDS:", finalOutputList.length.toLocaleString()],
+        [],
+        ["SUMMARY TAXABLE PROPERTIES"],
+        [],
+        ["CURRENT (2028)"],
+        ["TOTAL MARKET VALUE (2028):", fmt(sum(taxableRecords, 'marketValue2028'))],
+        ["TOTAL ASSESSED VALUE (2028):", fmt(sum(taxableRecords, 'assessedValue2028'))],
+        ["TOTAL YEARLY TAX (2028 capped at 6%):", fmt(sum(taxableRecords, 'yearlyTax2028'))],
+        [],
+        ["RPVARA (2029)"],
+        ["TOTAL MARKET VALUE (2029):", fmt(sum(taxableRecords, 'marketValue2029'))],
+        ["TOTAL ASSESSED VALUE (2029):", fmt(sum(taxableRecords, 'assessedValue2029'))],
+        ["TOTAL YEARLY TAX (2029):", fmt(sum(taxableRecords, 'yearlyTax2029'))],
+        [],
+        ["SUMMARY EXEMPTED PROPERTIES"],
+        [],
+        ["CURRENT (2028)"],
+        ["TOTAL MARKET VALUE (2028):", fmt(sum(exemptRecords, 'marketValue2028'))],
+        ["TOTAL ASSESSED VALUE (2028):", fmt(sum(exemptRecords, 'assessedValue2028'))],
+        [],
+        ["RPVARA (2029)"],
+        ["TOTAL MARKET VALUE (2029):", fmt(sum(exemptRecords, 'marketValue2029'))],
+        ["TOTAL ASSESSED VALUE (2029):", fmt(sum(exemptRecords, 'assessedValue2029'))],
+        []
+      ];
+
+      const rightSummaryContent: any[][] = [
+        ["ASSESSMENT LEVELS & TAX RATES USED:"],
+        ["AU / USAGE CODE", "ASSESSMENT LEVEL (%)", "TAX RATE (%)"],
+        ...Object.entries(taxRates).map(([au, config]) => [
+          au,
+          fmtPct(config.assessmentLevel),
+          fmtPct(config.taxRate)
+        ])
+      ];
+
+      const startRow = 4;
+      const startCol = 3;
+      const maxRows = Math.max(leftSummaryRows.length, startRow + rightSummaryContent.length);
+
+      const topSummaryRows: any[][] = [];
+      for (let r = 0; r < maxRows; r++) {
+        const row: any[] = leftSummaryRows[r] ? [...leftSummaryRows[r]] : [];
+        while (row.length < startCol) {
+          row.push("");
+        }
+        const rightRowIdx = r - startRow;
+        if (rightRowIdx >= 0 && rightRowIdx < rightSummaryContent.length) {
+          row.push(...rightSummaryContent[rightRowIdx]);
+        }
+        topSummaryRows.push(row);
+      }
+
+      topSummaryRows.push(activeHeaders);
+
       const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet([["DATA LINK PARAÑAQUE - SMART EXPORT"], ["EXPORT DATE:", new Date().toLocaleString()], ["TOTAL RECORDS:", finalOutputList.length.toLocaleString()], [], ["SUMMARY TAXABLE PROPERTIES"], [], ["CURRENT (2028)"], ["TOTAL MARKET VALUE (2028):", fmt(sum(taxableRecords, 'marketValue2028'))], ["TOTAL ASSESSED VALUE (2028):", fmt(sum(taxableRecords, 'assessedValue2028'))], ["TOTAL YEARLY TAX (2028 capped at 6%):", fmt(sum(taxableRecords, 'yearlyTax2028'))], [], ["RPVARA (2029)"], ["TOTAL MARKET VALUE (2029):", fmt(sum(taxableRecords, 'marketValue2029'))], ["TOTAL ASSESSED VALUE (2029):", fmt(sum(taxableRecords, 'assessedValue2029'))], ["TOTAL YEARLY TAX (2029):", fmt(sum(taxableRecords, 'yearlyTax2029'))], [], ["SUMMARY EXEMPTED PROPERTIES"], [], ["CURRENT (2028)"], ["TOTAL MARKET VALUE (2028):", fmt(sum(exemptRecords, 'marketValue2028'))], ["TOTAL ASSESSED VALUE (2028):", fmt(sum(exemptRecords, 'assessedValue2028'))], [], ["RPVARA (2029)"], ["TOTAL MARKET VALUE (2029):", fmt(sum(exemptRecords, 'marketValue2029'))], ["TOTAL ASSESSED VALUE (2029):", fmt(sum(exemptRecords, 'assessedValue2029'))], [], activeHeaders]);
-      XLSX.utils.sheet_add_json(ws, formattedExport, { origin: -1, skipHeader: true }); ws['!cols'] = activeHeaders.map(() => ({ wch: 22 })); applyCenterStyle(ws, 26); XLSX.utils.book_append_sheet(wb, ws, "ExportResults");
+      const ws = XLSX.utils.aoa_to_sheet(topSummaryRows);
+      XLSX.utils.sheet_add_json(ws, formattedExport, { origin: -1, skipHeader: true });
+      ws['!cols'] = activeHeaders.map(() => ({ wch: 22 }));
+      applyCenterStyle(ws, topSummaryRows.length - 1);
+
+      // Style the column header row in ExportResults: bold + all-border highlight
+      {
+        const headerRowIdx = topSummaryRows.length - 1;
+        const borderStyle = { style: 'thin', color: { rgb: '000000' } };
+        const fullBorder = { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle };
+        for (let C = 0; C < activeHeaders.length; C++) {
+          const cellAddr = XLSX.utils.encode_cell({ r: headerRowIdx, c: C });
+          if (!ws[cellAddr]) ws[cellAddr] = { t: 's', v: activeHeaders[C] };
+          ws[cellAddr].s = {
+            font: { bold: true },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: fullBorder,
+          };
+        }
+      }
+
+      XLSX.utils.book_append_sheet(wb, ws, "ExportResults");
+
+      // --- Comparative Summary Report on SMV Sheet ---
+      {
+        // Group by barangay and sum year values
+        const smvByBrgy = new Map<string, { mv28: number; mv29: number; av28: number; av29: number; tax28: number; tax29: number }>();
+        finalOutputList.forEach(r => {
+          const brgy = (r.barangayName || 'UNMAPPED').toUpperCase();
+          if (!smvByBrgy.has(brgy)) smvByBrgy.set(brgy, { mv28: 0, mv29: 0, av28: 0, av29: 0, tax28: 0, tax29: 0 });
+          const entry = smvByBrgy.get(brgy)!;
+          entry.mv28  += r.marketValue2028  || 0;
+          entry.mv29  += r.marketValue2029  || 0;
+          entry.av28  += r.assessedValue2028 || 0;
+          entry.av29  += r.assessedValue2029 || 0;
+          entry.tax28 += r.yearlyTax2028    || 0;
+          entry.tax29 += r.yearlyTax2029    || 0;
+        });
+
+        const numFmt = (v: number) => v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        // Build AOA: col A=name, B=mv28, C=mv29, D=av28, E=av29, F=tax28, G=tax29
+        const smvRows: any[][] = [
+          // Row 0 (xlsx row 1): empty
+          ["", "", "", "", "", "", ""],
+          // Row 1 (xlsx row 2): title
+          ["", "COMPARATIVE SUMMARY REPORT ON SMV", "", "", "", "", ""],
+          // Row 2 (xlsx row 3): empty
+          ["", "", "", "", "", "", ""],
+          // Row 3 (xlsx row 4): group headers
+          ["", "MARKET VALUE", "", "ASSESSED VALUE", "", "YEARLY TAX", ""],
+          // Row 4 (xlsx row 5): year headers
+          ["", "2028", "2029 & 2030", "2028", "2029 & 2030", "2028", "2029 & 2030"],
+          // Row 5 (xlsx row 6): cap note
+          ["", "(CAPPED AT 6%)", "", "(CAPPED AT 6%)", "", "(CAPPED AT 6%)", ""],
+          // Row 6 (xlsx row 7): empty
+          ["", "", "", "", "", "", ""],
+          // Data rows start at row 7 (xlsx row 8)
+          ...Array.from(smvByBrgy.entries())
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([brgy, d]) => [
+              brgy,
+              numFmt(d.mv28),
+              numFmt(d.mv29),
+              numFmt(d.av28),
+              numFmt(d.av29),
+              numFmt(d.tax28),
+              numFmt(d.tax29),
+            ]),
+        ];
+
+        const wsSMV = XLSX.utils.aoa_to_sheet(smvRows);
+
+        // Column widths: A=20, B-G=22
+        wsSMV['!cols'] = [{ wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }];
+
+        // Merges: title B2:G2 (r=1,c=1..6), group headers B4:C4, D4:E4, F4:G4 (r=3)
+        wsSMV['!merges'] = [
+          { s: { r: 1, c: 1 }, e: { r: 1, c: 6 } }, // Title
+          { s: { r: 3, c: 1 }, e: { r: 3, c: 2 } }, // MARKET VALUE header
+          { s: { r: 3, c: 3 }, e: { r: 3, c: 4 } }, // ASSESSED VALUE header
+          { s: { r: 3, c: 5 }, e: { r: 3, c: 6 } }, // YEARLY TAX header
+        ];
+
+        // Helper to set cell style
+        const setCell = (cell: string, v: any, s: any) => {
+          wsSMV[cell] = { v, t: typeof v === 'number' ? 'n' : 's', s };
+        };
+
+        const borderThin = { style: 'thin', color: { rgb: '000000' } };
+        const allBorders = { top: borderThin, bottom: borderThin, left: borderThin, right: borderThin };
+        const boldCenter = { font: { bold: true }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true } };
+
+        // Title cell (B2 = r1c1)
+        setCell('B2', 'COMPARATIVE SUMMARY REPORT ON SMV', {
+          font: { bold: true, sz: 13 },
+          alignment: { horizontal: 'center', vertical: 'center' },
+          border: allBorders,
+        });
+        // Also set merged empty cells with border
+        ['C2','D2','E2','F2','G2'].forEach(c => setCell(c, '', { border: allBorders }));
+
+        // Group headers row 4 (r=3): B4, D4, F4
+        const groupHeaderStyle = { ...boldCenter, border: allBorders, fill: { fgColor: { rgb: 'FFFFFF' } } };
+        setCell('B4', 'MARKET VALUE', groupHeaderStyle);
+        setCell('C4', '', { border: allBorders });
+        setCell('D4', 'ASSESSED VALUE', groupHeaderStyle);
+        setCell('E4', '', { border: allBorders });
+        setCell('F4', 'YEARLY TAX', groupHeaderStyle);
+        setCell('G4', '', { border: allBorders });
+
+        // Year headers row 5 (r=4)
+        ['B5','C5','D5','E5','F5','G5'].forEach((c, i) => {
+          const labels = ['2028', '2029 & 2030', '2028', '2029 & 2030', '2028', '2029 & 2030'];
+          setCell(c, labels[i], { ...boldCenter, border: allBorders });
+        });
+
+        // Cap row row 6 (r=5): grey shading on odd cols (C6, E6, G6)
+        const capStyle = { ...boldCenter, border: allBorders };
+        const shadedStyle = { border: allBorders, fill: { patternType: 'solid', fgColor: { rgb: 'CCCCCC' } } };
+        setCell('B6', '(CAPPED AT 6%)', capStyle);
+        setCell('C6', '', shadedStyle);
+        setCell('D6', '(CAPPED AT 6%)', capStyle);
+        setCell('E6', '', shadedStyle);
+        setCell('F6', '(CAPPED AT 6%)', capStyle);
+        setCell('G6', '', shadedStyle);
+
+        // Data rows: apply border + number alignment
+        const dataStart = 8; // xlsx row 8 = array index 7
+        const dataCount = smvByBrgy.size;
+        for (let i = 0; i < dataCount; i++) {
+          const xlRow = dataStart + i;
+          const cols = ['A','B','C','D','E','F','G'];
+          cols.forEach((col, ci) => {
+            const cellRef = `${col}${xlRow}`;
+            if (wsSMV[cellRef]) {
+              wsSMV[cellRef].s = {
+                border: allBorders,
+                alignment: ci === 0
+                  ? { horizontal: 'left', vertical: 'center' }
+                  : { horizontal: 'right', vertical: 'center' },
+                font: { bold: ci === 0 },
+              };
+            }
+          });
+        }
+
+        XLSX.utils.book_append_sheet(wb, wsSMV, "Comparative SMV");
+      }
 
       const geoPart = settings.barangays.length === uniqueBarangays.length ? "All-Barangays" : settings.barangays.join("-");
       const statusPart = settings.statuses.join("-").replace(/\s+/g, '_');
@@ -1441,6 +1655,22 @@ export default function Home() {
       XLSX.utils.sheet_add_json(ws, abstractData, { origin: -1, skipHeader: true });
       ws['!cols'] = headers.map(() => ({ wch: 22 }));
       applyCenterStyle(ws, 3);
+
+      // Style the column header row in AbstractReport: bold + all-border highlight
+      {
+        const borderStyle = { style: 'thin', color: { rgb: '000000' } };
+        const fullBorder = { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle };
+        for (let C = 0; C < headers.length; C++) {
+          const cellAddr = XLSX.utils.encode_cell({ r: 4, c: C });
+          if (!ws[cellAddr]) ws[cellAddr] = { t: 's', v: headers[C] };
+          ws[cellAddr].s = {
+            font: { bold: true },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: fullBorder,
+          };
+        }
+      }
+
       XLSX.utils.book_append_sheet(wb, ws, "AbstractReport");
       XLSX.writeFile(wb, `AbstractReport-${new Date().toISOString().split('T')[0]}.xlsx`);
       showSuccessToast(`Exported ${abstractData.length} Abstract entries successfully.`);
@@ -1509,6 +1739,22 @@ export default function Home() {
       XLSX.utils.sheet_add_json(ws, exportRows, { origin: -1, skipHeader: true });
       ws['!cols'] = headers.map(() => ({ wch: 22 }));
       applyCenterStyle(ws, 3);
+
+      // Style the column header row in BuildingPermits: bold + all-border highlight
+      {
+        const borderStyle = { style: 'thin', color: { rgb: '000000' } };
+        const fullBorder = { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle };
+        for (let C = 0; C < headers.length; C++) {
+          const cellAddr = XLSX.utils.encode_cell({ r: 4, c: C });
+          if (!ws[cellAddr]) ws[cellAddr] = { t: 's', v: headers[C] };
+          ws[cellAddr].s = {
+            font: { bold: true },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: fullBorder,
+          };
+        }
+      }
+
       XLSX.utils.book_append_sheet(wb, ws, "BuildingPermits");
       XLSX.writeFile(wb, `BuildingPermitAbstract-${new Date().toISOString().split('T')[0]}.xlsx`);
       showSuccessToast(`Exported ${exportRows.length} Permit entries successfully.`);

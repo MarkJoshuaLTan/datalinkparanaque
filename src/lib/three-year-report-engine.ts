@@ -463,6 +463,25 @@ export const exportThreeYearReport = (rows: ThreeYearReportRow[], filenameSuffix
   ];
 
   const suffixStr = filenameSuffix ? `-${filenameSuffix}` : '';
+  // Style both header rows in ThreeYearReport: bold + all-border highlight
+  {
+    const borderStyle = { style: 'thin', color: { rgb: '000000' } };
+    const fullBorder = { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle };
+    [R_HEADER - 1, R_SUBHEADER - 1].forEach(rowIdx => {
+      for (let C = 0; C <= 12; C++) {
+        const cellAddr = `${COL_LETTERS[C]}${rowIdx + 1}`;
+        if (ws[cellAddr]) {
+          ws[cellAddr].s = {
+            ...ws[cellAddr].s,
+            font: { bold: true },
+            alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+            border: fullBorder,
+          };
+        }
+      }
+    });
+  }
+
   XLSX.utils.book_append_sheet(wb, ws, 'ThreeYearReport');
   XLSX.writeFile(wb, `3YearReport${suffixStr}-${new Date().toISOString().split('T')[0]}.xlsx`);
 };

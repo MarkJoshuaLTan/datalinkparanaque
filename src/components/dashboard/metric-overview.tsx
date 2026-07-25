@@ -80,6 +80,13 @@ interface MetricOverviewProps {
     totalAssessedValue: number;
     totalYearlyTax: number;
     totalErrors: number;
+    // Year breakdowns (standard mode)
+    totalMarketValue2028?: number;
+    totalMarketValue2029?: number;
+    totalAssessedValue2028?: number;
+    totalAssessedValue2029?: number;
+    totalYearlyTax2028?: number;
+    totalYearlyTax2029?: number;
     // Relational Specific
     linkedCount?: number;
     unlinkedCount?: number;
@@ -155,7 +162,11 @@ export function MetricOverview({
       icon: Database,
       color: isHero ? "border-t-green-600 bg-green-500/5" : "border-l-green-600 bg-green-500/5",
       textClass: "text-green-600",
-      definition: "The combined Market Value for the currently selected tax category (Taxable or Exempted)."
+      definition: "The combined Market Value for the currently selected tax category (Taxable or Exempted).",
+      yearBreakdown: [
+        { year: "2028", value: stats.totalMarketValue2028 },
+        { year: "2029", value: stats.totalMarketValue2029 },
+      ]
     },
     {
       label: "Total Assessed",
@@ -163,7 +174,11 @@ export function MetricOverview({
       icon: BarChart3,
       color: isHero ? "border-t-blue-600 bg-blue-500/5" : "border-l-blue-600 bg-blue-500/5",
       textClass: "text-blue-600",
-      definition: "The sum of all Assessed Values for the active tax view."
+      definition: "The sum of all Assessed Values for the active tax view.",
+      yearBreakdown: [
+        { year: "2028", value: stats.totalAssessedValue2028 },
+        { year: "2029", value: stats.totalAssessedValue2029 },
+      ]
     },
     {
       label: "Total Tax",
@@ -171,7 +186,11 @@ export function MetricOverview({
       icon: TrendingUp,
       color: isHero ? "border-t-emerald-600 bg-emerald-50/5" : "border-l-emerald-600 bg-emerald-50/5",
       textClass: "text-emerald-600",
-      definition: "The estimated combined Yearly Real Property Tax due. Always zero for Exempted properties."
+      definition: "The estimated combined Yearly Real Property Tax due. Always zero for Exempted properties.",
+      yearBreakdown: taxViewMode === 'E' ? undefined : [
+        { year: "2028", value: stats.totalYearlyTax2028 },
+        { year: "2029", value: stats.totalYearlyTax2029 },
+      ]
     }
   ];
 
@@ -426,6 +445,21 @@ export function MetricOverview({
                 </div>
                 <p className="font-black text-2xl text-foreground break-words">{stat.value}</p>
                 <p className="text-sm font-bold text-muted-foreground leading-relaxed">{stat.definition}</p>
+                {(stat as any).yearBreakdown && (
+                  <div className="mt-1 pt-3 border-t border-border/30 space-y-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Year Breakdown</p>
+                    {((stat as any).yearBreakdown as { year: string; value?: number }[]).map(({ year, value }) => (
+                      <div key={year} className="flex items-center justify-between">
+                        <span className={cn("text-xs font-black uppercase tracking-widest px-2 py-0.5 rounded-md",
+                          year === "2028" ? "bg-blue-500/10 text-blue-500" : "bg-emerald-500/10 text-emerald-500"
+                        )}>{year}</span>
+                        <span className="text-sm font-black tabular-nums text-foreground">
+                          ₱{(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </PopoverContent>
           </Popover>
