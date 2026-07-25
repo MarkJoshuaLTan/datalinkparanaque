@@ -32,9 +32,9 @@ import {
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const LOCAL_STORAGE_KEY = 'paranaque_datalink_v31';
+export const LOCAL_STORAGE_KEY = 'paranaque_datalink_v31';
 
-const defaultTaxRates: TaxRateMap = {
+export const defaultTaxRates: TaxRateMap = {
     "RESI": { assessmentLevel: 0.20, taxRate: 0.02 },
     "COMM": { assessmentLevel: 0.50, taxRate: 0.03 },
     "INDU": { assessmentLevel: 0.50, taxRate: 0.03 },
@@ -68,13 +68,21 @@ const buildSectionKey = (base: string, filter: string): string => {
 
 interface SettingsOverlayProps {
     onClose: () => void;
+    onSaveSettings?: (locationSettings: BarangayConfig[], taxRates: TaxRateMap) => void;
+    locationSettings?: BarangayConfig[];
+    taxRates?: TaxRateMap;
 }
 
-export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
+export function SettingsOverlay({
+    onClose,
+    onSaveSettings,
+    locationSettings: propLocationSettings,
+    taxRates: propTaxRates
+}: SettingsOverlayProps) {
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const [locationSettings, setLocationSettings] = useState<BarangayConfig[]>(initialLocationSettings);
-  const [taxRates, setTaxRates] = useState<TaxRateMap>(defaultTaxRates);
+  const [locationSettings, setLocationSettings] = useState<BarangayConfig[]>(propLocationSettings || initialLocationSettings);
+  const [taxRates, setTaxRates] = useState<TaxRateMap>(propTaxRates || defaultTaxRates);
   const [selectedBarangay, setSelectedBarangay] = useState<Barangay | undefined>(allBarangays[0]);
   const [currentSections, setCurrentSections] = useState<EditableSectionConfig[]>([]);
   const [currentTaxRates, setCurrentTaxRates] = useState<TaxRateMap>({});
@@ -87,17 +95,23 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
 
   useEffect(() => {
     setIsClient(true);
+    if (propLocationSettings) {
+      setLocationSettings(propLocationSettings);
+    }
+    if (propTaxRates) {
+      setTaxRates(propTaxRates);
+    }
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.locationSettings) setLocationSettings(parsed.locationSettings);
-        if (parsed.taxRates) setTaxRates(parsed.taxRates);
+        if (parsed.locationSettings && !propLocationSettings) setLocationSettings(parsed.locationSettings);
+        if (parsed.taxRates && !propTaxRates) setTaxRates(parsed.taxRates);
       }
     } catch (error) {
         console.error("Failed to load settings from localStorage:", error);
     }
-  }, []);
+  }, [propLocationSettings, propTaxRates]);
 
   useEffect(() => {
     if (isClient) {
@@ -121,11 +135,22 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
     }
   };
 
+  const handleBarangayChange = (name: string) => {
+    if (selectedBarangay) {
+      const sectionsToSave = currentSections.map(({ originalIndex, ...rest }) => rest);
+      setLocationSettings(prev => prev.map(b => b.barangayCode === selectedBarangay.barangayCode ? { ...b, sections: sectionsToSave } : b));
+    }
+    setSelectedBarangay(allBarangays.find(b => b.name === name));
+  };
+
   const handleResetToDefaults = () => {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
     setLocationSettings(initialLocationSettings);
     setTaxRates(defaultTaxRates);
     setSelectedBarangay(allBarangays[0]);
+    if (onSaveSettings) {
+      onSaveSettings(initialLocationSettings, defaultTaxRates);
+    }
     toast({ title: "Data Restored", description: "Calibration rules have been reset to factory defaults." });
   };
 
@@ -143,6 +168,11 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
         const parsed = saved ? JSON.parse(saved) : {};
         const payload = JSON.stringify({ ...parsed, locationSettings: newLocationSettings, taxRates: currentTaxRates });
         localStorage.setItem(LOCAL_STORAGE_KEY, payload);
+        setLocationSettings(newLocationSettings);
+        setTaxRates(currentTaxRates);
+        if (onSaveSettings) {
+          onSaveSettings(newLocationSettings, currentTaxRates);
+        }
         toast({ title: "Settings Saved", description: "Calibration rules and tax rates have been updated successfully." });
         onClose();
     } catch(e) {
@@ -281,7 +311,7 @@ export function SettingsOverlay({ onClose }: SettingsOverlayProps) {
                           <Label htmlFor="barangay-select" className="text-right col-span-1 text-[11px] font-black uppercase tracking-widest text-muted-foreground">
                               Scope Barangay
                           </Label>
-                          <Select value={selectedBarangay?.name} onValueChange={(name) => setSelectedBarangay(allBarangays.find(b => b.name === name))}>
+                          <Select value={selectedBarangay?.name} onValueChange={handleBarangayChange}>
                               <SelectTrigger className="col-span-3 h-12 text-sm font-bold uppercase rounded-xl border-white/10" id="barangay-select">
                                   <SelectValue placeholder="Select a barangay" />
                               </SelectTrigger>
