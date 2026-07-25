@@ -117,7 +117,7 @@ import { AbstractExportModal, AbstractExportSettings } from '@/components/dashbo
 import { PermitExportModal, PermitExportSettings, PermitMatchStatus } from '@/components/dashboard/permit-export-modal';
 import { ThreeYearExportModal } from '@/components/dashboard/three-year-export-modal';
 import { useNotification } from '@/contexts/NotificationContext';
-import { SettingsOverlay } from '@/components/dashboard/settings-overlay';
+import { SettingsOverlay, LOCAL_STORAGE_KEY, defaultTaxRates } from '@/components/dashboard/settings-overlay';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { parseFile } from '@/lib/importer';
 import { ThreeYearReportRow, buildThreeYearReportData, exportThreeYearReport } from '@/lib/three-year-report-engine';
@@ -133,20 +133,6 @@ import { AnalyticsView } from '@/components/dashboard/analytics-view';
 import { DataFlowTab } from '@/components/dashboard/data-flow-tab';
 
 const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
-
-const defaultTaxRates: TaxRateMap = {
-  "RESI": { assessmentLevel: 0.20, taxRate: 0.02 },
-  "COMM": { assessmentLevel: 0.50, taxRate: 0.03 },
-  "INDU": { assessmentLevel: 0.50, taxRate: 0.03 },
-  "AGRI": { assessmentLevel: 0.20, taxRate: 0.025 },
-  "GOV": { assessmentLevel: 0.15, taxRate: 0.00 },
-  "SPEC": { assessmentLevel: 0.15, taxRate: 0.025 },
-  "SPC1": { assessmentLevel: 0.15, taxRate: 0.025 },
-  "SPC2": { assessmentLevel: 0.15, taxRate: 0.025 },
-  "SPC3": { assessmentLevel: 0.15, taxRate: 0.025 },
-  "SPC4": { assessmentLevel: 0.15, taxRate: 0.025 },
-  "SPC5": { assessmentLevel: 0.15, taxRate: 0.025 },
-};
 
 type ProcessingStep = 'idle' | 'cleanup' | 'dedupe' | 'calibrate' | 'complete';
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -308,6 +294,19 @@ export default function Home() {
   const [taxRates, setTaxRates] = useState<TaxRateMap>(defaultTaxRates);
   const [processingReports, setProcessingReports] = useState<ProcessingReport[]>([]);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.locationSettings) setLocationSettings(parsed.locationSettings);
+        if (parsed.taxRates) setTaxRates(parsed.taxRates);
+      }
+    } catch (error) {
+      console.error("Failed to load settings from localStorage:", error);
+    }
+  }, []);
+
   // --- 1.2 WORKFLOW STATE ---
   const [workflowMode, setWorkflowMode] = useState<'idle' | 'standard' | 'abstract' | 'building-permit' | 'three-year-report'>('idle');
   const [abstractStep, setAbstractStep] = useState<'roll' | 'journal' | 'ready'>('roll');
@@ -384,7 +383,6 @@ export default function Home() {
   });
 
   const defaultExportColumns = {
-    "TYPE": true,
     "DATE": true,
     "ARP NO#": true,
     "PIN": true,
@@ -1037,11 +1035,21 @@ export default function Home() {
     if (outcome === 'accepted') { setDeferredPrompt(null); }
   };
 
-  const runProcessWithData = async (data: LandRecord[], rawCount: number, fileName: string, silent = false, overrideExemptPins?: Set<string>) => {
+  const runProcessWithData = async (
+    data: LandRecord[], 
+    rawCount: number, 
+    fileName: string, 
+    silent = false, 
+    overrideExemptPins?: Set<string>,
+    overrideLocationSettings?: BarangayConfig[],
+    overrideTaxRates?: TaxRateMap
+  ) => {
     if (!silent) { setIsProcessing(true); setProcessingStep('cleanup'); await delay(1200); setProcessingStep('dedupe'); await delay(1000); setProcessingStep('calibrate'); await delay(800); }
     startTransition(() => {
       const activeExemptPins = overrideExemptPins || exemptPins;
-      const { processed, allWithDuplicateMarkers, report } = processRecords(data, rules, locationSettings, taxRates, options, fileName, activeExemptPins);
+      const activeLocationSettings = overrideLocationSettings || locationSettings;
+      const activeTaxRates = overrideTaxRates || taxRates;
+      const { processed, allWithDuplicateMarkers, report } = processRecords(data, rules, activeLocationSettings, activeTaxRates, options, fileName, activeExemptPins);
       setProcessedData(processed);
       setPreviewData(allWithDuplicateMarkers);
       setProcessingReports(prev => [report, ...prev]);
@@ -1054,6 +1062,20 @@ export default function Home() {
       }
     });
   };
+
+  const handleSaveSettings = useCallback((newLocationSettings: BarangayConfig[], newTaxRates: TaxRateMap) => {
+    setLocationSettings(newLocationSettings);
+    setTaxRates(newTaxRates);
+    const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData];
+    if (combined.length > 0) {
+      if (processedData.length > 0) {
+        runProcessWithData(combined, combined.length, importedFileName, true, exemptPins, newLocationSettings, newTaxRates);
+      } else {
+        const { allWithDuplicateMarkers } = processRecords(combined, [], newLocationSettings, newTaxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, importedFileName, exemptPins);
+        setPreviewData(allWithDuplicateMarkers);
+      }
+    }
+  }, [rawData, journalData, salesData, cancelledData, permitData, processedData.length, importedFileName, exemptPins]);
 
   const handleDataImported = (importResults: any[], mode: 'raw' | 'exempt' | 'journal' | 'sales' | 'three-year-sales' | 'roll' | 'cancelled' | 'permits' = 'raw') => {
     let latestRawData = [...rawData];
@@ -1297,7 +1319,6 @@ export default function Home() {
       const fmt = (val: number) => `₱${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
 
       const headerMapping: Record<string, string> = {
-        duplicateWithReference: "TYPE",
         date: "DATE",
         arpNo: "ARP NO#",
         pin: "PIN",
@@ -1328,9 +1349,7 @@ export default function Home() {
         const row: any = {};
         Object.entries(headerMapping).forEach(([key, label]) => {
           if (settings.columns[label]) {
-            if (label === "TYPE") {
-              row[label] = record.isComparisonInjected ? "VALID" : (record.duplicateWithReference === 'REF' ? 'VALID' : record.duplicateWithReference || "VALID");
-            } else if (label === "UNIT VALUE") {
+            if (label === "UNIT VALUE") {
               row[label] = processedData.length > 0 ? record.unitValue2029 : record.unitValue2028;
             } else if (label === "MARKET VALUE") {
               row[label] = processedData.length > 0 ? record.marketValue2029 : record.marketValue2028;
@@ -1849,7 +1868,7 @@ export default function Home() {
       </Dialog>
 
       <Sheet open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <SheetContent side="right" className="sm:max-w-[1200px] w-[95vw] p-0 border-none bg-card shadow-2xl"><SheetHeader className="sr-only"><SheetTitle>Configuration Panel</SheetTitle><SheetHeader><SheetTitle>Configuration Panel</SheetTitle><SheetDescription>Update global settings and calibration rules.</SheetDescription></SheetHeader></SheetHeader><SettingsOverlay onClose={() => setIsSettingsOpen(false)} /></SheetContent>
+        <SheetContent side="right" className="sm:max-w-[1200px] w-[95vw] p-0 border-none bg-card shadow-2xl"><SheetHeader className="sr-only"><SheetTitle>Configuration Panel</SheetTitle><SheetHeader><SheetTitle>Configuration Panel</SheetTitle><SheetDescription>Update global settings and calibration rules.</SheetDescription></SheetHeader></SheetHeader><SettingsOverlay onClose={() => setIsSettingsOpen(false)} onSaveSettings={handleSaveSettings} locationSettings={locationSettings} taxRates={taxRates} /></SheetContent>
       </Sheet>
 
       <AlertDialog open={isClearConfirmOpen} onOpenChange={setIsClearConfirmOpen}><AlertDialogContent className="bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl"><AlertDialogHeader><AlertDialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2"><Trash2 className="w-4 h-4 text-red-600" /> Confirm Session Reset</AlertDialogTitle><AlertDialogDescription className="text-sm font-bold text-muted-foreground leading-relaxed">Are you sure you want to clear your current workspace? All property records and processing results in this session will be permanently removed.<br /><br /><span className="text-red-600/80 font-black uppercase tracking-tighter">Note: Your administrative audit logs will not be affected.</span></AlertDialogDescription></AlertDialogHeader><AlertDialogFooter className="gap-3"><AlertDialogCancel className="font-black uppercase text-xs h-10 px-6 hover:bg-muted hover:text-foreground">Cancel</AlertDialogCancel><AlertDialogAction onClick={() => { setIsClearConfirmOpen(false); clearWorkspace(); }} className="bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs h-10 px-8 shadow-lg shadow-red-500/10 transition-all">Wipe Session Data</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
