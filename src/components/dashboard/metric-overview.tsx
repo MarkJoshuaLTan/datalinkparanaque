@@ -393,9 +393,9 @@ export function MetricOverview({
         </div>
         
         {workflowMode === 'standard' && (
-          <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-xl border border-zinc-800">
-             <Button onClick={() => onTaxViewModeChange('T')} variant={taxViewMode === 'T' ? 'secondary' : 'ghost'} size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2", taxViewMode === 'T' && "bg-emerald-600 text-white hover:bg-emerald-500")}><CheckCircle2 className="w-3 h-3" /> Taxable</Button>
-             <Button onClick={() => onTaxViewModeChange('E')} variant={taxViewMode === 'E' ? 'secondary' : 'ghost'} size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2", taxViewMode === 'E' && "bg-blue-600 text-white hover:bg-blue-500")}><Database className="w-3 h-3" /> Exempted</Button>
+          <div className="flex items-center gap-1 bg-muted/80 dark:bg-zinc-950 p-1 rounded-xl border border-border dark:border-zinc-800">
+             <Button onClick={() => onTaxViewModeChange('T')} variant={taxViewMode === 'T' ? 'secondary' : 'ghost'} size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2", taxViewMode === 'T' ? "bg-emerald-600 text-white hover:bg-emerald-500" : "text-muted-foreground hover:text-foreground")}><CheckCircle2 className="w-3 h-3" /> Taxable</Button>
+             <Button onClick={() => onTaxViewModeChange('E')} variant={taxViewMode === 'E' ? 'secondary' : 'ghost'} size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2", taxViewMode === 'E' ? "bg-blue-600 text-white hover:bg-blue-500" : "text-muted-foreground hover:text-foreground")}><Database className="w-3 h-3" /> Exempted</Button>
           </div>
         )}
       </div>
