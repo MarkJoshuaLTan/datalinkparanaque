@@ -1397,6 +1397,7 @@ export default function Home() {
         ["CURRENT (2028)"],
         ["TOTAL MARKET VALUE (2028):", fmt(sum(taxableRecords, 'marketValue2028'))],
         ["TOTAL ASSESSED VALUE (2028):", fmt(sum(taxableRecords, 'assessedValue2028'))],
+        ["TOTAL YEARLY TAX (2028):", fmt(sum(taxableRecords, 'yearlyTax2028Uncapped'))],
         ["TOTAL YEARLY TAX (2028 capped at 6%):", fmt(sum(taxableRecords, 'yearlyTax2028'))],
         [],
         ["RPVARA (2029)"],
@@ -1467,6 +1468,32 @@ export default function Home() {
         }
       }
 
+      // Add merge and borders to the ASSESSMENT LEVELS & TAX RATES USED table in ExportResults
+      {
+        ws['!merges'] = ws['!merges'] || [];
+        ws['!merges'].push({ s: { r: startRow, c: startCol }, e: { r: startRow, c: startCol + 2 } });
+
+        const borderStyle = { style: 'thin', color: { rgb: '000000' } };
+        const fullBorder = { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle };
+
+        for (let rIdx = 0; rIdx < rightSummaryContent.length; rIdx++) {
+          const r = startRow + rIdx;
+          const isHeader = rIdx === 0 || rIdx === 1;
+          for (let cIdx = 0; cIdx < 3; cIdx++) {
+            const c = startCol + cIdx;
+            const cellAddr = XLSX.utils.encode_cell({ r, c });
+            if (!ws[cellAddr]) {
+              ws[cellAddr] = { t: 's', v: '' };
+            }
+            ws[cellAddr].s = {
+              border: fullBorder,
+              alignment: { horizontal: 'center', vertical: 'center' },
+              font: { bold: isHeader },
+            };
+          }
+        }
+      }
+
       XLSX.utils.book_append_sheet(wb, ws, "ExportResults");
 
       // --- Comparative Summary Report on SMV Sheet ---
@@ -1493,17 +1520,11 @@ export default function Home() {
           ["", "", "", "", "", "", ""],
           // Row 1 (xlsx row 2): title
           ["", "COMPARATIVE SUMMARY REPORT ON SMV", "", "", "", "", ""],
-          // Row 2 (xlsx row 3): empty
-          ["", "", "", "", "", "", ""],
-          // Row 3 (xlsx row 4): group headers
-          ["", "MARKET VALUE", "", "ASSESSED VALUE", "", "YEARLY TAX", ""],
-          // Row 4 (xlsx row 5): year headers
-          ["", "2028", "2029 & 2030", "2028", "2029 & 2030", "2028", "2029 & 2030"],
-          // Row 5 (xlsx row 6): cap note
-          ["", "(CAPPED AT 6%)", "", "(CAPPED AT 6%)", "", "(CAPPED AT 6%)", ""],
-          // Row 6 (xlsx row 7): empty
-          ["", "", "", "", "", "", ""],
-          // Data rows start at row 7 (xlsx row 8)
+          // Row 2 (xlsx row 3): group headers
+          ["BARANGAY", "MARKET VALUE", "", "ASSESSED VALUE", "", "YEARLY TAX", ""],
+          // Row 3 (xlsx row 4): year headers
+          ["", "2028", "2029 & 2030", "2028", "2029 & 2030", "2028 (CAPPED AT 6%)", "2029 & 2030"],
+          // Data rows start at row 4 (xlsx row 5)
           ...Array.from(smvByBrgy.entries())
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([brgy, d]) => [
@@ -1519,15 +1540,21 @@ export default function Home() {
 
         const wsSMV = XLSX.utils.aoa_to_sheet(smvRows);
 
-        // Column widths: A=20, B-G=22
+        // Column widths: A=22, B-G=22
         wsSMV['!cols'] = [{ wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }];
 
-        // Merges: title B2:G2 (r=1,c=1..6), group headers B4:C4, D4:E4, F4:G4 (r=3)
+        // Merges:
+        // Title B2:G2 (r=1, c=1..6)
+        // BARANGAY A3:A4 (r=2..3, c=0)
+        // MARKET VALUE B3:C3 (r=2, c=1..2)
+        // ASSESSED VALUE D3:E3 (r=2, c=3..4)
+        // YEARLY TAX F3:G3 (r=2, c=5..6)
         wsSMV['!merges'] = [
           { s: { r: 1, c: 1 }, e: { r: 1, c: 6 } }, // Title
-          { s: { r: 3, c: 1 }, e: { r: 3, c: 2 } }, // MARKET VALUE header
-          { s: { r: 3, c: 3 }, e: { r: 3, c: 4 } }, // ASSESSED VALUE header
-          { s: { r: 3, c: 5 }, e: { r: 3, c: 6 } }, // YEARLY TAX header
+          { s: { r: 2, c: 0 }, e: { r: 3, c: 0 } }, // BARANGAY header (vertical merge)
+          { s: { r: 2, c: 1 }, e: { r: 2, c: 2 } }, // MARKET VALUE header
+          { s: { r: 2, c: 3 }, e: { r: 2, c: 4 } }, // ASSESSED VALUE header
+          { s: { r: 2, c: 5 }, e: { r: 2, c: 6 } }, // YEARLY TAX header
         ];
 
         // Helper to set cell style
@@ -1537,7 +1564,7 @@ export default function Home() {
 
         const borderThin = { style: 'thin', color: { rgb: '000000' } };
         const allBorders = { top: borderThin, bottom: borderThin, left: borderThin, right: borderThin };
-        const boldCenter = { font: { bold: true }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true } };
+        const boldCenter = { font: { bold: true }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true }, border: allBorders };
 
         // Title cell (B2 = r1c1)
         setCell('B2', 'COMPARATIVE SUMMARY REPORT ON SMV', {
@@ -1548,33 +1575,31 @@ export default function Home() {
         // Also set merged empty cells with border
         ['C2','D2','E2','F2','G2'].forEach(c => setCell(c, '', { border: allBorders }));
 
-        // Group headers row 4 (r=3): B4, D4, F4
-        const groupHeaderStyle = { ...boldCenter, border: allBorders, fill: { fgColor: { rgb: 'FFFFFF' } } };
-        setCell('B4', 'MARKET VALUE', groupHeaderStyle);
-        setCell('C4', '', { border: allBorders });
-        setCell('D4', 'ASSESSED VALUE', groupHeaderStyle);
-        setCell('E4', '', { border: allBorders });
-        setCell('F4', 'YEARLY TAX', groupHeaderStyle);
-        setCell('G4', '', { border: allBorders });
+        // BARANGAY header (A3 = r2c0, merged A3:A4)
+        setCell('A3', 'BARANGAY', boldCenter);
+        setCell('A4', '', { border: allBorders });
 
-        // Year headers row 5 (r=4)
-        ['B5','C5','D5','E5','F5','G5'].forEach((c, i) => {
-          const labels = ['2028', '2029 & 2030', '2028', '2029 & 2030', '2028', '2029 & 2030'];
-          setCell(c, labels[i], { ...boldCenter, border: allBorders });
-        });
+        // Group headers row 3 (r=2): B3, D3, F3
+        setCell('B3', 'MARKET VALUE', boldCenter);
+        setCell('C3', '', { border: allBorders });
+        setCell('D3', 'ASSESSED VALUE', boldCenter);
+        setCell('E3', '', { border: allBorders });
+        setCell('F3', 'YEARLY TAX', boldCenter);
+        setCell('G3', '', { border: allBorders });
 
-        // Cap row row 6 (r=5): grey shading on odd cols (C6, E6, G6)
-        const capStyle = { ...boldCenter, border: allBorders };
-        const shadedStyle = { border: allBorders, fill: { patternType: 'solid', fgColor: { rgb: 'CCCCCC' } } };
-        setCell('B6', '(CAPPED AT 6%)', capStyle);
-        setCell('C6', '', shadedStyle);
-        setCell('D6', '(CAPPED AT 6%)', capStyle);
-        setCell('E6', '', shadedStyle);
-        setCell('F6', '(CAPPED AT 6%)', capStyle);
-        setCell('G6', '', shadedStyle);
+        // Year headers row 4 (r=3)
+        const subHeaders = [
+          { cell: 'B4', label: '2028' },
+          { cell: 'C4', label: '2029 & 2030' },
+          { cell: 'D4', label: '2028' },
+          { cell: 'E4', label: '2029 & 2030' },
+          { cell: 'F4', label: '2028 (CAPPED AT 6%)' },
+          { cell: 'G4', label: '2029 & 2030' },
+        ];
+        subHeaders.forEach(sh => setCell(sh.cell, sh.label, boldCenter));
 
-        // Data rows: apply border + number alignment
-        const dataStart = 8; // xlsx row 8 = array index 7
+        // Data rows: apply border + number alignment starting at xlsx row 5
+        const dataStart = 5;
         const dataCount = smvByBrgy.size;
         for (let i = 0; i < dataCount; i++) {
           const xlRow = dataStart + i;

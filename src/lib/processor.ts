@@ -69,6 +69,7 @@ export interface LandRecord {
   marketValue2028?: number;
   assessedValue2028?: number;
   yearlyTax2028?: number;
+  yearlyTax2028Uncapped?: number;
   
   unitValue2029?: number;
   marketValue2029?: number;
@@ -393,6 +394,7 @@ export function processRecords(
     const unitValue2028 = unitValue;
     const marketValue2028 = marketValue;
     const assessedValue2028 = assessedValue;
+    const yearlyTax2028Uncapped = yearlyTax;
     const yearlyTax2028 = isExempt ? 0 : (yearlyTax + (yearlyTax * 0.06));
 
     const record: LandRecord = {
@@ -416,6 +418,7 @@ export function processRecords(
       marketValue2028,
       assessedValue2028,
       yearlyTax2028,
+      yearlyTax2028Uncapped,
       unitValue2029: unitValue,
       marketValue2029: marketValue,
       assessedValue2029: assessedValue,
