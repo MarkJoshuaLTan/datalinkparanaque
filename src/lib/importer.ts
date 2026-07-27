@@ -28,13 +28,18 @@ export const HEADER_ALIASES = {
     'landarea', 'area', 'areasqm', 'sqm', 'lotarea', 'totalarea', 'sqmeters', 'totalsqm'
   ],
   unitValue: [
+    'currentunitvalue', 'currentuv', 'unitvalue2028', 'unitval2028',
     'unitvalue', 'uv', 'unitcost', 'marketvaluepersqm', 'unitprice', 'marketunitvalue'
   ],
   marketValue: [
-    'marketvalue', 'mv', 'totalmarketvalue', 'marketval', 'totalmv', 'marketvaluetotal'
+    'currentmarketvalue', 'currentmarket', 'currentmarketval', 'currentmv',
+    'marketvalue', 'marketval', 'marketvalue2028', 'marketval2028',
+    'mv', 'totalmarketvalue', 'totalmv', 'marketvaluetotal'
   ],
   assessedValue: [
-    'assessedvalue', 'av', 'al', 'assessedval', 'totalav', 'assessedlevelamount', 'totalassessed'
+    'currentassessed', 'currentassessedvalue', 'currentassessedval', 'currentav',
+    'assessedvalue', 'assessedval', 'assessedvalue2028', 'assessedval2028',
+    'assessed', 'av', 'totalav', 'totalassessed', 'assessedlevelamount'
   ],
   yearlyTax: [
     'yearlytax', 'tax', 'annualtax', 'taxdue', 'yearlytaxdue', 'annualtaxdue', 'totaltax'

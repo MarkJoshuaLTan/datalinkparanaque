@@ -313,6 +313,19 @@ export default function Home() {
   const [permitStep, setPermitStep] = useState<'roll' | 'permits' | 'ready'>('roll');
   const [threeYearStep, setThreeYearStep] = useState<'roll' | 'sales' | 'ready'>('roll');
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const hasData = rawData.length > 0 || previewData.length > 0 || journalData.length > 0 || salesData.length > 0 || permitData.length > 0 || threeYearSalesData.length > 0 || cancelledData.length > 0;
+      if (hasData || workflowMode !== 'idle') {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [rawData.length, previewData.length, journalData.length, salesData.length, permitData.length, threeYearSalesData.length, cancelledData.length, workflowMode]);
+
   const isAbstract = workflowMode === 'abstract';
   const isBuildingPermit = workflowMode === 'building-permit';
   const isThreeYearReport = workflowMode === 'three-year-report';
@@ -1926,8 +1939,8 @@ export default function Home() {
           </TooltipProvider>
         </div>
         <div className="flex items-center gap-1.5">
-          {workflowMode !== 'idle' && <Button variant="ghost" onClick={() => clearWorkspace()} className="mr-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary gap-2"><ChevronLeft className="w-3.5 h-3.5" /> Switch Engine</Button>}
-          {showDetailedResults && <div className="flex items-center gap-2 mr-3 px-4 border-r border-white/10"><TooltipProvider><Tooltip><TooltipTrigger asChild><div className="flex items-center gap-3"><Label htmlFor="summary-toggle" className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground cursor-pointer hover:text-primary transition-colors">Show Summary</Label><Switch id="summary-toggle" checked={showSummary} onCheckedChange={setShowSummary} className="data-[state=checked]:bg-primary scale-90" /></div></TooltipTrigger><TooltipContent>Toggle Dashboard KPI Overview</TooltipContent></Tooltip></TooltipProvider></div>}
+          {workflowMode !== 'idle' && <Button variant="ghost" onClick={() => clearWorkspace()} className="mr-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary hover:bg-primary/10 gap-2 transition-all"><ChevronLeft className="w-3.5 h-3.5" /> Switch Engine</Button>}
+          {showDetailedResults && <div className="flex items-center gap-2 mr-3 px-4 border-r border-border/40"><TooltipProvider><Tooltip><TooltipTrigger asChild><div className="flex items-center gap-3"><Label htmlFor="summary-toggle" className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground cursor-pointer hover:text-primary transition-colors">Show Summary</Label><Switch id="summary-toggle" checked={showSummary} onCheckedChange={setShowSummary} className="data-[state=checked]:bg-primary scale-90" /></div></TooltipTrigger><TooltipContent>Toggle Dashboard KPI Overview</TooltipContent></Tooltip></TooltipProvider></div>}
           {deferredPrompt && <Button variant="ghost" size="icon" onClick={handleInstallClick} className="hover:bg-muted"><Download className="w-5 h-5" /></Button>}
           <Button variant="ghost" size="icon" onClick={toggleFullScreen} className="hover:bg-muted">{isFullScreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}</Button>
           <ModeToggle />

@@ -269,24 +269,35 @@ export function matchesPinPattern(pin: string, pattern: string): boolean {
   return regex.test(cleanPin);
 }
 
-export function calculateAssessedValue(marketValue: number, au: string, taxRates: TaxRateMap): number {
+function resolveTaxConfig(au: string, taxRates: TaxRateMap): { assessmentLevel: number; taxRate: number } | null {
   const auUpper = (au || '').toUpperCase().trim();
-  let config = taxRates[auUpper];
-  if (!config) {
-    const baseKey = Object.keys(taxRates).find(key => auUpper.includes(key));
-    if (baseKey) config = taxRates[baseKey];
+  if (!auUpper) return null;
+  if (taxRates[auUpper]) return taxRates[auUpper];
+
+  for (const [key, config] of Object.entries(taxRates)) {
+    if (auUpper.includes(key) || key.includes(auUpper) || auUpper.startsWith(key.substring(0, 3)) || key.startsWith(auUpper.substring(0, 3))) {
+      return config;
+    }
   }
+
+  if (auUpper.startsWith('R')) return taxRates['RESI'] || null;
+  if (auUpper.startsWith('C')) return taxRates['COMM'] || null;
+  if (auUpper.startsWith('I')) return taxRates['INDU'] || null;
+  if (auUpper.startsWith('A')) return taxRates['AGRI'] || null;
+  if (auUpper.startsWith('G')) return taxRates['GOV'] || null;
+  if (auUpper.startsWith('S')) return taxRates['SPEC'] || taxRates['SPC1'] || null;
+
+  return null;
+}
+
+export function calculateAssessedValue(marketValue: number, au: string, taxRates: TaxRateMap): number {
+  const config = resolveTaxConfig(au, taxRates);
   const level = config ? config.assessmentLevel : 0.20;
   return marketValue * level;
 }
 
 export function calculateYearlyTax(assessedValue: number, au: string, taxRates: TaxRateMap): number {
-  const auUpper = (au || '').toUpperCase().trim();
-  let config = taxRates[auUpper];
-  if (!config) {
-    const baseKey = Object.keys(taxRates).find(key => auUpper.includes(key));
-    if (baseKey) config = taxRates[baseKey];
-  }
+  const config = resolveTaxConfig(au, taxRates);
   const rate = config ? config.taxRate : 0.02;
   return assessedValue * rate;
 }
@@ -364,16 +375,19 @@ export function processRecords(
     let unitValue = Number(r.unitValue) || 0;
     const kind = r.kind?.trim().toUpperCase() || '';
     const isExempt = normalizedExemptPins.has(normalizePin(r.pin));
+    const isBOrM = kind === 'M' || kind === 'B';
 
-    if (kind !== 'M' && kind !== 'B' && unitValue === 0 && marketValue > 0 && landArea > 0) {
+    if (!isBOrM && unitValue === 0 && marketValue > 0 && landArea > 0) {
       unitValue = Math.round(marketValue / landArea);
     } else { unitValue = Math.round(unitValue); }
 
-    if (unitValue > 0 && landArea > 0 && kind !== 'M' && kind !== 'B') {
+    if (unitValue > 0 && landArea > 0 && !isBOrM) {
       marketValue = unitValue * landArea;
     }
 
-    const assessedValue = calculateAssessedValue(marketValue, r.au || '', taxRates);
+    const assessedValue = isBOrM
+      ? (Number(r.assessedValue) || 0)
+      : calculateAssessedValue(marketValue, r.au || '', taxRates);
     const yearlyTax = isExempt ? 0 : calculateYearlyTax(assessedValue, r.au || '', taxRates);
 
     const unitValue2028 = unitValue;
@@ -402,6 +416,10 @@ export function processRecords(
       marketValue2028,
       assessedValue2028,
       yearlyTax2028,
+      unitValue2029: unitValue,
+      marketValue2029: marketValue,
+      assessedValue2029: assessedValue,
+      yearlyTax2029: yearlyTax,
       isDuplicate: false,
       isCleanup,
       isManualArchive: r.isManualArchive || false,

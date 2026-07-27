@@ -16,8 +16,8 @@
     --secondary-foreground: 142 71% 45%;
     --muted: 0 0% 92%;
     --muted-foreground: 0 0% 40%;
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 0 0% 92%;
+    --accent-foreground: 0 0% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 85%;
@@ -39,7 +39,7 @@
     --secondary-foreground: 0 0% 95%;
     --muted: 240 4% 15%;
     --muted-foreground: 0 0% 60%;
-    --accent: 142 61% 55%;
+    --accent: 240 4% 15%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
@@ -95,7 +95,7 @@
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--accent));
+  background: hsl(var(--primary) / 0.8);
 }
 
 /* Custom vertical scrollbar for settings panel */
@@ -114,7 +114,7 @@
 }
 
 .scrollbar-vertical-custom::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--accent));
+  background: hsl(var(--primary) / 0.8);
 }
 
 .select-none {
