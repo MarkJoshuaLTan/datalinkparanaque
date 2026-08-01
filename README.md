@@ -43,11 +43,10 @@
 
 ## 📸 Screenshots
 
-![Dashboard Placeholder](/placeholder-images.json)  
-*(Screenshot of the main dashboard metrics and data preview table)*
+<img width="1906" height="945" alt="image" src="https://github.com/user-attachments/assets/016537d6-0c80-4d04-b502-b9ec2cd7982a" />
+ 
+<img width="1878" height="937" alt="image" src="https://github.com/user-attachments/assets/e8dc8337-1a73-42a8-a166-bc2ed1f35fb2" />
 
-![Three Year Report Placeholder](/placeholder-images.json)  
-*(Screenshot of the relational joiner and export settings)*
 
 ---
 
