@@ -288,6 +288,7 @@ export default function Home() {
   const [cancelledData, setCancelledData] = useState<LandRecord[]>([]);
   const [permitData, setPermitData] = useState<LandRecord[]>([]);
   const [threeYearSalesData, setThreeYearSalesData] = useState<LandRecord[]>([]);
+  const [exemptData, setExemptData] = useState<LandRecord[]>([]);
   const [exemptPins, setExemptPins] = useState<Set<string>>(new Set());
   const [rules, setRules] = useState<CalibrationRule[]>([]);
   const [locationSettings, setLocationSettings] = useState<BarangayConfig[]>(initialLocationSettings);
@@ -1035,7 +1036,7 @@ export default function Home() {
   const clearWorkspace = async () => {
     setIsClearing(true);
     await delay(500);
-    setRawData([]); setProcessedData([]); setPreviewData([]); setJournalData([]); setSalesData([]); setCancelledData([]); setPermitData([]); setThreeYearSalesData([]); setExemptPins(new Set());
+    setRawData([]); setProcessedData([]); setPreviewData([]); setJournalData([]); setSalesData([]); setCancelledData([]); setPermitData([]); setThreeYearSalesData([]); setExemptData([]); setExemptPins(new Set());
     setRawFileManifest([]); setExemptFileManifest([]); setJournalFileManifest([]); setSalesFileManifest([]); setCancelledFileManifest([]); setPermitFileManifest([]); setThreeYearSalesFileManifest([]);
     setSearchQuery(""); setImportedFileName(""); setShowDetailedResults(false);
     setWorkflowMode('idle'); setAbstractStep('roll'); setPermitStep('roll'); setThreeYearStep('roll'); setViewMode('results');
@@ -1086,7 +1087,7 @@ export default function Home() {
   const handleSaveSettings = useCallback((newLocationSettings: BarangayConfig[], newTaxRates: TaxRateMap) => {
     setLocationSettings(newLocationSettings);
     setTaxRates(newTaxRates);
-    const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData];
+    const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData, ...exemptData];
     if (combined.length > 0) {
       if (processedData.length > 0) {
         runProcessWithData(combined, combined.length, importedFileName, true, exemptPins, newLocationSettings, newTaxRates);
@@ -1104,6 +1105,7 @@ export default function Home() {
     let latestCancelledData = [...cancelledData];
     let latestPermitData = [...permitData];
     let latestThreeYearSalesData = [...threeYearSalesData];
+    let latestExemptData = [...exemptData];
     let latestExemptPins = new Set(exemptPins);
 
     const newManifestEntries: { name: string, count: number }[] = [];
@@ -1119,6 +1121,7 @@ export default function Home() {
         const pinsFromThisFile = new Set<string>();
         imported.forEach((r: any) => { if (r.pin) { const pin = r.pin.trim(); latestExemptPins.add(pin); pinsFromThisFile.add(pin); } });
         newExemptManifestEntries.push({ name: fileName, count: imported.length, pins: Array.from(pinsFromThisFile) });
+        latestExemptData = [...latestExemptData.filter(r => r.sourceFile !== fileName), ...imported];
       } else if (mode === 'journal') {
         latestJournalData = [...latestJournalData.filter(r => r.sourceFile !== fileName), ...imported];
         newManifestEntries.push({ name: fileName, count: rawCount });
@@ -1142,6 +1145,7 @@ export default function Home() {
 
     if (mode === 'exempt') {
       setExemptPins(new Set(latestExemptPins));
+      setExemptData(latestExemptData);
       setExemptFileManifest(prev => {
         const names = new Set(newExemptManifestEntries.map(e => e.name));
         return [...prev.filter(f => !names.has(f.name)), ...newExemptManifestEntries];
@@ -1184,7 +1188,7 @@ export default function Home() {
       setRawData(latestRawData);
     }
 
-    const combined = [...latestRawData, ...latestJournalData, ...latestSalesData, ...latestCancelledData, ...latestPermitData];
+    const combined = [...latestRawData, ...latestJournalData, ...latestSalesData, ...latestCancelledData, ...latestPermitData, ...latestExemptData];
     const topFileName = importResults.length > 1 ? `Batch (${importResults.length} Files)` : importResults[0].fileName;
     if (mode !== 'exempt') setImportedFileName(topFileName);
 
@@ -1223,7 +1227,7 @@ export default function Home() {
     else if (mode === 'cancelled') { setCancelledData(prev => prev.filter(r => r.sourceFile !== fileName)); setCancelledFileManifest(prev => prev.filter(f => f.name !== fileName)); }
     else if (mode === 'permits') { setPermitData(prev => prev.filter(r => r.sourceFile !== fileName)); setPermitFileManifest(prev => prev.filter(f => f.name !== fileName)); }
     else if (mode === 'three-year-sales') { setThreeYearSalesData(prev => prev.filter(r => r.sourceFile !== fileName)); setThreeYearSalesFileManifest(prev => prev.filter(f => f.name !== fileName)); }
-    else { const newExemptFiles = exemptFileManifest.filter(f => f.name !== fileName); setExemptFileManifest(newExemptFiles); const newExemptPins = new Set<string>(); newExemptFiles.forEach(f => f.pins.forEach(pin => newExemptPins.add(pin))); setExemptPins(newExemptPins); }
+    else { const newExemptFiles = exemptFileManifest.filter(f => f.name !== fileName); setExemptFileManifest(newExemptFiles); const newExemptPins = new Set<string>(); newExemptFiles.forEach(f => f.pins.forEach(pin => newExemptPins.add(pin))); setExemptPins(newExemptPins); setExemptData(prev => prev.filter(r => r.sourceFile !== fileName)); }
     setProcessedData([]); toast({ title: "File Removed", description: `${fileName} has been removed from the session.` });
   };
 
@@ -1234,7 +1238,7 @@ export default function Home() {
     else if (mode === 'cancelled') { setCancelledData([]); setCancelledFileManifest([]); }
     else if (mode === 'permits') { setPermitData([]); setPermitFileManifest([]); }
     else if (mode === 'three-year-sales') { setThreeYearSalesData([]); setThreeYearSalesFileManifest([]); }
-    else { setExemptFileManifest([]); setExemptPins(new Set()); }
+    else { setExemptFileManifest([]); setExemptPins(new Set()); setExemptData([]); }
     setProcessedData([]); toast({ title: "Files Cleared", description: `All files have been removed from the ${mode} session.` });
   };
 
@@ -1262,7 +1266,7 @@ export default function Home() {
     finally { setIsDirectImporting(false); if (e.target) e.target.value = ''; }
   };
 
-  const runProcess = async () => { const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData]; if (combined.length === 0) return; runProcessWithData(combined, combined.length, importedFileName); };
+  const runProcess = async () => { const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData, ...exemptData]; if (combined.length === 0) return; runProcessWithData(combined, combined.length, importedFileName); };
 
   const handleSaveRecord = useCallback((updatedRecord: LandRecord, silent = false) => {
     setSelectedRecord(null); setComparisonRecord(null); if (!silent) setIsProcessing(true);
@@ -1276,13 +1280,14 @@ export default function Home() {
       setCancelledData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
       setPermitData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
       setThreeYearSalesData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
+      setExemptData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
       setTimeout(() => {
-        const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData];
+        const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData, ...exemptData];
         if (processedData.length > 0) { runProcessWithData(combined, combined.length, importedFileName, silent); }
         else { const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, importedFileName, exemptPins); setPreviewData(allWithDuplicateMarkers); if (!silent) setIsProcessing(false); }
       }, silent ? 0 : 10);
     });
-  }, [rawData, journalData, salesData, cancelledData, permitData, processedData.length, importedFileName, locationSettings, taxRates, exemptPins]);
+  }, [rawData, journalData, salesData, cancelledData, permitData, exemptData, processedData.length, importedFileName, locationSettings, taxRates, exemptPins]);
 
   const handleArchiveRecord = useCallback((record: LandRecord) => { handleSaveRecord({ ...record, isManualArchive: true }, true); toast({ title: "Record Archived", description: "The record has been moved to the Archive tab." }); }, [handleSaveRecord]);
   const handleUnarchiveRecord = useCallback((record: LandRecord) => { handleSaveRecord({ ...record, isManualArchive: false }, true); toast({ title: "Record Restored", description: "The record has been moved back to the Results tab." }); }, [handleSaveRecord]);
@@ -1299,14 +1304,15 @@ export default function Home() {
       setCancelledData(prev => prev.filter(r => !matchFn(r)));
       setPermitData(prev => prev.filter(r => !matchFn(r)));
       setThreeYearSalesData(prev => prev.filter(r => !matchFn(r)));
+      setExemptData(prev => prev.filter(r => !matchFn(r)));
       setTimeout(() => {
-        const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData].filter(r => !matchFn(r));
+        const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData, ...exemptData].filter(r => !matchFn(r));
         if (processedData.length > 0) { runProcessWithData(combined, combined.length, importedFileName, silent); }
         else { const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, importedFileName, exemptPins); setPreviewData(allWithDuplicateMarkers); if (!silent) setIsProcessing(false); }
       }, silent ? 0 : 10);
     });
     toast({ title: "Record Deleted", description: "The record has been permanently deleted." });
-  }, [rawData, journalData, salesData, cancelledData, permitData, processedData.length, importedFileName, locationSettings, taxRates, exemptPins]);
+  }, [rawData, journalData, salesData, cancelledData, permitData, exemptData, processedData.length, importedFileName, locationSettings, taxRates, exemptPins]);
 
   const handleRowClick = useCallback((record: LandRecord) => { 
     setSelectedRecord(record); 

@@ -354,6 +354,15 @@ export function processRecords(
   records.forEach(r => { if (r.arpNo) arpCounts.set(r.arpNo, (arpCounts.get(r.arpNo) || 0) + 1); });
 
   let calibratedCount = 0;
+  const exemptPinArp = new Set<string>();
+  records.forEach(r => {
+    if (r.taxability === 'E') {
+      const pin = normalizePin(r.pin);
+      const arp = r.arpNo ? r.arpNo.trim().toUpperCase() : '';
+      if (pin && arp) exemptPinArp.add(`${pin}|${arp}`);
+    }
+  });
+
   const normalizedExemptPins = new Set(Array.from(exemptPins).map(p => normalizePin(p)));
 
   let result = records.map(r => {
@@ -374,7 +383,9 @@ export function processRecords(
     let marketValue = Number(r.marketValue) || 0;
     let unitValue = Number(r.unitValue) || 0;
     const kind = r.kind?.trim().toUpperCase() || '';
-    const isExempt = normalizedExemptPins.has(normalizePin(r.pin));
+    const rPin = normalizePin(r.pin);
+    const rArp = r.arpNo ? r.arpNo.trim().toUpperCase() : '';
+    const isExempt = r.taxability === 'E' || (rPin && rArp && exemptPinArp.has(`${rPin}|${rArp}`)) || normalizedExemptPins.has(rPin);
     const isBOrM = kind === 'M' || kind === 'B';
 
     if (!isBOrM && unitValue === 0 && marketValue > 0 && landArea > 0) {
@@ -578,7 +589,13 @@ export function processRecords(
     } else { record.newArpNo = '---'; }
   });
 
-  const finalProcessed = result.filter(r => r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP');
+  const finalProcessed = result.filter(r => {
+    // Exempt files' records (and taxable marked as exempt) should remain in results if they are DUPLICATE
+    if (r.taxability === 'E') {
+      return r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && r.statusLabel !== 'NO ARP NO#';
+    }
+    return r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP';
+  });
   const errorCount = finalProcessed.filter(r => !r.isValid).length;
   const validCount = finalProcessed.filter(r => r.isValid).length;
 
