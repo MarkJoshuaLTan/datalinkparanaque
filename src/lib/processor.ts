@@ -373,7 +373,7 @@ export function processRecords(
     if (options.systemCleanup) {
       const rowValues = Object.values(r).map(v => String(v).toUpperCase());
       const isTotalRow = rowValues.some(v => v.includes("GRAND TOTAL") || v.includes("PAGE TOTAL") || v.includes("TOTALS"));
-      const allValuesEmpty = !r.pin && !r.arpNo && !r.acctName;
+      const allValuesEmpty = !r.pin && !r.arpNo && !r.acctName && !r.address;
       const hasMinimalData = ((r.date || r.arpNo || r.pin) && (r.acctName || (r.pin && r.pin !== "")));
       if (allValuesEmpty) { isCleanup = true; cleanupReason = "Empty Row"; }
       else if (isTotalRow) { isCleanup = true; cleanupReason = "Total Row"; }
@@ -593,9 +593,8 @@ export function processRecords(
   });
 
   const finalProcessed = result.filter(r => {
-    // Exempt files' records (and taxable marked as exempt) should remain in results if they are DUPLICATE
     if (r.taxability === 'E') {
-      return r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && r.statusLabel !== 'NO ARP NO#';
+      return r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP' && r.statusLabel !== 'NO ARP NO#';
     }
     return r.statusLabel !== 'DUPLICATE' && r.statusLabel !== 'INCOMPLETE' && r.statusLabel !== 'CLEANUP';
   });

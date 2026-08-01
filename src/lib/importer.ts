@@ -269,7 +269,8 @@ export const parseFile = async (
           ((importMode === 'sales' || importMode === 'three-year-sales') && r.arpNo) ||
           (importMode === 'cancelled' && r.pin) ||
           (importMode === 'permits' && (r.buildingPermitNo || r.acctName)) ||
-          (importMode === 'raw' && (r.pin || r.arpNo))
+          (importMode === 'raw') ||
+          (importMode === 'exempt')
         );
 
         resolve({ data: finalRecords, count: finalRecords.length });
