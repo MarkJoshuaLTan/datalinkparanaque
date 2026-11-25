@@ -1,14 +1,6 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,64 +12,116 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { LandRecord, validateRecord, ValidationError, getModeOfConveyance } from '@/lib/processor';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
   AlertTriangle, Save, Edit3, Archive, RotateCcw, ArrowRightLeft,
-  CheckCircle2, Link2, Database, Tag, HardHat, TrendingUp,
-  MapPin, Unlink2, AlertCircle, DollarSign, Building2, BarChart3, Trash2
+  Link2, Unlink2, AlertCircle, HardHat, TrendingUp, Trash2, X,
+  FileText, Calculator, MapPin
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
-interface EditableItemProps {
+interface EditableFieldProps {
   label: string;
   field: keyof LandRecord;
   value: any;
+  isEditing: boolean;
   isMono?: boolean;
   type?: string;
+  uppercase?: boolean;
   errors?: ValidationError[];
   onChange: (field: keyof LandRecord, value: any) => void;
+  displayOverride?: string;
+  accent?: string;
 }
 
-const EditableItem = ({ label, field, value, isMono = false, type = "text", errors, onChange }: EditableItemProps) => {
-  const hasError = errors?.some(e => e.field === field);
-  const displayValue = (type === "number" && value === 0) ? "" : (value ?? "");
+const FieldItem = ({
+  label,
+  field,
+  value,
+  isEditing,
+  isMono = false,
+  type = "text",
+  uppercase = false,
+  errors,
+  onChange,
+  displayOverride,
+  accent,
+}: EditableFieldProps) => {
+  const error = errors?.find(e => e.field === field);
+  const hasError = !!error;
+  const inputVal = (type === "number" && value === 0) ? "" : (value ?? "");
+  const viewText = displayOverride ?? (value !== undefined && value !== null && String(value).trim() !== "" ? String(value) : "—");
+
+  if (!isEditing) {
+    return (
+      <div className="space-y-0.5 min-w-0">
+        <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+          <span>{label}</span>
+          {hasError && <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />}
+        </p>
+        <p
+          className={cn(
+            "text-sm font-semibold text-foreground break-words leading-snug",
+            isMono && "tabular-nums",
+            uppercase && "uppercase",
+            hasError && "text-red-600",
+            accent
+          )}
+        >
+          {viewText}
+        </p>
+        {hasError && (
+          <p className="text-xs text-red-600 font-medium leading-snug">{error.message}</p>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-1.5">
-      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none flex items-center gap-1">
-        {label}
-        {hasError && <AlertTriangle className="w-3 h-3 text-red-500" />}
+    <div className="space-y-1 min-w-0">
+      <label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+        <span>{label}</span>
+        {hasError && <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />}
       </label>
       <Input
         type={type}
-        value={displayValue}
+        value={inputVal}
         onChange={(e) => onChange(field, e.target.value)}
-        className={cn("h-9 text-xs font-bold", isMono && "font-mono", hasError && "border-red-500 bg-red-500/5 focus-visible:ring-red-500")}
+        className={cn(
+          "h-8 text-sm font-medium bg-background",
+          isMono && "tabular-nums",
+          uppercase && "uppercase",
+          hasError && "border-red-500 focus-visible:ring-red-500"
+        )}
       />
-      {hasError && <p className="text-[9px] text-red-500 font-bold uppercase tracking-tight">{errors?.find(e => e.field === field)?.message}</p>}
+      {hasError && (
+        <p className="text-xs text-red-600 font-medium leading-snug">{error.message}</p>
+      )}
     </div>
   );
 };
 
-/** Generic read-only display item */
-const StaticItem = ({ label, value, isMono = false, subValue, accent }: { label: string; value: string; isMono?: boolean; subValue?: string; accent?: string }) => (
-  <div className="space-y-0.5">
-    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{label}</p>
-    <p className={cn("text-xs font-black truncate", isMono && "font-mono", accent)}>{value}</p>
-    {subValue && <p className="text-[9px] font-bold text-muted-foreground/50 uppercase">{subValue}</p>}
+const StaticItem = ({ label, value, isMono = false, accent }: { label: string; value: string; isMono?: boolean; accent?: string }) => (
+  <div className="space-y-0.5 min-w-0">
+    <p className="text-xs font-medium text-muted-foreground">{label}</p>
+    <p className={cn("text-sm font-semibold text-foreground break-words leading-snug", isMono && "tabular-nums", accent)}>
+      {value || "—"}
+    </p>
   </div>
 );
 
-/** Generic currency formatter */
-const fmtCurrency = (value?: number | string) => {
-  if (value === undefined || value === null) return '---';
-  if (typeof value === 'string') return value;
-  return `₱${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmtCurrency = (value?: number | string, decimals = 2) => {
+  if (value === undefined || value === null || value === "") return "—";
+  if (typeof value === "string") return value;
+  return `₱${value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+const KIND_LABELS: Record<string, string> = {
+  L: "Land (L)",
+  B: "Building (B)",
+  M: "Machinery (M)",
+};
 
 interface RecordDetailModalProps {
   record: LandRecord | null;
@@ -89,25 +133,43 @@ interface RecordDetailModalProps {
   onUnarchive?: (record: LandRecord) => void;
   onDelete?: (record: LandRecord) => void;
   workflowMode?: string;
+  isProcessed?: boolean;
 }
 
-export function RecordDetailModal({ record, comparisonRecord, open, onOpenChange, onSave, onArchive, onUnarchive, onDelete, workflowMode }: RecordDetailModalProps) {
+export function RecordDetailModal({
+  record,
+  comparisonRecord,
+  open,
+  onOpenChange,
+  onSave,
+  onArchive,
+  onUnarchive,
+  onDelete,
+  workflowMode,
+  isProcessed = false,
+}: RecordDetailModalProps) {
   const [editedRecord, setEditedRecord] = useState<LandRecord | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (record) setEditedRecord({ ...record });
+    if (record) {
+      setEditedRecord({ ...record });
+      setIsEditing(false);
+    } else {
+      setEditedRecord(null);
+      setIsEditing(false);
+    }
   }, [record]);
 
-  if (!editedRecord) return null;
+  if (!open || !editedRecord) return null;
 
   const r = editedRecord as any;
-  const isAbstract   = workflowMode === 'abstract';
-  const isPermit     = workflowMode === 'building-permit';
-  const isThreeYear  = workflowMode === 'three-year-report';
-  const isSpecial    = isAbstract || isPermit || isThreeYear;
+  const isAbstract = workflowMode === 'abstract';
+  const isPermit = workflowMode === 'building-permit';
+  const isThreeYear = workflowMode === 'three-year-report';
+  const isSpecial = isAbstract || isPermit || isThreeYear;
 
-  // ── Field change handler ──────────────────────────────────────────
   const handleChange = (field: keyof LandRecord, value: any) => {
     let v = value;
     if (field === 'landArea' || field === 'unitValue' || field === 'marketValue' || field === 'estimatedCost') {
@@ -123,360 +185,556 @@ export function RecordDetailModal({ record, comparisonRecord, open, onOpenChange
     setEditedRecord(updated);
   };
 
-  /** Generic field change for fields not in LandRecord keyof (e.g. permit extras stored as `any`) */
   const handleAnyChange = (field: string, value: any) => {
     setEditedRecord(prev => prev ? { ...prev, [field]: value } : prev);
   };
 
-  // ── Status badge ──────────────────────────────────────────────────
-  const getStatusBadge = () => {
+  const handleCancelEdit = () => {
+    if (record) setEditedRecord({ ...record });
+    setIsEditing(false);
+  };
+
+  const handleCommitSave = () => {
+    onSave?.(editedRecord);
+    setIsEditing(false);
+  };
+
+  const getStatusIndicator = () => {
     if (isPermit) {
-      if (r.isUnderReview) return <Badge className="bg-orange-500 text-white font-black uppercase text-[9px] h-5 px-2.5 tracking-widest gap-1.5"><AlertCircle className="w-3 h-3" /> Under Review</Badge>;
-      if (r.isPotentialMatch) return <Badge className="bg-amber-500 text-white font-black uppercase text-[9px] h-5 px-2.5 tracking-widest gap-1.5"><AlertCircle className="w-3 h-3" /> Potential Match</Badge>;
+      if (r.isUnderReview) return <span className="inline-flex items-center gap-1 text-xs font-semibold text-orange-600"><AlertCircle className="w-3.5 h-3.5" /> Under Review</span>;
+      if (r.isPotentialMatch) return <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600"><AlertCircle className="w-3.5 h-3.5" /> Potential Match</span>;
       return r.isJoined
-        ? <Badge className="bg-emerald-600 text-white font-black uppercase text-[9px] h-5 px-2.5 tracking-widest gap-1.5"><Link2 className="w-3 h-3" /> Matched</Badge>
-        : <Badge variant="destructive" className="font-black uppercase text-[9px] h-5 px-2.5 tracking-widest gap-1.5"><Unlink2 className="w-3 h-3" /> Unlinked</Badge>;
+        ? <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#16A249]"><Link2 className="w-3.5 h-3.5" /> Matched</span>
+        : <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600"><Unlink2 className="w-3.5 h-3.5" /> Unlinked</span>;
     }
     if (isThreeYear) {
-      if (r.isUnderReview) return <Badge className="bg-orange-500 text-white font-black uppercase text-[9px] h-5 px-2.5 tracking-widest gap-1.5"><AlertCircle className="w-3 h-3" /> Under Review</Badge>;
+      if (r.isUnderReview) return <span className="inline-flex items-center gap-1 text-xs font-semibold text-orange-600"><AlertCircle className="w-3.5 h-3.5" /> Under Review</span>;
       return r.isJoined
-        ? <Badge className="bg-violet-600 text-white font-black uppercase text-[9px] h-5 px-2.5 tracking-widest gap-1.5"><Link2 className="w-3 h-3" /> Linked</Badge>
-        : <Badge variant="destructive" className="font-black uppercase text-[9px] h-5 px-2.5 tracking-widest gap-1.5"><Unlink2 className="w-3 h-3" /> Unlinked</Badge>;
+        ? <span className="inline-flex items-center gap-1 text-xs font-semibold text-violet-600"><Link2 className="w-3.5 h-3.5" /> Linked</span>
+        : <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600"><Unlink2 className="w-3.5 h-3.5" /> Unlinked</span>;
     }
     if (isAbstract) {
       return r.isJoined
-        ? <Badge className="bg-emerald-600 text-white font-black uppercase text-[9px] h-5 px-2.5 tracking-widest gap-1.5"><Link2 className="w-3 h-3" /> Relational Match</Badge>
-        : <Badge variant="destructive" className="font-black uppercase text-[9px] h-5 px-2.5 tracking-widest opacity-60">Unlinked</Badge>;
+        ? <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#16A249]"><Link2 className="w-3.5 h-3.5" /> Linked</span>
+        : <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600">Unlinked</span>;
     }
     if (!editedRecord.isValid) {
-      if (editedRecord.landArea === 0 && editedRecord.pin && editedRecord.arpNo)
-        return <Badge variant="destructive" className="text-[10px] h-5 px-2 font-black uppercase tracking-tighter flex items-center gap-1 bg-red-600"><AlertTriangle className="w-3 h-3" /> ERROR</Badge>;
-      return <Badge variant="destructive" className="text-[10px] h-5 px-2 font-black uppercase tracking-tighter">INVALID</Badge>;
+      return <span className="inline-flex items-center gap-1 text-xs font-bold uppercase text-red-600"><AlertTriangle className="w-3.5 h-3.5" /> {editedRecord.statusLabel || "Invalid"}</span>;
     }
-    if (editedRecord.isCleanup || editedRecord.isManualArchive)
-      return <Badge variant="outline" className="text-[10px] h-5 px-2 font-black uppercase tracking-tighter bg-orange-100 text-orange-700 border-orange-200">{editedRecord.isManualArchive ? 'ARCHIVED' : (editedRecord.cleanupReason || 'CLEANUP')}</Badge>;
-    if (editedRecord.isDuplicate)
-      return <Badge variant="destructive" className="text-[10px] h-5 px-2 font-black uppercase tracking-tighter">DUPLICATE</Badge>;
-    return <Badge variant="secondary" className="text-[10px] h-5 px-2 font-black uppercase tracking-tighter bg-emerald-100 text-emerald-700 border-emerald-200">VALID</Badge>;
+    if (editedRecord.isCleanup || editedRecord.isManualArchive) {
+      return <span className="inline-flex items-center gap-1 text-xs font-bold uppercase text-orange-600">{editedRecord.isManualArchive ? "Archived" : (editedRecord.cleanupReason || "Cleanup")}</span>;
+    }
+    if (editedRecord.isDuplicate) {
+      return <span className="inline-flex items-center gap-1 text-xs font-bold uppercase text-red-600">Duplicate</span>;
+    }
+    return <span className="inline-flex items-center gap-1 text-xs font-bold uppercase text-[#16A249]">Valid</span>;
   };
 
-  const isZeroArea = editedRecord.landArea === 0 && editedRecord.pin && editedRecord.arpNo;
   const isInArchive = editedRecord.isManualArchive || editedRecord.isCleanup || editedRecord.isDuplicate;
+  const headerRef = isPermit
+    ? (r.buildingPermitNo || "—")
+    : (editedRecord.arpNo || editedRecord.pin || "—");
 
-  // ── Title / gradient per mode ─────────────────────────────────────
-  const titleGradient = isPermit ? 'from-orange-500 to-amber-400' : isThreeYear ? 'from-violet-600 to-purple-400' : 'from-blue-600 to-emerald-500';
-  const titleIcon = isPermit ? <HardHat className="w-5 h-5 text-orange-500" /> : isThreeYear ? <TrendingUp className="w-5 h-5 text-violet-500" /> : <Edit3 className="w-5 h-5 text-primary" />;
-  const titleText = isPermit ? 'Building Permit Editor' : isThreeYear ? '3-Year Report Editor' : isAbstract ? 'Relational Audit Explorer' : 'Property Record Editor';
-  const descLabel = isPermit ? 'Permit No.' : isThreeYear ? 'Account' : isAbstract ? 'Abstract Transaction' : 'Correction & Validation';
-  const descValue = isPermit ? (r.buildingPermitNo || '---') : (record?.acctName || '---');
+  const headerIcon = isPermit
+    ? <HardHat className="w-4 h-4 text-[#16A249] shrink-0" />
+    : isThreeYear
+      ? <TrendingUp className="w-4 h-4 text-violet-600 shrink-0" />
+      : <FileText className="w-4 h-4 text-[#16A249] shrink-0" />;
 
-  // ── Section header helper ─────────────────────────────────────────
-  const SectionTitle = ({ icon: Icon, label, color }: { icon: any; label: string; color: string }) => (
-    <h4 className={cn("text-[10px] font-black uppercase flex items-center gap-2 tracking-widest leading-none", color)}>
-      <Icon className="w-3.5 h-3.5" /> {label}
-    </h4>
-  );
+  const kindKey = (editedRecord.kind || "").trim().toUpperCase();
+  const kindDisplay = KIND_LABELS[kindKey] || editedRecord.kind || "—";
+  const taxDisplay = editedRecord.taxability === 'E' ? 'Exempted (E)' : 'Taxable (T)';
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[95vh] bg-card/95 backdrop-blur-xl border-white/10 p-0 shadow-2xl flex flex-col overflow-hidden">
-
-        {/* ── Header ─────────────────────────────────────────────── */}
-        <DialogHeader className="p-6 pb-2 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <DialogTitle className={cn("text-xl font-black bg-gradient-to-r bg-clip-text text-transparent uppercase tracking-tight flex items-center gap-2 leading-none", titleGradient)}>
-                {titleIcon} {titleText}
-              </DialogTitle>
-              <DialogDescription className="text-xs font-bold">
-                <span className="text-muted-foreground">{descLabel}: </span>
-                <span className="font-black text-foreground underline decoration-primary/30 underline-offset-4">{descValue}</span>
-              </DialogDescription>
-            </div>
-            <div>{getStatusBadge()}</div>
+    <aside
+      className="w-[410px] xl:w-[450px] shrink-0 border-l border-border bg-card flex flex-col h-full overflow-hidden"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      {/* Top Header */}
+      <div className="px-4 py-3 border-b border-border bg-card shrink-0 flex items-start justify-between gap-2">
+        <div className="min-w-0 space-y-1">
+          <div className="flex items-center gap-1.5 text-sm font-bold text-foreground min-w-0">
+            {headerIcon}
+            <span className="shrink-0">Record Details</span>
+            <span className="text-muted-foreground font-normal">/</span>
+            <span className="text-[#16A249] tabular-nums truncate" title={headerRef}>{headerRef}</span>
           </div>
-        </DialogHeader>
-
-        {/* ── Body ───────────────────────────────────────────────── */}
-        <ScrollArea className="flex-1 px-6">
-          <div className="space-y-6 pb-6">
-
-            {/* ════ ABSTRACT panel ══════════════════════════════════ */}
-            {isAbstract && (
-              <div className="p-4 rounded-xl bg-blue-600/5 border border-blue-600/20 space-y-4 shadow-inner">
-                <SectionTitle icon={ArrowRightLeft} label="Sequential Ownership Analysis" color="text-blue-700" />
-                <div className="grid grid-cols-3 gap-4 bg-background/40 p-4 rounded-xl border border-white/10">
-                  <div className="space-y-3">
-                    <div className="text-[8px] font-black uppercase text-red-600 tracking-[0.2em] border-b border-red-500/20 pb-1 mb-2">Ownership Transfer From</div>
-                    <StaticItem label="Previous Owner" value={r.cancelledOwner || '---'} />
-                    <StaticItem label="Previous Title No." value={r.cancelledTctNo || '---'} isMono />
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-1">
-                      <ArrowRightLeft className="w-6 h-6 text-blue-600/40" />
-                      <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">{getModeOfConveyance(editedRecord.update, editedRecord.acctName)}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3 border-l border-white/10 pl-4">
-                    <div className="text-[8px] font-black uppercase text-emerald-600 tracking-[0.2em] border-b border-emerald-500/20 pb-1 mb-2 flex items-center gap-1">Ownership Transfer To <CheckCircle2 className="w-2.5 h-2.5" /></div>
-                    <StaticItem label="New Owner (Account)" value={editedRecord.acctName || '---'} />
-                    <StaticItem label="New Title No." value={r.rollTctNo || '---'} isMono subValue="Assessment Roll Match" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-4 gap-4 pt-3 border-t border-blue-600/10">
-                  <div className="space-y-0.5">
-                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1"><Tag className="w-2.5 h-2.5 text-emerald-600" /> Consideration</p>
-                    <p className="text-sm font-black font-mono text-emerald-600">{fmtCurrency(r.sellingPrice)}</p>
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1"><Database className="w-2.5 h-2.5 text-blue-600" /> Area</p>
-                    <p className="text-sm font-black font-mono">{(editedRecord.landArea || 0).toLocaleString()} sqm</p>
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Notarial Date</p>
-                    <p className="text-sm font-black uppercase">{r.notarialDate || '---'}</p>
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Doc File No.</p>
-                    <p className="text-sm font-black uppercase">{r.docFileNo || '---'}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ════ BUILDING PERMIT panel ═══════════════════════════ */}
-            {isPermit && (
-              <div className="space-y-4">
-                {/* Permit identity (editable) */}
-                <div className="p-4 rounded-xl bg-orange-500/5 border border-orange-500/20 space-y-4 shadow-inner">
-                  <SectionTitle icon={HardHat} label="Permit Details" color="text-orange-700" />
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Permit No.</label>
-                      <Input value={r.buildingPermitNo || ''} onChange={e => handleAnyChange('buildingPermitNo', e.target.value)} className="h-9 text-xs font-bold font-mono text-orange-600" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Date Issued</label>
-                      <Input value={r.dateIssued || ''} onChange={e => handleAnyChange('dateIssued', e.target.value)} className="h-9 text-xs font-bold" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Barangay / Owner Name</label>
-                      <Input value={r.barangayName || ''} onChange={e => handleAnyChange('barangayName', e.target.value)} className="h-9 text-xs font-bold uppercase" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Use of Occupancy</label>
-                      <Input value={r.useOfOccupancy || ''} onChange={e => handleAnyChange('useOfOccupancy', e.target.value)} className="h-9 text-xs font-bold text-blue-600 uppercase" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1"><MapPin className="w-2.5 h-2.5" /> Property Location</label>
-                      <Input value={editedRecord.location || ''} onChange={e => handleChange('location', e.target.value)} className="h-9 text-xs font-bold uppercase" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1"><DollarSign className="w-2.5 h-2.5 text-emerald-600" /> Estimated Cost (₱)</label>
-                      <Input type="number" value={r.estimatedCost || ''} onChange={e => handleAnyChange('estimatedCost', e.target.value === '' ? 0 : Number(e.target.value))} className="h-9 text-xs font-bold font-mono text-emerald-600" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Assessment Roll match (read-only derived fields) */}
-                <div className={cn("p-4 rounded-xl border space-y-4 shadow-inner", r.isJoined ? "bg-emerald-500/5 border-emerald-500/20" : "bg-muted/20 border-white/10 opacity-60")}>
-                  <SectionTitle icon={Database} label={r.isJoined ? "Assessment Roll Match" : "Assessment Roll Match — No match found"} color={r.isJoined ? "text-emerald-700" : "text-muted-foreground"} />
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-background/40 p-4 rounded-xl border border-white/10">
-                    <StaticItem label="ARP / TDN (Roll)" value={r.rollArp || '---'} isMono accent={r.isJoined ? "text-emerald-700" : ""} />
-                    <StaticItem label="Floor Area (Roll)" value={r.rollArea ? `${Number(r.rollArea).toLocaleString()} sqm` : '---'} />
-                    <StaticItem label="Class (Roll)" value={r.rollClass || '---'} />
-                    <StaticItem label="Owner (Roll)" value={r.rollOwner || '---'} />
-                  </div>
-                  {r.rollAddress && <div className="px-4 pb-1"><StaticItem label="Roll Address" value={r.rollAddress} /></div>}
-                </div>
-              </div>
-            )}
-
-            {/* ════ THREE YEAR REPORT panel ═════════════════════════ */}
-            {isThreeYear && (
-              <div className="space-y-4">
-                {/* Record identity (editable) */}
-                <div className="p-4 rounded-xl bg-violet-500/5 border border-violet-500/20 space-y-4 shadow-inner">
-                  <SectionTitle icon={TrendingUp} label="Record Identity" color="text-violet-700" />
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1"><Building2 className="w-2.5 h-2.5 text-violet-500" /> Name of New Owner</label>
-                      <Input value={editedRecord.acctName || ''} onChange={e => handleChange('acctName', e.target.value)} className="h-9 text-xs font-bold uppercase" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">ARPN / Tax Dec. No.</label>
-                      <Input value={editedRecord.arpNo || ''} onChange={e => handleChange('arpNo', e.target.value)} className="h-9 text-xs font-bold font-mono text-violet-700" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1"><MapPin className="w-2.5 h-2.5 text-violet-500" /> Location</label>
-                      <Input value={r.rollAddress || editedRecord.location || ''} onChange={e => handleChange('location', e.target.value)} className="h-9 text-xs font-bold uppercase" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Classification</label>
-                      <Input value={r.salesClassification || ''} onChange={e => handleAnyChange('salesClassification', e.target.value)} className="h-9 text-xs font-bold uppercase text-blue-600" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Area (sqm)</label>
-                      <Input type="number" value={editedRecord.landArea || ''} onChange={e => handleChange('landArea', e.target.value)} className="h-9 text-xs font-bold font-mono" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1"><DollarSign className="w-2.5 h-2.5 text-emerald-600" /> Selling Price</label>
-                      <Input type="number" value={r.sellingPrice || ''} onChange={e => handleAnyChange('sellingPrice', e.target.value === '' ? 0 : Number(e.target.value))} className="h-9 text-xs font-bold font-mono text-emerald-600" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Sales Value (Peso/Sqm)</label>
-                      <Input type="number" value={r.salesValue || ''} onChange={e => handleAnyChange('salesValue', e.target.value === '' ? 0 : Number(e.target.value))} className="h-9 text-xs font-bold font-mono text-emerald-600" />
-                    </div>
-                    <StaticItem label="Kind of Property (Roll)" value={
-                      !r.isJoined ? '---' : r.kindGroup === 'Land' ? 'Land' : r.kindGroup === 'Building' ? 'Building' : r.kind || 'Other'
-                    } accent="text-emerald-700 text-sm font-black" />
-                  </div>
-                </div>
-
-                {/* Sales values (editable) */}
-                <div className={cn("p-4 rounded-xl border space-y-4 shadow-inner", r.isJoined ? "bg-emerald-500/5 border-emerald-500/20" : "bg-muted/20 border-white/10")}>
-                  <SectionTitle icon={BarChart3} label={r.isJoined ? "Sales Values" : "Sales Values — No roll match"} color={r.isJoined ? "text-emerald-700" : "text-muted-foreground"} />
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="p-3 rounded-xl bg-background/60 border border-white/10 space-y-2">
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest text-center">Lowest (10)</p>
-                      <Input type="number" value={r.saleLow || ''} onChange={e => handleAnyChange('saleLow', e.target.value === '' ? 0 : Number(e.target.value))} className="h-9 text-xs font-bold font-mono text-emerald-600 text-center" placeholder="0.00" />
-                    </div>
-                    <div className="p-3 rounded-xl bg-emerald-600/10 border border-emerald-500/20 space-y-2">
-                      <p className="text-[9px] font-black text-emerald-700 uppercase tracking-widest text-center">Median (11)</p>
-                      <Input type="number" value={r.saleMedian || ''} onChange={e => handleAnyChange('saleMedian', e.target.value === '' ? 0 : Number(e.target.value))} className="h-9 text-xs font-bold font-mono text-emerald-700 text-center border-emerald-300 focus-visible:ring-emerald-500" placeholder="0.00" />
-                    </div>
-                    <div className="p-3 rounded-xl bg-background/60 border border-white/10 space-y-2">
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest text-center">Highest (12)</p>
-                      <Input type="number" value={r.saleHigh || ''} onChange={e => handleAnyChange('saleHigh', e.target.value === '' ? 0 : Number(e.target.value))} className="h-9 text-xs font-bold font-mono text-emerald-600 text-center" placeholder="0.00" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ════ Duplicate comparison (standard only) ════════════ */}
-            {comparisonRecord && editedRecord.statusLabel === 'DUPLICATE' && !isSpecial && (
-              <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-3 shadow-inner">
-                <SectionTitle icon={ArrowRightLeft} label="Duplicate Conflict Analysis" color="text-amber-700" />
-                <div className="grid grid-cols-2 gap-6 bg-background/40 p-4 rounded-xl border border-white/10">
-                  <div className="space-y-3">
-                    <div className="text-[8px] font-black uppercase text-muted-foreground tracking-[0.2em] border-b pb-1 mb-2">Archived (This Row)</div>
-                    <StaticItem label="ARP No#" value={editedRecord.arpNo} isMono />
-                    <StaticItem label="Market Value" value={fmtCurrency(editedRecord.marketValue)} isMono />
-                  </div>
-                  <div className="space-y-3 border-l border-white/10 pl-6">
-                    <div className="text-[8px] font-black uppercase text-emerald-600 tracking-[0.2em] border-b border-emerald-500/20 pb-1 mb-2 flex items-center gap-1">Priority (Active) <CheckCircle2 className="w-2.5 h-2.5" /></div>
-                    <StaticItem label="ARP No#" value={comparisonRecord.arpNo} isMono />
-                    <StaticItem label="Market Value" value={fmtCurrency(comparisonRecord.marketValue)} isMono />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ════ Editable fields (standard + abstract) ═══════════ */}
-            {!isPermit && !isThreeYear && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-5 rounded-xl bg-muted/30 border shadow-inner space-y-4">
-                  <h4 className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-2 leading-none">
-                    <div className="w-1 h-3 bg-primary rounded-full" /> {isAbstract ? "Identification" : "Primary Identity"}
-                  </h4>
-                  <div className="grid grid-cols-1 gap-3">
-                    <EditableItem label="Account Name" field="acctName" value={editedRecord.acctName} errors={editedRecord.errors} onChange={handleChange} />
-                    <div className="grid grid-cols-2 gap-3">
-                      <EditableItem label="PIN Number" field="pin" value={editedRecord.pin} errors={editedRecord.errors} onChange={handleChange} isMono />
-                      <EditableItem label="ARP No#" field="arpNo" value={editedRecord.arpNo} errors={editedRecord.errors} onChange={handleChange} isMono />
-                    </div>
-                    <EditableItem label="Address" field="address" value={editedRecord.address} errors={editedRecord.errors} onChange={handleChange} />
-                    <div className="grid grid-cols-2 gap-3">
-                      <EditableItem label="Date" field="date" value={editedRecord.date} errors={editedRecord.errors} onChange={handleChange} />
-                      <EditableItem label="Update Code" field="update" value={editedRecord.update} errors={editedRecord.errors} onChange={handleChange} />
-                    </div>
-                  </div>
-                </div>
-                <div className="p-5 rounded-xl bg-muted/30 border shadow-inner space-y-4">
-                  <h4 className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-2 leading-none">
-                    <div className="w-1 h-3 bg-primary rounded-full" /> {isAbstract ? "Assessment" : "Financial Data"}
-                  </h4>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className={cn("rounded-lg transition-all", isZeroArea && "bg-red-500/5 p-1.5 ring-1 ring-red-500/20")}>
-                        <EditableItem label="Land Area (sqm)" field="landArea" value={editedRecord.landArea} errors={editedRecord.errors} onChange={handleChange} isMono type="number" />
-                      </div>
-                      <EditableItem label="Unit Value (₱)" field="unitValue" value={editedRecord.unitValue} errors={editedRecord.errors} onChange={handleChange} isMono type="number" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
-                      <StaticItem label="Location" value={editedRecord.location || 'Pending Calibration'} />
-                      <StaticItem label="Actual Use (AU)" value={editedRecord.au || '---'} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Market Value</p>
-                        <p className="text-sm font-black text-emerald-600 font-mono">{fmtCurrency(editedRecord.marketValue)}</p>
-                      </div>
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Assessed Value</p>
-                        <p className="text-sm font-black text-blue-600 font-mono">{fmtCurrency(editedRecord.assessedValue)}</p>
-                      </div>
-                    </div>
-                    <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
-                      <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-0.5">Yearly Tax Estimate</p>
-                      <p className="text-xl font-black font-mono tracking-tighter">{fmtCurrency(editedRecord.yearlyTax)}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-          </div>
-        </ScrollArea>
-
-        {/* ── Footer ─────────────────────────────────────────────── */}
-        <div className="p-6 border-t bg-muted/30 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
-          <div className="flex gap-2 w-full sm:w-auto">
-            {!isSpecial && (
-              isInArchive
-                ? <Button variant="outline" onClick={() => onUnarchive?.(editedRecord)} className="font-black uppercase text-[9px] h-9 px-3 text-emerald-600 border-emerald-200 hover:bg-emerald-50"><RotateCcw className="w-3 h-3 mr-1.5" /> Restore Record</Button>
-                : <Button variant="outline" onClick={() => onArchive?.(editedRecord)} className="font-black uppercase text-[9px] h-9 px-3 text-orange-600 border-orange-200 hover:bg-orange-50"><Archive className="w-3 h-3 mr-1.5" /> Archive Record</Button>
-            )}
-            {onDelete && (
-              <>
-                <Button variant="outline" onClick={() => setIsDeleteDialogOpen(true)} className="font-black uppercase text-[9px] h-9 px-3 text-red-600 border-red-200 hover:bg-red-50"><Trash2 className="w-3 h-3 mr-1.5" /> Delete Record</Button>
-                <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the record and remove it from the active datasets.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={(e) => {
-                        e.preventDefault();
-                        setIsDeleteDialogOpen(false);
-                        setTimeout(() => onDelete(editedRecord), 200);
-                      }} className="bg-red-600 text-white hover:bg-red-700">Delete</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background">
+              {getStatusIndicator()}
+            </span>
+            {editedRecord.barangayName && (
+              <span className="text-xs font-medium text-muted-foreground truncate">
+                {editedRecord.barangayName}
+              </span>
             )}
           </div>
-          <div className="flex gap-3 w-full sm:w-auto">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="font-black uppercase text-[10px] h-10 px-5 flex-1 sm:flex-none">Discard</Button>
+        </div>
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          {!isEditing ? (
             <Button
-              onClick={() => onSave?.(editedRecord)}
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditing(true)}
+              className="h-8 px-2.5 text-xs font-semibold gap-1.5"
+            >
+              <Edit3 className="w-3.5 h-3.5" /> Edit
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCancelEdit}
+              className="h-8 px-2.5 text-xs font-semibold"
+            >
+              Cancel
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => onOpenChange(false)}
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            title="Close details panel"
+            aria-label="Close details panel"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Scrollable Body */}
+      <div className="flex-1 overflow-y-auto scrollbar-vertical-custom px-4 py-4 space-y-5">
+        {/* ABSTRACT panel */}
+        {isAbstract && (
+          <section className="space-y-3 pb-4 border-b border-border">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <ArrowRightLeft className="w-3.5 h-3.5" /> Ownership Transfer
+            </h4>
+            <div className="rounded-lg border border-border bg-background p-3 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <StaticItem label="Transfer From" value={r.cancelledOwner || "—"} />
+                <StaticItem label="Prev Title No." value={r.cancelledTctNo || "—"} isMono />
+              </div>
+              <div className="border-t border-border pt-2.5 grid grid-cols-2 gap-3">
+                <StaticItem label="Transfer To" value={editedRecord.acctName || "—"} />
+                <StaticItem label="New Title No." value={r.rollTctNo || "—"} isMono />
+              </div>
+              <div className="border-t border-border pt-2.5 grid grid-cols-2 gap-3">
+                <StaticItem label="Mode" value={getModeOfConveyance(editedRecord.update, editedRecord.acctName)} />
+                <StaticItem label="Consideration" value={fmtCurrency(r.sellingPrice)} isMono accent="text-[#16A249]" />
+                <StaticItem label="Notarial Date" value={r.notarialDate || "—"} />
+                <StaticItem label="Doc File No." value={r.docFileNo || "—"} isMono />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* BUILDING PERMIT panel */}
+        {isPermit && (
+          <section className="space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <HardHat className="w-3.5 h-3.5" /> Permit Details
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground">Permit No.</p>
+                {isEditing ? (
+                  <Input value={r.buildingPermitNo || ''} onChange={e => handleAnyChange('buildingPermitNo', e.target.value)} className="h-8 text-sm tabular-nums font-medium" />
+                ) : (
+                  <p className="text-sm font-semibold tabular-nums">{r.buildingPermitNo || "—"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground">Date Issued</p>
+                {isEditing ? (
+                  <Input value={r.dateIssued || ''} onChange={e => handleAnyChange('dateIssued', e.target.value)} className="h-8 text-sm font-medium" />
+                ) : (
+                  <p className="text-sm font-semibold">{r.dateIssued || "—"}</p>
+                )}
+              </div>
+              <div className="col-span-2 space-y-1">
+                <p className="text-xs font-medium text-muted-foreground">Barangay / Owner Name</p>
+                {isEditing ? (
+                  <Input value={r.barangayName || ''} onChange={e => handleAnyChange('barangayName', e.target.value)} className="h-8 text-sm font-medium uppercase" />
+                ) : (
+                  <p className="text-sm font-semibold uppercase">{r.barangayName || "—"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground">Use of Occupancy</p>
+                {isEditing ? (
+                  <Input value={r.useOfOccupancy || ''} onChange={e => handleAnyChange('useOfOccupancy', e.target.value)} className="h-8 text-sm font-medium uppercase" />
+                ) : (
+                  <p className="text-sm font-semibold uppercase">{r.useOfOccupancy || "—"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground">Estimated Cost</p>
+                {isEditing ? (
+                  <Input type="number" value={r.estimatedCost || ''} onChange={e => handleAnyChange('estimatedCost', e.target.value === '' ? 0 : Number(e.target.value))} className="h-8 text-sm tabular-nums font-medium" />
+                ) : (
+                  <p className="text-sm font-semibold tabular-nums text-[#16A249]">{fmtCurrency(r.estimatedCost)}</p>
+                )}
+              </div>
+              <div className="col-span-2">
+                <FieldItem label="Property Location" field="location" value={editedRecord.location} isEditing={isEditing} uppercase errors={editedRecord.errors} onChange={handleChange} />
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-background p-3 space-y-2.5">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                {r.isJoined ? "Assessment Roll Match" : "No Assessment Roll Match"}
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <StaticItem label="ARP / TDN (Roll)" value={r.rollArp || "—"} isMono accent={r.isJoined ? "text-[#16A249]" : ""} />
+                <StaticItem label="Floor Area (Roll)" value={r.rollArea ? `${Number(r.rollArea).toLocaleString()} sqm` : "—"} isMono />
+                <StaticItem label="Class (Roll)" value={r.rollClass || "—"} />
+                <StaticItem label="Owner (Roll)" value={r.rollOwner || "—"} />
+              </div>
+              {r.rollAddress && <StaticItem label="Roll Address" value={r.rollAddress} />}
+            </div>
+          </section>
+        )}
+
+        {/* THREE YEAR REPORT panel */}
+        {isThreeYear && (
+          <section className="space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5" /> 3-Year Report Details
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2">
+                <FieldItem label="Name of New Owner" field="acctName" value={editedRecord.acctName} isEditing={isEditing} uppercase errors={editedRecord.errors} onChange={handleChange} />
+              </div>
+              <FieldItem label="ARPN / Tax Dec. No." field="arpNo" value={editedRecord.arpNo} isEditing={isEditing} isMono errors={editedRecord.errors} onChange={handleChange} />
+              <StaticItem
+                label="Kind (Roll)"
+                value={!r.isJoined ? "—" : r.kindGroup === 'Land' ? 'Land' : r.kindGroup === 'Building' ? 'Building' : r.kind || 'Other'}
+                accent="text-[#16A249]"
+              />
+              <div className="col-span-2">
+                <FieldItem label="Location" field="location" value={r.rollAddress || editedRecord.location} isEditing={isEditing} uppercase errors={editedRecord.errors} onChange={handleChange} />
+              </div>
+              <FieldItem label="Area (sqm)" field="landArea" value={editedRecord.landArea} isEditing={isEditing} isMono type="number" errors={editedRecord.errors} onChange={handleChange} />
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground">Selling Price</p>
+                {isEditing ? (
+                  <Input type="number" value={r.sellingPrice || ''} onChange={e => handleAnyChange('sellingPrice', e.target.value === '' ? 0 : Number(e.target.value))} className="h-8 text-sm tabular-nums font-medium" />
+                ) : (
+                  <p className="text-sm font-semibold tabular-nums">{fmtCurrency(r.sellingPrice)}</p>
+                )}
+              </div>
+            </div>
+            <div className="rounded-lg border border-border bg-background p-3 space-y-2">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Sales Value Brackets</p>
+              <div className="grid grid-cols-3 gap-2">
+                <StaticItem label="Lowest" value={fmtCurrency(r.saleLow)} isMono />
+                <StaticItem label="Median" value={fmtCurrency(r.saleMedian)} isMono />
+                <StaticItem label="Highest" value={fmtCurrency(r.saleHigh)} isMono />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Duplicate conflict comparison (standard only) */}
+        {comparisonRecord && editedRecord.statusLabel === 'DUPLICATE' && !isSpecial && (
+          <section className="rounded-lg border border-border bg-background p-3 space-y-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <ArrowRightLeft className="w-3.5 h-3.5" /> Duplicate Conflict
+            </h4>
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div className="space-y-1.5">
+                <p className="text-xs font-semibold text-muted-foreground border-b border-border pb-1">Archived (This)</p>
+                <StaticItem label="ARP No#" value={editedRecord.arpNo || "—"} isMono />
+                <StaticItem label="Market Value" value={isProcessed ? fmtCurrency(editedRecord.marketValue) : "—"} isMono />
+              </div>
+              <div className="space-y-1.5 border-l border-border pl-3">
+                <p className="text-xs font-semibold text-[#16A249] border-b border-border pb-1">Active Reference</p>
+                <StaticItem label="ARP No#" value={comparisonRecord.arpNo || "—"} isMono />
+                <StaticItem label="Market Value" value={isProcessed ? fmtCurrency(comparisonRecord.marketValue) : "—"} isMono />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* STANDARD + ABSTRACT Complete Record Details */}
+        {!isPermit && !isThreeYear && (
+          <>
+            {/* Section 1: Primary Identity & Classification */}
+            <section className="space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 border-b border-border pb-1.5">
+                <FileText className="w-3.5 h-3.5 text-[#16A249]" /> Record Details
+              </h4>
+
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                <FieldItem label="Date" field="date" value={editedRecord.date} isEditing={isEditing} isMono errors={editedRecord.errors} onChange={handleChange} />
+                <FieldItem label="Update Code" field="update" value={editedRecord.update} isEditing={isEditing} uppercase errors={editedRecord.errors} onChange={handleChange} />
+
+                <div className="col-span-2">
+                  <FieldItem label="Account Name" field="acctName" value={editedRecord.acctName} isEditing={isEditing} uppercase errors={editedRecord.errors} onChange={handleChange} />
+                </div>
+
+                <div className="col-span-2">
+                  <FieldItem label="PIN Number" field="pin" value={editedRecord.pin} isEditing={isEditing} isMono errors={editedRecord.errors} onChange={handleChange} />
+                </div>
+
+                <FieldItem label="ARP No#" field="arpNo" value={editedRecord.arpNo} isEditing={isEditing} isMono errors={editedRecord.errors} onChange={handleChange} />
+                <FieldItem label="Previous ARP" field="previous" value={editedRecord.previous} isEditing={isEditing} isMono errors={editedRecord.errors} onChange={handleChange} />
+
+                <FieldItem label="New ARP#" field="newArpNo" value={editedRecord.newArpNo} isEditing={isEditing} isMono accent="text-blue-600 dark:text-blue-400" errors={editedRecord.errors} onChange={handleChange} />
+
+                {/* Taxability */}
+                <div className="space-y-1 min-w-0">
+                  <p className="text-xs font-medium text-muted-foreground">Taxability</p>
+                  {isEditing ? (
+                    <div className="flex gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleChange('taxability', 'T')}
+                        className={cn(
+                          "flex-1 h-8 rounded-md text-xs font-bold border transition-colors",
+                          editedRecord.taxability !== 'E'
+                            ? "bg-[#16A249] text-white border-[#16A249]"
+                            : "bg-background text-muted-foreground border-border hover:text-foreground"
+                        )}
+                      >
+                        Taxable (T)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChange('taxability', 'E')}
+                        className={cn(
+                          "flex-1 h-8 rounded-md text-xs font-bold border transition-colors",
+                          editedRecord.taxability === 'E'
+                            ? "bg-blue-600 text-white border-blue-600"
+                            : "bg-background text-muted-foreground border-border hover:text-foreground"
+                        )}
+                      >
+                        Exempt (E)
+                      </button>
+                    </div>
+                  ) : (
+                    <p className={cn("text-sm font-semibold", editedRecord.taxability === 'E' ? "text-blue-600 dark:text-blue-400" : "text-foreground")}>
+                      {taxDisplay}
+                    </p>
+                  )}
+                </div>
+
+                <FieldItem label="Kind" field="kind" value={editedRecord.kind} displayOverride={kindDisplay} isEditing={isEditing} uppercase errors={editedRecord.errors} onChange={handleChange} />
+                <FieldItem label="Actual Use (AU)" field="au" value={editedRecord.au} isEditing={isEditing} uppercase errors={editedRecord.errors} onChange={handleChange} />
+
+                <FieldItem
+                  label="Land Area (sqm)"
+                  field="landArea"
+                  value={editedRecord.landArea}
+                  displayOverride={editedRecord.landArea !== undefined ? `${Number(editedRecord.landArea).toLocaleString(undefined, { maximumFractionDigits: 2 })} sqm` : "—"}
+                  isEditing={isEditing}
+                  isMono
+                  type="number"
+                  errors={editedRecord.errors}
+                  onChange={handleChange}
+                />
+
+                {isEditing ? (
+                  <FieldItem label="Unit Value (₱)" field="unitValue" value={editedRecord.unitValue} isEditing={isEditing} isMono type="number" errors={editedRecord.errors} onChange={handleChange} />
+                ) : (
+                  <StaticItem label="Barangay" value={editedRecord.barangayName || "Unmapped"} />
+                )}
+
+                {(editedRecord.lotNo || editedRecord.blkNo || editedRecord.tctNo) && (
+                  <>
+                    {editedRecord.lotNo && <StaticItem label="Lot No." value={editedRecord.lotNo} isMono />}
+                    {editedRecord.blkNo && <StaticItem label="Block No." value={editedRecord.blkNo} isMono />}
+                    {editedRecord.tctNo && (
+                      <div className="col-span-2">
+                        <StaticItem label="Title / TCT No." value={editedRecord.tctNo} isMono />
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </section>
+
+            {/* Section 2: Location & Address */}
+            <section className="space-y-3 pt-1">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 border-b border-border pb-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#16A249]" /> Location & Address
+              </h4>
+              <div className="space-y-3">
+                <FieldItem label="Assessed Location" field="location" value={editedRecord.location} isEditing={isEditing} uppercase errors={editedRecord.errors} onChange={handleChange} />
+                <FieldItem label="Owner Address" field="address" value={editedRecord.address} isEditing={isEditing} uppercase errors={editedRecord.errors} onChange={handleChange} />
+                {editedRecord.sourceFile && (
+                  <StaticItem label="Source File" value={editedRecord.sourceFile} />
+                )}
+              </div>
+            </section>
+
+            {/* Section 3: Valuation Breakdown */}
+            <section className="space-y-3 pt-1">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 border-b border-border pb-1.5">
+                <Calculator className="w-3.5 h-3.5 text-[#16A249]" /> Valuation Breakdown
+              </h4>
+
+              {!isProcessed ? (
+                <div className="rounded-lg border border-border bg-background p-3.5 text-xs text-muted-foreground leading-relaxed">
+                  Valuations (2028 Current, Deferred 2011 GR, and 2029 RPVARA) will appear here after running <span className="font-semibold text-foreground">Run Batch Processor</span>.
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {/* 2028 Current */}
+                  <div className="rounded-lg border border-border bg-background overflow-hidden">
+                    <div className="px-3 py-1.5 border-b border-border bg-muted/30 flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">2028 — Current (Capped @ 6%)</span>
+                    </div>
+                    <div className="p-3 grid grid-cols-2 gap-x-3 gap-y-2">
+                      <StaticItem label="Unit Value" value={editedRecord.unitValue2028 ? fmtCurrency(editedRecord.unitValue2028, 0) : "—"} isMono />
+                      <StaticItem label="Market Value" value={fmtCurrency(editedRecord.marketValue2028, 0)} isMono />
+                      <StaticItem label="Assessed Value" value={fmtCurrency(editedRecord.assessedValue2028, 0)} isMono />
+                      <StaticItem label="Yearly Tax (Cap)" value={fmtCurrency(editedRecord.yearlyTax2028)} isMono accent="text-blue-600 dark:text-blue-400" />
+                    </div>
+                  </div>
+
+                  {/* Deferred (2011 GR) */}
+                  <div className="rounded-lg border border-border bg-background overflow-hidden">
+                    <div className="px-3 py-1.5 border-b border-border bg-muted/30 flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Deferred (2011 GR)</span>
+                    </div>
+                    <div className="p-3 grid grid-cols-2 gap-x-3 gap-y-2">
+                      <StaticItem label="Unit Value" value={editedRecord.unitValueDeferred ? fmtCurrency(editedRecord.unitValueDeferred, 0) : "—"} isMono />
+                      <StaticItem label="Market Value" value={editedRecord.marketValueDeferred ? fmtCurrency(editedRecord.marketValueDeferred, 0) : "—"} isMono />
+                      <StaticItem label="Assessed Value" value={editedRecord.assessedValueDeferred ? fmtCurrency(editedRecord.assessedValueDeferred, 0) : "—"} isMono />
+                      <StaticItem
+                        label="Yearly Tax"
+                        value={editedRecord.yearlyTaxDeferred !== undefined && (editedRecord.marketValueDeferred || 0) > 0 ? fmtCurrency(editedRecord.yearlyTaxDeferred) : "—"}
+                        isMono
+                        accent="text-amber-600 dark:text-amber-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 2029 RPVARA */}
+                  <div className="rounded-lg border border-border bg-background overflow-hidden">
+                    <div className="px-3 py-1.5 border-b border-border bg-muted/30 flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#16A249]">2029 — RPVARA</span>
+                    </div>
+                    <div className="p-3 grid grid-cols-2 gap-x-3 gap-y-2">
+                      <StaticItem label="Unit Value" value={(editedRecord.unitValue2029 ?? editedRecord.unitValue) ? fmtCurrency(editedRecord.unitValue2029 ?? editedRecord.unitValue, 0) : "—"} isMono />
+                      <StaticItem label="Market Value" value={fmtCurrency(editedRecord.marketValue2029 ?? editedRecord.marketValue, 0)} isMono />
+                      <StaticItem label="Assessed Value" value={fmtCurrency(editedRecord.assessedValue2029 ?? editedRecord.assessedValue, 0)} isMono />
+                      <StaticItem label="Yearly Tax" value={fmtCurrency(editedRecord.yearlyTax2029 ?? editedRecord.yearlyTax)} isMono accent="text-[#16A249]" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+          </>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="px-4 py-3 border-t border-border bg-muted/20 flex items-center justify-between gap-2 shrink-0">
+        {isEditing ? (
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCancelEdit}
+              className="h-9 px-3.5 text-xs font-bold uppercase tracking-wider"
+            >
+              Discard
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleCommitSave}
               className={cn(
-                "font-black uppercase text-[10px] h-10 px-6 shadow-lg gap-2 flex-1 sm:flex-none text-white",
-                isPermit ? "bg-orange-500 hover:bg-orange-700" : isThreeYear ? "bg-violet-600 hover:bg-violet-800" : "bg-primary hover:bg-emerald-800"
+                "h-9 px-4 text-xs font-bold uppercase tracking-wider gap-1.5 text-white",
+                isPermit ? "bg-orange-600 hover:bg-orange-700" : isThreeYear ? "bg-violet-600 hover:bg-violet-700" : "bg-[#16A249] hover:bg-[#138a3e]"
               )}
             >
               <Save className="w-3.5 h-3.5" /> Save Changes
             </Button>
-          </div>
-        </div>
-
-      </DialogContent>
-    </Dialog>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-2">
+              {!isSpecial && (
+                isInArchive ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onUnarchive?.(editedRecord)}
+                    className="h-8 px-3 text-xs font-semibold text-[#16A249] hover:text-[#138a3e]"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Restore
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onArchive?.(editedRecord)}
+                    className="h-8 px-3 text-xs font-semibold text-orange-600 hover:text-orange-700"
+                  >
+                    <Archive className="w-3.5 h-3.5 mr-1.5" /> Archive
+                  </Button>
+                )
+              )}
+              {onDelete && (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                    className="h-8 px-3 text-xs font-semibold text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
+                  </Button>
+                  <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the record and remove it from the active datasets.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsDeleteDialogOpen(false);
+                            setTimeout(() => onDelete(editedRecord), 200);
+                          }}
+                          className="bg-red-600 text-white hover:bg-red-700"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
+              )}
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => setIsEditing(true)}
+              className="h-8 px-3.5 text-xs font-semibold bg-[#16A249] hover:bg-[#138a3e] text-white gap-1.5"
+            >
+              <Edit3 className="w-3.5 h-3.5" /> Edit Record
+            </Button>
+          </>
+        )}
+      </div>
+    </aside>
   );
 }

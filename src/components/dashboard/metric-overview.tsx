@@ -82,10 +82,13 @@ interface MetricOverviewProps {
     totalErrors: number;
     // Year breakdowns (standard mode)
     totalMarketValue2028?: number;
+    totalMarketValueDeferred?: number;
     totalMarketValue2029?: number;
     totalAssessedValue2028?: number;
+    totalAssessedValueDeferred?: number;
     totalAssessedValue2029?: number;
     totalYearlyTax2028?: number;
+    totalYearlyTaxDeferred?: number;
     totalYearlyTax2029?: number;
     // Relational Specific
     linkedCount?: number;
@@ -103,6 +106,7 @@ interface MetricOverviewProps {
   taxViewMode: 'T' | 'E';
   onTaxViewModeChange: (mode: 'T' | 'E') => void;
   workflowMode?: string;
+  isProcessed?: boolean;
 }
 
 export function MetricOverview({ 
@@ -110,7 +114,8 @@ export function MetricOverview({
   variant = 'default', 
   taxViewMode, 
   onTaxViewModeChange,
-  workflowMode = 'standard'
+  workflowMode = 'standard',
+  isProcessed = false
 }: MetricOverviewProps) {
   const isHero = variant === 'hero';
   const isAbstract = workflowMode === 'abstract';
@@ -128,7 +133,7 @@ export function MetricOverview({
       label: "Data Errors",
       value: <AnimatedNumber value={stats.totalErrors} />,
       icon: AlertTriangle,
-      color: isHero ? "border-t-red-500 bg-red-500/5" : "border-l-red-500 bg-red-500/5",
+      color: isHero ? "border-t-red-500" : "border-l-red-500",
       textClass: "text-red-600",
       definition: "Records flagged for critical issues like missing PIN or invalid formats that require manual correction."
     },
@@ -144,7 +149,7 @@ export function MetricOverview({
       label: "Valid Records",
       value: <AnimatedNumber value={stats.finalCount} />,
       icon: CheckCircle2,
-      color: isHero ? "border-t-primary bg-primary/5" : "border-l-primary bg-primary/5",
+      color: isHero ? "border-t-primary" : "border-l-primary",
       textClass: "text-primary",
       definition: "Unique and verified records that have passed all city-standard validation rules."
     },
@@ -152,43 +157,46 @@ export function MetricOverview({
       label: "Duplicates",
       value: <AnimatedNumber value={stats.duplicatesRemoved} />,
       icon: Archive,
-      color: isHero ? "border-t-amber-400 bg-amber-500/5" : "border-l-amber-400 bg-amber-500/5",
+      color: isHero ? "border-t-amber-400" : "border-l-amber-400",
       textClass: "text-amber-500",
       definition: "Multiple records sharing the same PIN. The engine automatically archives older entries."
     },
     {
       label: "Total Market",
-      value: <AnimatedNumber value={stats.totalMarketValue || 0} prefix="₱" decimals={2} />,
+      value: isProcessed ? <AnimatedNumber value={stats.totalMarketValue || 0} prefix="₱" decimals={2} /> : <span className="text-muted-foreground">---</span>,
       icon: Database,
-      color: isHero ? "border-t-green-600 bg-green-500/5" : "border-l-green-600 bg-green-500/5",
+      color: isHero ? "border-t-green-600" : "border-l-green-600",
       textClass: "text-green-600",
-      definition: "The combined Market Value for the currently selected tax category (Taxable or Exempted).",
-      yearBreakdown: [
+      definition: "The combined Market Value for the currently selected tax category (Taxable or Exempted). Run Batch Processor to compute.",
+      yearBreakdown: isProcessed ? [
         { year: "2028", value: stats.totalMarketValue2028 },
+        { year: "Deferred (2011 GR)", value: stats.totalMarketValueDeferred },
         { year: "2029", value: stats.totalMarketValue2029 },
-      ]
+      ] : undefined
     },
     {
       label: "Total Assessed",
-      value: <AnimatedNumber value={stats.totalAssessedValue || 0} prefix="₱" decimals={2} />,
+      value: isProcessed ? <AnimatedNumber value={stats.totalAssessedValue || 0} prefix="₱" decimals={2} /> : <span className="text-muted-foreground">---</span>,
       icon: BarChart3,
-      color: isHero ? "border-t-blue-600 bg-blue-500/5" : "border-l-blue-600 bg-blue-500/5",
+      color: isHero ? "border-t-blue-600" : "border-l-blue-600",
       textClass: "text-blue-600",
-      definition: "The sum of all Assessed Values for the active tax view.",
-      yearBreakdown: [
+      definition: "The sum of all Assessed Values for the active tax view. Run Batch Processor to compute.",
+      yearBreakdown: isProcessed ? [
         { year: "2028", value: stats.totalAssessedValue2028 },
+        { year: "Deferred (2011 GR)", value: stats.totalAssessedValueDeferred },
         { year: "2029", value: stats.totalAssessedValue2029 },
-      ]
+      ] : undefined
     },
     {
       label: "Total Tax",
-      value: taxViewMode === 'E' ? "₱0.00" : <AnimatedNumber value={stats.totalYearlyTax || 0} prefix="₱" decimals={2} />,
+      value: !isProcessed ? <span className="text-muted-foreground">---</span> : (taxViewMode === 'E' ? "₱0.00" : <AnimatedNumber value={stats.totalYearlyTax || 0} prefix="₱" decimals={2} />),
       icon: TrendingUp,
-      color: isHero ? "border-t-emerald-600 bg-emerald-50/5" : "border-l-emerald-600 bg-emerald-50/5",
+      color: isHero ? "border-t-emerald-600" : "border-l-emerald-600",
       textClass: "text-emerald-600",
-      definition: "The estimated combined Yearly Real Property Tax due. Always zero for Exempted properties.",
-      yearBreakdown: taxViewMode === 'E' ? undefined : [
+      definition: "The estimated combined Yearly Real Property Tax due. Always zero for Exempted properties. Run Batch Processor to compute.",
+      yearBreakdown: (!isProcessed || taxViewMode === 'E') ? undefined : [
         { year: "2028", value: stats.totalYearlyTax2028 },
+        { year: "Deferred (2011 GR)", value: stats.totalYearlyTaxDeferred },
         { year: "2029", value: stats.totalYearlyTax2029 },
       ]
     }
@@ -199,7 +207,7 @@ export function MetricOverview({
       label: "Journal Logs",
       value: <AnimatedNumber value={stats.totalRawRows} />,
       icon: BookUser,
-      color: isHero ? "border-t-amber-500 bg-amber-500/5" : "border-l-amber-500 bg-amber-500/5",
+      color: isHero ? "border-t-amber-500" : "border-l-amber-500",
       textClass: "text-amber-600",
       definition: "Total number of transaction records imported from the Journal files."
     },
@@ -207,7 +215,7 @@ export function MetricOverview({
       label: "Unlinked Records",
       value: <AnimatedNumber value={stats.unlinkedCount || 0} />,
       icon: Unlink2,
-      color: isHero ? "border-t-red-500 bg-red-500/5" : "border-l-red-500 bg-red-500/5",
+      color: isHero ? "border-t-red-500" : "border-l-red-500",
       textClass: "text-red-600",
       definition: "Journal entries whose PINs could not be found within the staged Assessment Roll reference."
     },
@@ -215,7 +223,7 @@ export function MetricOverview({
       label: "Assessment Roll",
       value: <AnimatedNumber value={stats.rollCount || 0} />,
       icon: FileSpreadsheet,
-      color: isHero ? "border-t-blue-500 bg-blue-500/5" : "border-l-blue-500 bg-blue-500/5",
+      color: isHero ? "border-t-blue-500" : "border-l-blue-500",
       textClass: "text-blue-600",
       definition: "Total reference parcel records loaded from the Assessment Roll files."
     },
@@ -223,7 +231,7 @@ export function MetricOverview({
       label: "Successful Joins",
       value: <AnimatedNumber value={stats.linkedCount || 0} />,
       icon: Link2,
-      color: isHero ? "border-t-emerald-600 bg-emerald-50/5" : "border-l-emerald-600 bg-emerald-50/5",
+      color: isHero ? "border-t-emerald-600" : "border-l-emerald-600",
       textClass: "text-emerald-600",
       definition: "Total records successfully matched between the Journal and the Assessment Roll."
     },
@@ -231,7 +239,7 @@ export function MetricOverview({
       label: "Exempted Count",
       value: <AnimatedNumber value={stats.exemptedCount || 0} />,
       icon: ShieldCheck,
-      color: isHero ? "border-t-blue-700 bg-blue-600/5" : "border-l-blue-700 bg-blue-600/5",
+      color: isHero ? "border-t-blue-700" : "border-l-blue-700",
       textClass: "text-blue-700",
       definition: "Count of matched records identified as Exempt based on the imported Exempt list."
     },
@@ -246,7 +254,7 @@ export function MetricOverview({
       label: "Total Assessed",
       value: <AnimatedNumber value={stats.totalAssessedValue || 0} prefix="₱" decimals={2} />,
       icon: BarChart3,
-      color: isHero ? "border-t-blue-600 bg-blue-500/5" : "border-l-blue-600 bg-blue-500/5",
+      color: isHero ? "border-t-blue-600" : "border-l-blue-600",
       textClass: "text-blue-600",
       definition: "Total Assessed Value baseline for matched parcels."
     },
@@ -254,7 +262,7 @@ export function MetricOverview({
       label: "Total Market",
       value: <AnimatedNumber value={stats.totalMarketValue || 0} prefix="₱" decimals={2} />,
       icon: Database,
-      color: isHero ? "border-t-green-600 bg-green-500/5" : "border-l-green-600 bg-green-500/5",
+      color: isHero ? "border-t-green-600" : "border-l-green-600",
       textClass: "text-green-600",
       definition: "Total Market Value baseline for matched parcels."
     }
@@ -265,7 +273,7 @@ export function MetricOverview({
       label: "Permits Loaded",
       value: <AnimatedNumber value={stats.totalRawRows} />,
       icon: HardHat,
-      color: isHero ? "border-t-orange-500 bg-orange-500/5" : "border-l-orange-500 bg-orange-500/5",
+      color: isHero ? "border-t-orange-500" : "border-l-orange-500",
       textClass: "text-orange-600",
       definition: "Total number of building permit log entries imported in this session."
     },
@@ -273,7 +281,7 @@ export function MetricOverview({
       label: "Matches Found",
       value: <AnimatedNumber value={stats.linkedCount || 0} />,
       icon: Link2,
-      color: isHero ? "border-t-emerald-600 bg-emerald-50/5" : "border-l-emerald-600 bg-emerald-50/5",
+      color: isHero ? "border-t-emerald-600" : "border-l-emerald-600",
       textClass: "text-emerald-600",
       definition: "Permit records successfully linked to the Assessment Roll reference via PIN or ARP."
     },
@@ -281,7 +289,7 @@ export function MetricOverview({
       label: "Unlinked Logs",
       value: <AnimatedNumber value={stats.unlinkedCount || 0} />,
       icon: Unlink2,
-      color: isHero ? "border-t-red-500 bg-red-500/5" : "border-l-red-500 bg-red-500/5",
+      color: isHero ? "border-t-red-500" : "border-l-red-500",
       textClass: "text-red-600",
       definition: "Building permits that could not be reconciled with a parcel in the current Assessment Roll."
     },
@@ -289,7 +297,7 @@ export function MetricOverview({
       label: "Reference Roll",
       value: <AnimatedNumber value={stats.rollCount || 0} />,
       icon: FileSpreadsheet,
-      color: isHero ? "border-t-blue-500 bg-blue-500/5" : "border-l-blue-500 bg-blue-500/5",
+      color: isHero ? "border-t-blue-500" : "border-l-blue-500",
       textClass: "text-blue-600",
       definition: "The total size of the Assessment Roll used as a lookup reference for floor areas and classes."
     },
@@ -297,7 +305,7 @@ export function MetricOverview({
       label: "Total Cost",
       value: <AnimatedNumber value={stats.totalMarketValue || 0} prefix="₱" decimals={2} />,
       icon: TrendingUp,
-      color: isHero ? "border-t-emerald-600 bg-emerald-50/5" : "border-l-emerald-600 bg-emerald-50/5",
+      color: isHero ? "border-t-emerald-600" : "border-l-emerald-600",
       textClass: "text-emerald-600",
       definition: "Aggregated Estimated Construction Cost from all valid permit entries."
     }
@@ -308,7 +316,7 @@ export function MetricOverview({
       label: "Sales Data",
       value: <AnimatedNumber value={stats.totalRawRows} />,
       icon: ClipboardList,
-      color: isHero ? "border-t-violet-500 bg-violet-500/5" : "border-l-violet-500 bg-violet-500/5",
+      color: isHero ? "border-t-violet-500" : "border-l-violet-500",
       textClass: "text-violet-600",
       definition: "Total number of sales transaction entries loaded from your imported sales data file."
     },
@@ -316,7 +324,7 @@ export function MetricOverview({
       label: "Reference Roll",
       value: <AnimatedNumber value={stats.rollCount || 0} />,
       icon: FileSpreadsheet,
-      color: isHero ? "border-t-blue-500 bg-blue-500/5" : "border-l-blue-500 bg-blue-500/5",
+      color: isHero ? "border-t-blue-500" : "border-l-blue-500",
       textClass: "text-blue-600",
       definition: "Total parcel records in the Assessment Roll used as the lookup reference for matching."
     },
@@ -324,7 +332,7 @@ export function MetricOverview({
       label: "Linked",
       value: <AnimatedNumber value={stats.linkedCount || 0} />,
       icon: Link2,
-      color: isHero ? "border-t-emerald-600 bg-emerald-50/5" : "border-l-emerald-600 bg-emerald-50/5",
+      color: isHero ? "border-t-emerald-600" : "border-l-emerald-600",
       textClass: "text-emerald-600",
       definition: "Records fully matched to the Assessment Roll with complete data — ready for export."
     },
@@ -332,7 +340,7 @@ export function MetricOverview({
       label: "Unlinked",
       value: <AnimatedNumber value={stats.unlinkedCount || 0} />,
       icon: Unlink2,
-      color: isHero ? "border-t-red-500 bg-red-500/5" : "border-l-red-500 bg-red-500/5",
+      color: isHero ? "border-t-red-500" : "border-l-red-500",
       textClass: "text-red-600",
       definition: "Sales entries whose ARPN could not be found in the Assessment Roll reference file."
     },
@@ -340,7 +348,7 @@ export function MetricOverview({
       label: "Under Review",
       value: <AnimatedNumber value={stats.underReviewCount || 0} />,
       icon: AlertCircle,
-      color: isHero ? "border-t-amber-500 bg-amber-500/5" : "border-l-amber-500 bg-amber-500/5",
+      color: isHero ? "border-t-amber-500" : "border-l-amber-500",
       textClass: "text-amber-600",
       definition: "Matched records where critical fields (name, location, kind, or area) are missing and need attention."
     },
@@ -348,7 +356,7 @@ export function MetricOverview({
       label: "Other/Unmapped",
       value: <AnimatedNumber value={stats.otherUnmappedCount || 0} />,
       icon: MapPin,
-      color: isHero ? "border-t-purple-500 bg-purple-500/5" : "border-l-purple-500 bg-purple-500/5",
+      color: isHero ? "border-t-purple-500" : "border-l-purple-500",
       textClass: "text-purple-600",
       definition: "Matched records whose property kind (K-AU) is not classified as Land or Building (e.g. M-RESI, M-COMM)."
     },
@@ -356,7 +364,7 @@ export function MetricOverview({
       label: "Land",
       value: <AnimatedNumber value={stats.landCount || 0} />,
       icon: TreePine,
-      color: isHero ? "border-t-green-600 bg-green-500/5" : "border-l-green-600 bg-green-500/5",
+      color: isHero ? "border-t-green-600" : "border-l-green-600",
       textClass: "text-green-600",
       definition: "Count of fully linked records classified as Land in the Assessment Roll."
     },
@@ -364,7 +372,7 @@ export function MetricOverview({
       label: "Building",
       value: <AnimatedNumber value={stats.buildingCount || 0} />,
       icon: Building2,
-      color: isHero ? "border-t-sky-500 bg-sky-500/5" : "border-l-sky-500 bg-sky-500/5",
+      color: isHero ? "border-t-sky-500" : "border-l-sky-500",
       textClass: "text-sky-600",
       definition: "Count of fully linked records classified as Building in the Assessment Roll."
     }
@@ -373,57 +381,56 @@ export function MetricOverview({
   const statDefinitions = workflowMode === 'abstract' ? abstractStats : workflowMode === 'building-permit' ? permitStats : workflowMode === 'three-year-report' ? threeYearStats : standardStats;
 
   return (
-    <div className="space-y-4 w-full">
-      <div className={cn(
-        "flex items-center justify-between px-2",
-        isHero ? "max-w-6xl mx-auto" : "w-full"
-      )}>
-        <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-primary/10 border border-primary/20">
-            <Calculator className="w-4 h-4 text-primary" />
+    <div className={cn("w-full", isHero && "space-y-4")}>
+      {isHero && (
+        <div className="flex items-center justify-between max-w-6xl mx-auto px-2">
+          <div className="flex items-center gap-2">
+            <div className="rounded-lg bg-primary/10 border border-primary/20 p-1.5">
+              <Calculator className="text-primary w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-xs font-extrabold uppercase tracking-tight leading-none">
+                {workflowMode === 'abstract' ? "Abstract Joiner Summary" : workflowMode === 'building-permit' ? "Building Permit Analytics" : workflowMode === 'three-year-report' ? "3-Year Report Analytics" : "Dashboard Analytics Context"}
+              </h3>
+              <p className="text-xs font-medium text-muted-foreground mt-1">
+                {workflowMode === 'abstract' ? "Relational join metrics for Journal vs Roll" : workflowMode === 'building-permit' ? "Relational join metrics for Permit vs Roll" : workflowMode === 'three-year-report' ? "Relational join metrics for Sales Data vs Roll" : "Toggle view for specific financial subsets"}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xs font-black uppercase tracking-tight leading-none">
-              {workflowMode === 'abstract' ? "Abstract Joiner Summary" : workflowMode === 'building-permit' ? "Building Permit Analytics" : workflowMode === 'three-year-report' ? "3-Year Report Analytics" : "Dashboard Analytics Context"}
-            </h3>
-            <p className="text-[9px] font-bold text-muted-foreground mt-1 uppercase tracking-widest">
-              {workflowMode === 'abstract' ? "Relational join metrics for Journal vs Roll" : workflowMode === 'building-permit' ? "Relational join metrics for Permit vs Roll" : workflowMode === 'three-year-report' ? "Relational join metrics for Sales Data vs Roll" : "Toggle view for specific financial subsets"}
-            </p>
-          </div>
+          
+          {workflowMode === 'standard' && (
+            <div className="flex items-center gap-1 bg-muted/80 dark:bg-zinc-900/80 p-0.5 rounded-lg border border-border/50 shadow-inner">
+               <Button onClick={() => onTaxViewModeChange('T')} variant="ghost" size="sm" className={cn("text-xs font-bold uppercase tracking-wider gap-1.5 transition-all h-8 px-3", taxViewMode === 'T' ? "bg-emerald-600 text-white shadow-sm hover:bg-emerald-500 hover:text-white" : "text-muted-foreground hover:text-foreground hover:bg-background/80 dark:hover:bg-zinc-800/80")}><CheckCircle2 className="w-3.5 h-3.5" /> Taxable</Button>
+               <Button onClick={() => onTaxViewModeChange('E')} variant="ghost" size="sm" className={cn("text-xs font-bold uppercase tracking-wider gap-1.5 transition-all h-8 px-3", taxViewMode === 'E' ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500 hover:text-white" : "text-muted-foreground hover:text-foreground hover:bg-background/80 dark:hover:bg-zinc-800/80")}><Database className="w-3.5 h-3.5" /> Exempted</Button>
+            </div>
+          )}
         </div>
-        
-        {workflowMode === 'standard' && (
-          <div className="flex items-center gap-1 bg-muted/80 dark:bg-zinc-900/80 p-1 rounded-xl border border-border/50 shadow-inner">
-             <Button onClick={() => onTaxViewModeChange('T')} variant="ghost" size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2 transition-all", taxViewMode === 'T' ? "bg-emerald-600 text-white shadow-sm hover:bg-emerald-500 hover:text-white" : "text-muted-foreground hover:text-foreground hover:bg-background/80 dark:hover:bg-zinc-800/80")}><CheckCircle2 className="w-3 h-3" /> Taxable</Button>
-             <Button onClick={() => onTaxViewModeChange('E')} variant="ghost" size="sm" className={cn("h-8 text-[9px] font-black uppercase tracking-widest gap-2 transition-all", taxViewMode === 'E' ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500 hover:text-white" : "text-muted-foreground hover:text-foreground hover:bg-background/80 dark:hover:bg-zinc-800/80")}><Database className="w-3 h-3" /> Exempted</Button>
-          </div>
-        )}
-      </div>
+      )}
 
       <div className={cn(
-        "grid gap-3 shrink-0 transition-all duration-700 ease-in-out",
+        "grid shrink-0 transition-all duration-700 ease-in-out",
         isHero 
-          ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto w-full" 
-          : "grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 w-full"
+          ? "gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto w-full" 
+          : "gap-2 grid-cols-2 md:grid-cols-4 xl:grid-cols-8 w-full"
       )}>
         {statDefinitions.map((stat, i) => (
           <Popover key={i}>
             <PopoverTrigger asChild>
               <Card className={cn(
-                "flex flex-col shadow-sm cursor-help transition-all hover:scale-[1.03] active:scale-95 hover:shadow-xl border-border/10",
-                isHero ? "p-8 border-t-4 items-center text-center justify-center aspect-square md:aspect-auto md:h-64" : "p-4 border-l-4",
+                "flex flex-col shadow-sm cursor-help transition-all hover:scale-[1.02] active:scale-95 hover:shadow-lg border-border/10",
+                isHero ? "p-8 border-t-4 items-center text-center justify-center aspect-square md:aspect-auto md:h-64" : "px-3 py-2 border-l-4",
                 stat.color
               )}>
                 <div className={cn(
-                  "font-bold text-muted-foreground uppercase flex items-center gap-1.5 tracking-wide",
-                  isHero ? "text-xs mb-4" : "text-[11px] mb-1.5"
+                  "font-bold text-muted-foreground uppercase flex items-center gap-1.5 tracking-wide truncate",
+                  isHero ? "text-xs mb-4" : "text-xs mb-1"
                 )}>
-                  <stat.icon className={cn(isHero ? "w-4 h-4" : "w-3 h-3")} /> 
-                  {stat.label}
+                  <stat.icon className={cn("shrink-0", isHero ? "w-4 h-4" : "w-3.5 h-3.5")} /> 
+                  <span className="truncate">{stat.label}</span>
                 </div>
                 <div className={cn(
                   "font-black leading-tight truncate w-full",
-                  isHero ? "text-2xl md:text-3xl lg:text-2xl xl:text-3xl" : "text-[16px]",
+                  isHero ? "text-2xl md:text-3xl lg:text-2xl xl:text-3xl" : "text-base",
                   stat.textClass || "text-foreground"
                 )}>
                   {stat.value}
@@ -449,11 +456,11 @@ export function MetricOverview({
                   <div className="mt-1 pt-3 border-t border-border/30 space-y-2">
                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Year Breakdown</p>
                     {((stat as any).yearBreakdown as { year: string; value?: number }[]).map(({ year, value }) => (
-                      <div key={year} className="flex items-center justify-between">
-                        <span className={cn("text-xs font-black uppercase tracking-widest px-2 py-0.5 rounded-md",
-                          year === "2028" ? "bg-blue-500/10 text-blue-500" : "bg-emerald-500/10 text-emerald-500"
+                      <div key={year} className="flex items-center justify-between gap-2">
+                        <span className={cn("text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border border-border bg-background",
+                          year === "2028" ? "text-blue-600" : year.includes("Deferred") ? "text-amber-600" : "text-[#12A249]"
                         )}>{year}</span>
-                        <span className="text-sm font-black tabular-nums text-foreground">
+                        <span className="text-sm font-bold tabular-nums text-foreground">
                           ₱{(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>

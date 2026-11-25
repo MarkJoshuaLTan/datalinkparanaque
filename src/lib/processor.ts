@@ -70,6 +70,12 @@ export interface LandRecord {
   assessedValue2028?: number;
   yearlyTax2028?: number;
   yearlyTax2028Uncapped?: number;
+
+  // Deferred (2011 GR / 2012 SMV)
+  unitValueDeferred?: number;
+  marketValueDeferred?: number;
+  assessedValueDeferred?: number;
+  yearlyTaxDeferred?: number;
   
   unitValue2029?: number;
   marketValue2029?: number;
@@ -430,6 +436,10 @@ export function processRecords(
       assessedValue2028,
       yearlyTax2028,
       yearlyTax2028Uncapped,
+      unitValueDeferred: isBOrM ? 0 : unitValue,
+      marketValueDeferred: marketValue,
+      assessedValueDeferred: assessedValue,
+      yearlyTaxDeferred: yearlyTax,
       unitValue2029: unitValue,
       marketValue2029: marketValue,
       assessedValue2029: assessedValue,
@@ -530,6 +540,10 @@ export function processRecords(
                       if (!isBOrM && sectionSetting.unitValue && sectionSetting.unitValue > 0) {
                           updated.unitValue = sectionSetting.unitValue;
                       }
+                      if (!isBOrM) {
+                          const defUv = Number(sectionSetting.deferredUnitValue) || 0;
+                          updated.unitValueDeferred = defUv;
+                      }
                   }
               }
           }
@@ -543,8 +557,27 @@ export function processRecords(
           }
           updated.assessedValue = calculateAssessedValue(updated.marketValue, updated.au, taxRates);
           updated.yearlyTax = isExempt ? 0 : calculateYearlyTax(updated.assessedValue, updated.au, taxRates);
-      } else if (isExempt) {
-          updated.yearlyTax = 0;
+
+          // Deferred (2011 GR / 2012 SMV) — Land only
+          const defUv = Number(updated.unitValueDeferred) || 0;
+          if (defUv > 0 && updated.landArea > 0) {
+              updated.marketValueDeferred = updated.landArea * defUv;
+              updated.assessedValueDeferred = calculateAssessedValue(updated.marketValueDeferred, updated.au, taxRates);
+              updated.yearlyTaxDeferred = isExempt ? 0 : calculateYearlyTax(updated.assessedValueDeferred, updated.au, taxRates);
+          } else {
+              updated.marketValueDeferred = 0;
+              updated.assessedValueDeferred = 0;
+              updated.yearlyTaxDeferred = 0;
+          }
+      } else {
+          // Building (B) and Machinery (M) keep their imported values
+          updated.unitValueDeferred = 0;
+          updated.marketValueDeferred = updated.marketValue;
+          updated.assessedValueDeferred = updated.assessedValue;
+          updated.yearlyTaxDeferred = isExempt ? 0 : updated.yearlyTax;
+          if (isExempt) {
+              updated.yearlyTax = 0;
+          }
       }
 
       updated.unitValue2029 = updated.unitValue;

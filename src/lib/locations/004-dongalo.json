@@ -1,73 +1,402 @@
-
 {
   "name": "Dongalo",
   "barangayCode": "004",
   "sections": [
-    { "section": "001-(023, 035, 070, 076)", "location": "STA. MONICA ST.", "unitValue": 18300 },
-    { "section": "001-(001 TO 004)", "location": "CORNER STA. MONICA ST., CORNER DR. J. GABRIEL ST.", "unitValue": 24410 },
-    { "section": "001-073", "location": "DR. J. GABRIEL ST.", "unitValue": 23100 },
-    { "section": "001", "location": "FACTORY COMPOUND", "unitValue": 28900 },
-    { "section": "002-001", "location": "CORNER QUIRINO AVENUE, CORNER DR. J. GABRIEL ST.", "unitValue": 143590 },
-    { "section": "002-012", "location": "CORNER STA. MONICA ST., CORNER DR. J. GABRIEL ST.", "unitValue": 24410 },
-    { "section": "002", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "003-(003, 008, 009, 012, 014, 016, 017)", "location": "STA. MONICA ST.", "unitValue": 18300 },
-    { "section": "003-(010, 021)", "location": "DR. J. GABRIEL ST.", "unitValue": 23100 },
-    { "section": "003", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "004", "location": "STA. MONICA ST.", "unitValue": 18300 },
-    { "section": "004-011", "location": "DR. J. GABRIEL ST.", "unitValue": 23100 },
-    { "section": "004-016", "location": "CORNER DR. J. GABRIEL ST., CORNER QUIRINO AVENUE", "unitValue": 143590 },
-    { "section": "004", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "005-014", "location": "DENLUNA STREET (ALLEY)", "unitValue": 18300 },
-    { "section": "005-039", "location": "CORNER DR. J. GABRIEL ST., CORNER QUIRINO AVENUE", "unitValue": 143590 },
-    { "section": "005-(023, 025, 034, 035)", "location": "DR. J. GABRIEL ST.", "unitValue": 23100 },
-    { "section": "006-001", "location": "CORNER STA. MONICA ST., CORNER DR. J. GABRIEL ST.", "unitValue": 24410 },
-    { "section": "006", "location": "STA. MONICA ST.", "unitValue": 18300 },
-    { "section": "007-001", "location": "CORNER DR. J. GABRIEL ST., CORNER A. MABINI ST.", "unitValue": 24410 },
-    { "section": "007-(002 TO 031)", "location": "DR. J. GABRIEL ST.", "unitValue": 23100 },
-    { "section": "007-(032 TO 035)", "location": "CORNER DR. J. GABRIEL ST., CORNER STA. MONICA ST.", "unitValue": 24410 },
-    { "section": "008-015", "location": "DENLUNA STREET (ALLEY)", "unitValue": 18300 },
-    { "section": "008-(005 TO 018)", "location": "A. MABINI ST.", "unitValue": 23100 },
-    { "section": "008-004", "location": "CORNER A. MABINI ST., CORNER DR. J. GABRIEL ST.", "unitValue": 24410 },
-    { "section": "008-(010, 011)", "location": "CORNER DR. J. GABRIEL ST., CORNER S. DE GUZMAN ST.", "unitValue": 24410 },
-    { "section": "009-007", "location": "CORNER DR. J. GABRIEL ST., CORNER S. DE GUZMAN ST.", "unitValue": 24410 },
-    { "section": "009-(001 TO 004)", "location": "S. DE GUZMAN ST.", "unitValue": 23100 },
-    { "section": "010-(001 TO 008)", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "010-012", "location": "DINATBANGAN ST.", "unitValue": 18300 },
-    { "section": "010-(014 TO 023)", "location": "S. DE GUZMAN ST.", "unitValue": 23100 },
-    { "section": "010-011", "location": "CORNER DINATBANGAN ST., CORNER S. DE GUZMAN ST.", "unitValue": 21750 },
-    { "section": "011", "location": "S. DE GUZMAN ST.", "unitValue": 23100 },
-    { "section": "012-(001 TO 017)", "location": "A. MABINI ST.", "unitValue": 23100 },
-    { "section": "013", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "014-020", "location": "CORNER STA. MONICA ST., CORNER DINATBANGAN ST.", "unitValue": 21750 },
-    { "section": "014-013", "location": "CORNER DINATBANGAN ST., CORNER QUIRINO AVENUE", "unitValue": 143590 },
-    { "section": "015", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "016-018", "location": "CORNER DINATBANGAN ST., CORNER STA. MONICA ST.", "unitValue": 21750 },
-    { "section": "016-016", "location": "CORNER DINATBANGAN ST., CORNER A. MABINI ST.", "unitValue": 21750 },
-    { "section": "016-(001, 002)", "location": "CORNER A. MABINI ST., CORNER S. DE GUZMAN ST.", "unitValue": 24410 },
-    { "section": "017-(001 TO 008)", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "018-001 TO 005", "location": "CORNER S. DE GUZMAN ST., CORNER STA. MONICA ST.", "unitValue": 24410 },
-    { "section": "018-006 TO 008", "location": "CORNER S. DE GUZMAN ST., CORNER QUIRINO AVENUE", "unitValue": 143590 },
-    { "section": "018", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "019-026", "location": "CORNER S. DE GUZMAN ST., CORNER QUIRINO AVENUE", "unitValue": 143590 },
-    { "section": "019", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "020-001", "location": "CORNER DR. A. SANTOS ST., CORNER S. DE GUZMAN ST.", "unitValue": 24410 },
-    { "section": "020-002 TO 003", "location": "CORNER DR. A. SANTOS ST., CORNER A. MABINI ST.", "unitValue": 24410 },
-    { "section": "021-001", "location": "CORNER DR. A. SANTOS ST., CORNER S. DE GUZMAN ST.", "unitValue": 24410 },
-    { "section": "022-001", "location": "CORNER S. DE GUZMAN ST., CORNER BALAGTAS STREET", "unitValue": 24410 },
-    { "section": "022-012 TO 013", "location": "CORNER A. MABINI ST., CORNER BALAGTAS STREET", "unitValue": 24410 },
-    { "section": "024", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "026-(016 TO 032)", "location": "QUIRINO AVENUE", "unitValue": 130500 },
-    { "section": "027-001", "location": "CORNER A. MABINI ST., CORNER BALAGTAS STREET", "unitValue": 24410 },
-    { "section": "027-002", "location": "CORNER STA. MONICA ST., CORNER BALAGTAS STREET", "unitValue": 24410 },
-    { "section": "027-003", "location": "CORNER DR. RING AVENUE, CORNER BALAGTAS STREET", "unitValue": 143590 },
-    { "section": "028", "location": "MARINA BAYTOWN SOUTH", "unitValue": 32500 },
-    { "section": "029", "location": "PACIFIC AVENUE - MARINA SUBD. EAST", "unitValue": 130500 },
-    { "section": "038", "location": "PALM COURT VILLAGE / RIVIERA RESIDENCES", "unitValue": 130500 },
-    { "section": "039", "location": "PACIFIC AVENUE - MARINA SUBD. SOUTH", "unitValue": 130500 },
-    { "section": "040-(011 TO 047)", "location": "AGUINALDO HIGHWAY", "unitValue": 115200 },
-    { "section": "040-(017 TO 018)", "location": "CORNER AGUINALDO HWY / PACIFIC AVE", "unitValue": 126720 },
-    { "section": "040-020", "location": "CORNER MACAPAGAL AVE / PACIFIC AVE", "unitValue": 151700 },
-    { "section": "040", "location": "MACAPAGAL AVENUE", "unitValue": 138600 },
-    { "section": "041", "location": "CORNER MACAPAGAL AVE / PACIFIC AVE", "unitValue": 151700 }
+    {
+      "section": "001-(023, 035, 070, 076)",
+      "location": "STA. MONICA ST.",
+      "unitValue": 18300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "001-(001 TO 004)",
+      "location": "CORNER STA. MONICA ST., CORNER DR. J. GABRIEL ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "001-073",
+      "location": "DR. J. GABRIEL ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "001",
+      "location": "FACTORY COMPOUND",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "002-001",
+      "location": "CORNER QUIRINO AVENUE, CORNER DR. J. GABRIEL ST.",
+      "unitValue": 143590,
+      "deferredUnitValue": 6600
+    },
+    {
+      "section": "002-012",
+      "location": "CORNER STA. MONICA ST., CORNER DR. J. GABRIEL ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "002",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "003-(003, 008, 009, 012, 014, 016, 017)",
+      "location": "STA. MONICA ST.",
+      "unitValue": 18300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "003-(010, 021)",
+      "location": "DR. J. GABRIEL ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "003",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "004",
+      "location": "STA. MONICA ST.",
+      "unitValue": 18300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "004-011",
+      "location": "DR. J. GABRIEL ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "004-016",
+      "location": "CORNER DR. J. GABRIEL ST., CORNER QUIRINO AVENUE",
+      "unitValue": 143590,
+      "deferredUnitValue": 6600
+    },
+    {
+      "section": "004",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "005-014",
+      "location": "DENLUNA STREET (ALLEY)",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "005-039",
+      "location": "CORNER DR. J. GABRIEL ST., CORNER QUIRINO AVENUE",
+      "unitValue": 143590,
+      "deferredUnitValue": 6600
+    },
+    {
+      "section": "005-(023, 025, 034, 035)",
+      "location": "DR. J. GABRIEL ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "006-001",
+      "location": "CORNER STA. MONICA ST., CORNER DR. J. GABRIEL ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "006",
+      "location": "STA. MONICA ST.",
+      "unitValue": 18300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "007-001",
+      "location": "CORNER DR. J. GABRIEL ST., CORNER A. MABINI ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "007-(002 TO 031)",
+      "location": "DR. J. GABRIEL ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "007-(032 TO 035)",
+      "location": "CORNER DR. J. GABRIEL ST., CORNER STA. MONICA ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "008-015",
+      "location": "DENLUNA STREET (ALLEY)",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "008-(005 TO 018)",
+      "location": "A. MABINI ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "008-004",
+      "location": "CORNER A. MABINI ST., CORNER DR. J. GABRIEL ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "008-(010, 011)",
+      "location": "CORNER DR. J. GABRIEL ST., CORNER S. DE GUZMAN ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "009-007",
+      "location": "CORNER DR. J. GABRIEL ST., CORNER S. DE GUZMAN ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "009-(001 TO 004)",
+      "location": "S. DE GUZMAN ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "010-(001 TO 008)",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "010-012",
+      "location": "DINATBANGAN ST.",
+      "unitValue": 18300,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "010-(014 TO 023)",
+      "location": "S. DE GUZMAN ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "010-011",
+      "location": "CORNER DINATBANGAN ST., CORNER S. DE GUZMAN ST.",
+      "unitValue": 21750,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "011",
+      "location": "S. DE GUZMAN ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-(001 TO 017)",
+      "location": "A. MABINI ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "013",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "014-020",
+      "location": "CORNER STA. MONICA ST., CORNER DINATBANGAN ST.",
+      "unitValue": 21750,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "014-013",
+      "location": "CORNER DINATBANGAN ST., CORNER QUIRINO AVENUE",
+      "unitValue": 143590,
+      "deferredUnitValue": 6600
+    },
+    {
+      "section": "015",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "016-018",
+      "location": "CORNER DINATBANGAN ST., CORNER STA. MONICA ST.",
+      "unitValue": 21750,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "016-016",
+      "location": "CORNER DINATBANGAN ST., CORNER A. MABINI ST.",
+      "unitValue": 21750,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "016-(001, 002)",
+      "location": "CORNER A. MABINI ST., CORNER S. DE GUZMAN ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "017-(001 TO 008)",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "018-001 TO 005",
+      "location": "CORNER S. DE GUZMAN ST., CORNER STA. MONICA ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "018-006 TO 008",
+      "location": "CORNER S. DE GUZMAN ST., CORNER QUIRINO AVENUE",
+      "unitValue": 143590,
+      "deferredUnitValue": 6600
+    },
+    {
+      "section": "018",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "019-026",
+      "location": "CORNER S. DE GUZMAN ST., CORNER QUIRINO AVENUE",
+      "unitValue": 143590,
+      "deferredUnitValue": 6600
+    },
+    {
+      "section": "019",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "020-001",
+      "location": "CORNER DR. A. SANTOS ST., CORNER S. DE GUZMAN ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "020-002 TO 003",
+      "location": "CORNER DR. A. SANTOS ST., CORNER A. MABINI ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "021-001",
+      "location": "CORNER DR. A. SANTOS ST., CORNER S. DE GUZMAN ST.",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "022-001",
+      "location": "CORNER S. DE GUZMAN ST., CORNER BALAGTAS STREET",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "022-012 TO 013",
+      "location": "CORNER A. MABINI ST., CORNER BALAGTAS STREET",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "024",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "026-(016 TO 032)",
+      "location": "QUIRINO AVENUE",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "027-001",
+      "location": "CORNER A. MABINI ST., CORNER BALAGTAS STREET",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "027-002",
+      "location": "CORNER STA. MONICA ST., CORNER BALAGTAS STREET",
+      "unitValue": 24410,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "027-003",
+      "location": "CORNER DR. RING AVENUE, CORNER BALAGTAS STREET",
+      "unitValue": 143590,
+      "deferredUnitValue": 1980
+    },
+    {
+      "section": "028",
+      "location": "MARINA BAYTOWN SOUTH",
+      "unitValue": 32500,
+      "deferredUnitValue": 7000
+    },
+    {
+      "section": "029",
+      "location": "PACIFIC AVENUE - MARINA SUBD. EAST",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "038",
+      "location": "PALM COURT VILLAGE / RIVIERA RESIDENCES",
+      "unitValue": 130500,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "039",
+      "location": "PACIFIC AVENUE - MARINA SUBD. SOUTH",
+      "unitValue": 130500,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "040-(011 TO 047)",
+      "location": "AGUINALDO HIGHWAY",
+      "unitValue": 115200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "040-(017 TO 018)",
+      "location": "CORNER AGUINALDO HWY / PACIFIC AVE",
+      "unitValue": 126720,
+      "deferredUnitValue": 11000
+    },
+    {
+      "section": "040-020",
+      "location": "CORNER MACAPAGAL AVE / PACIFIC AVE",
+      "unitValue": 151700,
+      "deferredUnitValue": 16500
+    },
+    {
+      "section": "040",
+      "location": "MACAPAGAL AVENUE",
+      "unitValue": 138600,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "041",
+      "location": "CORNER MACAPAGAL AVE / PACIFIC AVE",
+      "unitValue": 151700,
+      "deferredUnitValue": 16500
+    }
   ]
 }

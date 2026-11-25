@@ -2,153 +2,893 @@
   "name": "San Dionisio",
   "barangayCode": "010",
   "sections": [
-    { "section": "001-{001, 002, 017, 026, 047, 048, 050, 052, 078, 083, 085, 086, 087, 090, 092, 093, 094}", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "001-{019, 027, 049, 089}", "location": "P. BURGOS ST", "unitValue": 33700 },
-    { "section": "001-{(005 TO 018)}", "location": "J DE LEON ST", "unitValue": 18300 },
-    { "section": "001", "location": "ROMERO ST", "unitValue": 23100 },
-    { "section": "001-{053, (054 TO 061), 082}", "location": "MORAS ST", "unitValue": 23100 },
-    { "section": "002-{001, 021, 022, 023, 025, 044, 048, 057, 058, 059, 060, 061}", "location": "P. BURGOS ST", "unitValue": 33700 },
-    { "section": "002", "location": "A. BONIFACIO ST", "unitValue": 33700 },
-    { "section": "002-{002, 005, 006, 007, 016, 017}", "location": "J. DE LEON ST", "unitValue": 18300 },
-    { "section": "002-{027, 028, 041, 042, 054, 055}", "location": "ROMERO ST.", "unitValue": 23100 },
-    { "section": "002-{045, 052, 053, 056}", "location": "MORAS ST", "unitValue": 23100 },
-    { "section": "003-{(002 TO 005)}", "location": "MORAS ST", "unitValue": 23100 },
-    { "section": "003-{(016 TO 018), (024 TO 027), 029}", "location": "JACINTO ST", "unitValue": 18300 },
-    { "section": "003-{031, 032, 034, (037 TO 040)}", "location": "SALINAS ST", "unitValue": 23100 },
-    { "section": "003-{050, 052, 053}", "location": "MAMAMANTE ST", "unitValue": 18300 },
-    { "section": "003", "location": "P BURGOS ST", "unitValue": 33700 },
-    { "section": "003-{(006 TO 015), 028, 030, 041, 042}", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "004-{002, (004 TO 008), 097, 098, 099, 100, 104, 105}", "location": "MORAS ST", "unitValue": 23100 },
-    { "section": "004-{(031 TO 037)}", "location": "JACINTO ST", "unitValue": 18300 },
-    { "section": "004-{053, (055 TO 058), 062, 108, 109, 110, 111, (094 TO 060)}", "location": "SALINAS ST", "unitValue": 23100 },
-    { "section": "004-{061, 063, 064, 065, 066, 067, 068, 069, 070, 071, 074}", "location": "MAMAMANTE ST", "unitValue": 18300 },
-    { "section": "004", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "004-{013, 014, 016, 042, 043, (077 TO 080), 089, 092, 093, 106, 107}", "location": "P BURGOS ST", "unitValue": 33700 },
-    { "section": "005-{001, 003, 004, 005, 006, 008, 009, 010, 011, 012, 013, 014, 087, 088}", "location": "MAMAMANTE ST", "unitValue": 18300 },
-    { "section": "005", "location": "SALVADOR ST", "unitValue": 23100 },
-    { "section": "005-{(065 TO 069), 071, 072, 081, 082, 084, 086, 089}", "location": "NT GARCIA ST", "unitValue": 23100 },
-    { "section": "005-{(015 TO 019), (024 TO 032), 050, 051, 052, 053, (059 TO 064), 080}", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "005-{(020 TO 022), 054, 055, 056, 057, 074, 085}", "location": "P BURGOS ST", "unitValue": 33700 },
-    { "section": "006-{003}", "location": "MAMAMANTE ST", "unitValue": 18300 },
-    { "section": "006-{019, 020, 021, 038, 039}", "location": "SALVADOR ST", "unitValue": 23100 },
-    { "section": "006", "location": "NT GARCIA ST", "unitValue": 23100 },
-    { "section": "006-{001, 002, 015, 016, 017, 035, 036}", "location": "P BURGOS ST", "unitValue": 33700 },
-    { "section": "006-{028, 029, 030, 031, 034}", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "007-{002, 004, 006, 007, 012}", "location": "NT GARCIA ST", "unitValue": 23100 },
-    { "section": "007-{031, 032, 034, 038, 050, 052, 053}", "location": "E VITALEZ ST", "unitValue": 18300 },
-    { "section": "007-{022, 040, 055, 056, 057, 058, 059, 060}", "location": "E BUENAVENTURA ST", "unitValue": 18300 },
-    { "section": "007-{001, 003, 033, 035, 046, 047, 048}", "location": "P BURGOS ST", "unitValue": 33700 },
-    { "section": "007", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "008", "location": "NT GARCIA ST", "unitValue": 23100 },
-    { "section": "008-{(034 TO 040), 042, 050, 052}", "location": "E VITALEZ ST", "unitValue": 18300 },
-    { "section": "008-{062, 063}", "location": "E BUENAVENTURA ST", "unitValue": 18300 },
-    { "section": "008", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "008-{011, 012, 013, 017, 045, 046, 047, 055, 058}", "location": "P BURGOS ST", "unitValue": 33700 },
-    { "section": "009-{(001 TO 007), 021, 022}", "location": "E BUENAVENTURA ST", "unitValue": 18300 },
-    { "section": "009", "location": "LOPEZ JAENA ST", "unitValue": 23100 },
-    { "section": "009-{042, 046, 047, (050 TO 053)}", "location": "EL FILIBUSTERISMO ST", "unitValue": 23100 },
-    { "section": "009-{008, 009, 013, 014, 015, 016, 017, 034, 037, 040, 042, 043, 055, 059, 060, 065}", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "009-{010, 011, 012, 035, 036, 039, 066, 067}", "location": "P BURGOS ST", "unitValue": 33700 },
-    { "section": "010-{005, 009, 012}", "location": "E BUENAVENTURA ST", "unitValue": 18300 },
-    { "section": "010-{023, 024, 025, 026, 027, 032, 038}", "location": "LOPEZ JAENA ST", "unitValue": 23100 },
-    { "section": "010-{043}", "location": "EL FILIBUSTERISMO ST", "unitValue": 23100 },
-    { "section": "010-{(001 TO 004), (028 TO 031)}", "location": "P BURGOS ST", "unitValue": 33700 },
-    { "section": "010", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "011-{(005 TO 008), 013, 042}", "location": "EL FILIBUSTERISMO ST", "unitValue": 23100 },
-    { "section": "011-{029, 032, 033}", "location": "M RODRIGUEZ ST", "unitValue": 18300 },
-    { "section": "011", "location": "G RAMOS ST", "unitValue": 18300 },
-    { "section": "011-{036, 037}", "location": "PELAEZ ST", "unitValue": 23100 },
-    { "section": "011-{(010 TO 012), (014 TO 018), 020, (026 TO 028), 034, 035, 038, 039, 041}", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "012-{(001 TO 008), 023}", "location": "EL FILIBUSTERISMO ST", "unitValue": 23100 },
-    { "section": "012-{022, 022, (024 TO 028), (031 TO 040), 042, 043, 047, 048, 049, 050, 051, 053, 054}", "location": "H RODRIGUEZ ST", "unitValue": 18300 },
-    { "section": "012-{(055 TO 057)}", "location": "PELAEZ ST", "unitValue": 23100 },
-    { "section": "012", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "012-{014, 016, 017, 060, 061, 079}", "location": "G RAMOS ST", "unitValue": 18300 },
-    { "section": "013-{(001 TO 007), 010, 011, 012, 013, 035, 038}", "location": "PELAEZ ST", "unitValue": 23100 },
-    { "section": "013", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "014", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "014-{(006 TO 013), 030, 031, 042, 061}", "location": "PELAEZ ST", "unitValue": 23100 },
-    { "section": "014-{(014 TO 027), 028, 029, 044, 046, 053, 058, 059, 060, 062, 063, 064, 065, 066, 082}", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "015-{(001 TO 003), 017, 030, 048, 049, 050}", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "015", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "016", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "017-{005}", "location": "COASTAL RD", "unitValue": 18300 },
-    { "section": "017", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "018-{001, (015 TO 020), (022 TO 024), 032, 036, 040, 078, 079, 086, 088}", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "018-{007, 009, 037, 038, 039, 041, 043, 044, 054, 057, 106}", "location": "KABIHASNAN", "unitValue": 64400 },
-    { "section": "018", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "019-{084}", "location": "TRAMO", "unitValue": 23100 },
-    { "section": "019", "location": "HOLY FAMILY COMPOUND", "unitValue": 18300 },
-    { "section": "019-{(008 TO 011), 013, 083}", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "019-{001, 002, 003, 007, 014, 025, 026, 039, 070, 071, 072, 073, 086, 087, 088, 090, 091}", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "020", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "021-{001, 005, 007, (008 TO 022), 024, 025, (028 TO 032), 035, 036, 037, 038, 039, 107, 128, 129, 130, 141, 142, 142, 144, 145, 145, 151, 153, 154, 155, 165, 166, 182}", "location": "JALEVILLE SUBD", "unitValue": 45800 },
-    { "section": "021", "location": "JALEVILLE SUBD", "unitValue": 45800 },
-    { "section": "021-{149, (185 TO 195)}", "location": "JALEVILLE SUBD", "unitValue": 45800 },
-    { "section": "021-{(119 TO 121), 123, 124, 135, 136, 137, (157 TO 162), 163, 164, 170}", "location": "AGUINALDO HIGHWAY", "unitValue": 85200 },
-    { "section": "022", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "023", "location": "QUIRINO AVE.", "unitValue": 85200 },
-    { "section": "025", "location": "NINOY AQUINO AVE", "unitValue": 85200 },
-    { "section": "026-{076, 101, 102, 103, 104, 106, (107 TO 115), 117, 119, 121, 122, 134, 135, 136}", "location": "NINOY AQUINO AVE", "unitValue": 85200 },
-    { "section": "026", "location": "LOPEZ JAENA ST", "unitValue": 23100 },
-    { "section": "026-{(001 TO 014)}", "location": "BUENAVENTURA ST", "unitValue": 18300 },
-    { "section": "026-{(015 TO 021), 023, 027, 028, 029, (048 TO 052), 140}", "location": "LOPEZ JAENA ST", "unitValue": 23100 },
-    { "section": "026-{056, 057, (059 TO 064)}", "location": "EL FILIBUSTERISMO ST", "unitValue": 23100 },
-    { "section": "026-{095, 097, 098, 099, 100, 131, 132}", "location": "H RODRIGUEZ ST", "unitValue": 18300 },
-    { "section": "027-{010, 014, (016 TO 018), 021, 022, (034 TO 037), 040, 042, 043, 058, 059}", "location": "NINOY AQUINO AVE", "unitValue": 85200 },
-    { "section": "027-{003, 004, 044, 045, 053, 054}", "location": "PELAEZ ST", "unitValue": 23100 },
-    { "section": "027-{038, 040, 067}", "location": "KABIHASNAN", "unitValue": 64400 },
-    { "section": "027", "location": "TRAMO", "unitValue": 23100 },
-    { "section": "027-{001, 002}", "location": "H RODRIGUEZ ST", "unitValue": 18300 },
-    { "section": "028", "location": "AMVEL BUSINES PARK", "unitValue": 85200 },
-    { "section": "029", "location": "NINOY AQUINO AVE", "unitValue": 85200 },
-    { "section": "029-{(014 TO 016), 017, 018, 019, 020, 021, (024 TO 030), 055, 057, 057, 061, 062, 067, 068, 081}", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "030-{034, 035, (043 TO 053), (054 TO 063), 066, 069, (072 TO 080), 081, 086, 087, 088}", "location": "AMVEL BUSINES PARK", "unitValue": 85200 },
-    { "section": "030", "location": "C5 EXTENSION", "unitValue": 85200 },
-    { "section": "031", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "031-{024, 033, 035, 036, (057 TO 061), (062 TO 066), 067, 068}", "location": "AMVEL BUSINES PARK", "unitValue": 85200 },
-    { "section": "031-{009, 011, 020, 023, 030, 031, 032}", "location": "C5 EXTENSION", "unitValue": 85200 },
-    { "section": "032", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "032-{078}", "location": "C5 EXTENSION", "unitValue": 85200 },
-    { "section": "032", "location": "A BONIFACIO ST", "unitValue": 33700 },
-    { "section": "032-{009, 097, (087 TO 094)}", "location": "TRAMO ROAD", "unitValue": 23100 },
-    { "section": "033-{009, 011, 013, 016, 018, 019, 095, 096, (023 TO 025), (064 TO 072)}", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "033", "location": "C5 EXTENSION", "unitValue": 85200 },
-    { "section": "034", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "035", "location": "JUANITA DE LEON ST", "unitValue": 48700 },
-    { "section": "035-{013, 040, (004 TO 007), (025 TO 030), (041 TO 049)}", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "036", "location": "GATCHALIAN SUBD 1&2-C", "unitValue": 23100 },
-    { "section": "037", "location": "GATCHALIAN SUBD 1&2-C", "unitValue": 23100 },
-    { "section": "037-{(058 TO 066)}", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "038-{006, 007, 230, 231, (001 TO 004), (018 TO 024), (098 TO 106), (108 TO 120), (133 TO 136), (220 TO 223), (226 TO 228)}", "location": "JUANITA DE LEON ST", "unitValue": 48700 },
-    { "section": "038", "location": "AURENINA/RODRIGUEZ COMPD", "unitValue": 18300 },
-    { "section": "038-{005, 008, 009, 016, (032 TO 039), (137 TO 158)}", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "039", "location": "GATCHALIAN SUBD 1&2-C", "unitValue": 23100 },
-    { "section": "040", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "041", "location": "PALANYAG ROAD/GATCHALIAN AVE", "unitValue": 48700 },
-    { "section": "041-{006, (025 TO 037), (062 TO 065)}", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "042-{017, 059, 080, 081, (069 TO 073)}", "location": "PALANYAG ROAD/GATCHALIAN AVE", "unitValue": 48700 },
-    { "section": "042", "location": "DON JOSE GREEN COURT SUBD", "unitValue": 28900 },
-    { "section": "043-{(001 TO 013), (075 TO 079)}", "location": "DR A SANTOS AVE", "unitValue": 85200 },
-    { "section": "043", "location": "PALANYAG ROAD/GATCHALIAN AVE", "unitValue": 48700 },
-    { "section": "043-{048, (014 TO 018), (056 TO 074)}", "location": "ANGELINA CANAYNAY AVENUE", "unitValue": 48700 },
-    { "section": "044", "location": "BERNABE SUBD", "unitValue": 18300 },
-    { "section": "045", "location": "VILLANUEVA VILLAGE", "unitValue": 28900 },
-    { "section": "046", "location": "VILLANUEVA VILLAGE", "unitValue": 28900 },
-    { "section": "047", "location": "VILLANUEVA VILLAGE", "unitValue": 28900 },
-    { "section": "048", "location": "R. MEDINA SUBD.", "unitValue": 23100 },
-    { "section": "049", "location": "GARDENVALE SUBD", "unitValue": 45800 },
-    { "section": "057", "location": "ANGELINA CANAYNAY AVENUE", "unitValue": 48700 },
-    { "section": "057-{038, 039, (012 TO 015), (067 TO 071), (136 TO 139), (141 TO 162)}", "location": "PALANYAG ROAD/GATCHALIAN AVE", "unitValue": 48700 },
-    { "section": "058", "location": "ANGELINA CANAYNAY AVENUE", "unitValue": 48700 },
-    { "section": "060", "location": "TRAMO ROAD", "unitValue": 23100 },
-    { "section": "061", "location": "TRAMO ROAD", "unitValue": 23100 },
-    { "section": "062", "location": "TRAMO ROAD", "unitValue": 23100 },
-    { "section": "063", "location": "TRAMO ROAD", "unitValue": 23100 },
-    { "section": "064", "location": "TRAMO ROAD", "unitValue": 23100 },
-    { "section": "065", "location": "TRAMO ROAD", "unitValue": 23100 },
-    { "section": "066", "location": "TRAMO ROAD", "unitValue": 23100 },
-    { "section": "067", "location": "TRAMO ROAD", "unitValue": 23100 },
-    { "section": "068", "location": "CH WOODSROW SUBD", "unitValue": 33700 }
+    {
+      "section": "001-{001, 002, 017, 026, 047, 048, 050, 052, 078, 083, 085, 086, 087, 090, 092, 093, 094}",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "001-{019, 027, 049, 089}",
+      "location": "P. BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "001-{(005 TO 018)}",
+      "location": "J DE LEON ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "001",
+      "location": "ROMERO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "001-{053, (054 TO 061), 082}",
+      "location": "MORAS ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "002-{001, 021, 022, 023, 025, 044, 048, 057, 058, 059, 060, 061}",
+      "location": "P. BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "002",
+      "location": "A. BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "002-{002, 005, 006, 007, 016, 017}",
+      "location": "J. DE LEON ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "002-{027, 028, 041, 042, 054, 055}",
+      "location": "ROMERO ST.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "002-{045, 052, 053, 056}",
+      "location": "MORAS ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "003-{(002 TO 005)}",
+      "location": "MORAS ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "003-{(016 TO 018), (024 TO 027), 029}",
+      "location": "JACINTO ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "003-{031, 032, 034, (037 TO 040)}",
+      "location": "SALINAS ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "003-{050, 052, 053}",
+      "location": "MAMAMANTE ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "003",
+      "location": "P BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{(006 TO 015), 028, 030, 041, 042}",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "004-{002, (004 TO 008), 097, 098, 099, 100, 104, 105}",
+      "location": "MORAS ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "004-{(031 TO 037)}",
+      "location": "JACINTO ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "004-{053, (055 TO 058), 062, 108, 109, 110, 111, (094 TO 060)}",
+      "location": "SALINAS ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "004-{061, 063, 064, 065, 066, 067, 068, 069, 070, 071, 074}",
+      "location": "MAMAMANTE ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "004",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "004-{013, 014, 016, 042, 043, (077 TO 080), 089, 092, 093, 106, 107}",
+      "location": "P BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "005-{001, 003, 004, 005, 006, 008, 009, 010, 011, 012, 013, 014, 087, 088}",
+      "location": "MAMAMANTE ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "005",
+      "location": "SALVADOR ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "005-{(065 TO 069), 071, 072, 081, 082, 084, 086, 089}",
+      "location": "NT GARCIA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "005-{(015 TO 019), (024 TO 032), 050, 051, 052, 053, (059 TO 064), 080}",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "005-{(020 TO 022), 054, 055, 056, 057, 074, 085}",
+      "location": "P BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "006-{003}",
+      "location": "MAMAMANTE ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "006-{019, 020, 021, 038, 039}",
+      "location": "SALVADOR ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "006",
+      "location": "NT GARCIA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "006-{001, 002, 015, 016, 017, 035, 036}",
+      "location": "P BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "006-{028, 029, 030, 031, 034}",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "007-{002, 004, 006, 007, 012}",
+      "location": "NT GARCIA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "007-{031, 032, 034, 038, 050, 052, 053}",
+      "location": "E VITALEZ ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "007-{022, 040, 055, 056, 057, 058, 059, 060}",
+      "location": "E BUENAVENTURA ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "007-{001, 003, 033, 035, 046, 047, 048}",
+      "location": "P BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "007",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "008",
+      "location": "NT GARCIA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "008-{(034 TO 040), 042, 050, 052}",
+      "location": "E VITALEZ ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "008-{062, 063}",
+      "location": "E BUENAVENTURA ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "008",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "008-{011, 012, 013, 017, 045, 046, 047, 055, 058}",
+      "location": "P BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "009-{(001 TO 007), 021, 022}",
+      "location": "E BUENAVENTURA ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "009",
+      "location": "LOPEZ JAENA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "009-{042, 046, 047, (050 TO 053)}",
+      "location": "EL FILIBUSTERISMO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "009-{008, 009, 013, 014, 015, 016, 017, 034, 037, 040, 042, 043, 055, 059, 060, 065}",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "009-{010, 011, 012, 035, 036, 039, 066, 067}",
+      "location": "P BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "010-{005, 009, 012}",
+      "location": "E BUENAVENTURA ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "010-{023, 024, 025, 026, 027, 032, 038}",
+      "location": "LOPEZ JAENA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "010-{043}",
+      "location": "EL FILIBUSTERISMO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "010-{(001 TO 004), (028 TO 031)}",
+      "location": "P BURGOS ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "010",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "011-{(005 TO 008), 013, 042}",
+      "location": "EL FILIBUSTERISMO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "011-{029, 032, 033}",
+      "location": "M RODRIGUEZ ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "011",
+      "location": "G RAMOS ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "011-{036, 037}",
+      "location": "PELAEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "011-{(010 TO 012), (014 TO 018), 020, (026 TO 028), 034, 035, 038, 039, 041}",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{(001 TO 008), 023}",
+      "location": "EL FILIBUSTERISMO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "012-{022, 022, (024 TO 028), (031 TO 040), 042, 043, 047, 048, 049, 050, 051, 053, 054}",
+      "location": "H RODRIGUEZ ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "012-{(055 TO 057)}",
+      "location": "PELAEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "012-{014, 016, 017, 060, 061, 079}",
+      "location": "G RAMOS ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "013-{(001 TO 007), 010, 011, 012, 013, 035, 038}",
+      "location": "PELAEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "014",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "014-{(006 TO 013), 030, 031, 042, 061}",
+      "location": "PELAEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "014-{(014 TO 027), 028, 029, 044, 046, 053, 058, 059, 060, 062, 063, 064, 065, 066, 082}",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "015-{(001 TO 003), 017, 030, 048, 049, 050}",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "015",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "016",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "017-{005}",
+      "location": "COASTAL RD",
+      "unitValue": 18300,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "017",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "018-{001, (015 TO 020), (022 TO 024), 032, 036, 040, 078, 079, 086, 088}",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "018-{007, 009, 037, 038, 039, 041, 043, 044, 054, 057, 106}",
+      "location": "KABIHASNAN",
+      "unitValue": 64400,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "018",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "019-{084}",
+      "location": "TRAMO",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "019",
+      "location": "HOLY FAMILY COMPOUND",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "019-{(008 TO 011), 013, 083}",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "019-{001, 002, 003, 007, 014, 025, 026, 039, 070, 071, 072, 073, 086, 087, 088, 090, 091}",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "020",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "021-{001, 005, 007, (008 TO 022), 024, 025, (028 TO 032), 035, 036, 037, 038, 039, 107, 128, 129, 130, 141, 142, 142, 144, 145, 145, 151, 153, 154, 155, 165, 166, 182}",
+      "location": "JALEVILLE SUBD",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021",
+      "location": "JALEVILLE SUBD",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{149, (185 TO 195)}",
+      "location": "JALEVILLE SUBD",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{(119 TO 121), 123, 124, 135, 136, 137, (157 TO 162), 163, 164, 170}",
+      "location": "AGUINALDO HIGHWAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "022",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "023",
+      "location": "QUIRINO AVE.",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "025",
+      "location": "NINOY AQUINO AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "026-{076, 101, 102, 103, 104, 106, (107 TO 115), 117, 119, 121, 122, 134, 135, 136}",
+      "location": "NINOY AQUINO AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "026",
+      "location": "LOPEZ JAENA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "026-{(001 TO 014)}",
+      "location": "BUENAVENTURA ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "026-{(015 TO 021), 023, 027, 028, 029, (048 TO 052), 140}",
+      "location": "LOPEZ JAENA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "026-{056, 057, (059 TO 064)}",
+      "location": "EL FILIBUSTERISMO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "026-{095, 097, 098, 099, 100, 131, 132}",
+      "location": "H RODRIGUEZ ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "027-{010, 014, (016 TO 018), 021, 022, (034 TO 037), 040, 042, 043, 058, 059}",
+      "location": "NINOY AQUINO AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "027-{003, 004, 044, 045, 053, 054}",
+      "location": "PELAEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "027-{038, 040, 067}",
+      "location": "KABIHASNAN",
+      "unitValue": 64400,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "027",
+      "location": "TRAMO",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "027-{001, 002}",
+      "location": "H RODRIGUEZ ST",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "028",
+      "location": "AMVEL BUSINES PARK",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "029",
+      "location": "NINOY AQUINO AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "029-{(014 TO 016), 017, 018, 019, 020, 021, (024 TO 030), 055, 057, 057, 061, 062, 067, 068, 081}",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "030-{034, 035, (043 TO 053), (054 TO 063), 066, 069, (072 TO 080), 081, 086, 087, 088}",
+      "location": "AMVEL BUSINES PARK",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "030",
+      "location": "C5 EXTENSION",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "031",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "031-{024, 033, 035, 036, (057 TO 061), (062 TO 066), 067, 068}",
+      "location": "AMVEL BUSINES PARK",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "031-{009, 011, 020, 023, 030, 031, 032}",
+      "location": "C5 EXTENSION",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "032",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "032-{078}",
+      "location": "C5 EXTENSION",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "032",
+      "location": "A BONIFACIO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "032-{009, 097, (087 TO 094)}",
+      "location": "TRAMO ROAD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "033-{009, 011, 013, 016, 018, 019, 095, 096, (023 TO 025), (064 TO 072)}",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "033",
+      "location": "C5 EXTENSION",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "034",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "035",
+      "location": "JUANITA DE LEON ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "035-{013, 040, (004 TO 007), (025 TO 030), (041 TO 049)}",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "036",
+      "location": "GATCHALIAN SUBD 1&2-C",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "037",
+      "location": "GATCHALIAN SUBD 1&2-C",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "037-{(058 TO 066)}",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "038-{006, 007, 230, 231, (001 TO 004), (018 TO 024), (098 TO 106), (108 TO 120), (133 TO 136), (220 TO 223), (226 TO 228)}",
+      "location": "JUANITA DE LEON ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "038",
+      "location": "AURENINA/RODRIGUEZ COMPD",
+      "unitValue": 18300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "038-{005, 008, 009, 016, (032 TO 039), (137 TO 158)}",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "039",
+      "location": "GATCHALIAN SUBD 1&2-C",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "040",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "041",
+      "location": "PALANYAG ROAD/GATCHALIAN AVE",
+      "unitValue": 48700,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "041-{006, (025 TO 037), (062 TO 065)}",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "042-{017, 059, 080, 081, (069 TO 073)}",
+      "location": "PALANYAG ROAD/GATCHALIAN AVE",
+      "unitValue": 48700,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "042",
+      "location": "DON JOSE GREEN COURT SUBD",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "043-{(001 TO 013), (075 TO 079)}",
+      "location": "DR A SANTOS AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "043",
+      "location": "PALANYAG ROAD/GATCHALIAN AVE",
+      "unitValue": 48700,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "043-{048, (014 TO 018), (056 TO 074)}",
+      "location": "ANGELINA CANAYNAY AVENUE",
+      "unitValue": 48700,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "044",
+      "location": "BERNABE SUBD",
+      "unitValue": 18300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "045",
+      "location": "VILLANUEVA VILLAGE",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "046",
+      "location": "VILLANUEVA VILLAGE",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "047",
+      "location": "VILLANUEVA VILLAGE",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "048",
+      "location": "R. MEDINA SUBD.",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "049",
+      "location": "GARDENVALE SUBD",
+      "unitValue": 45800,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "057",
+      "location": "ANGELINA CANAYNAY AVENUE",
+      "unitValue": 48700,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "057-{038, 039, (012 TO 015), (067 TO 071), (136 TO 139), (141 TO 162)}",
+      "location": "PALANYAG ROAD/GATCHALIAN AVE",
+      "unitValue": 48700,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "058",
+      "location": "ANGELINA CANAYNAY AVENUE",
+      "unitValue": 48700,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "060",
+      "location": "TRAMO ROAD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "061",
+      "location": "TRAMO ROAD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "062",
+      "location": "TRAMO ROAD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "063",
+      "location": "TRAMO ROAD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "064",
+      "location": "TRAMO ROAD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "065",
+      "location": "TRAMO ROAD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "066",
+      "location": "TRAMO ROAD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "067",
+      "location": "TRAMO ROAD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "068",
+      "location": "CH WOODSROW SUBD",
+      "unitValue": 33700,
+      "deferredUnitValue": 1600
+    }
   ]
 }

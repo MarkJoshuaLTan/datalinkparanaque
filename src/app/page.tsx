@@ -44,7 +44,11 @@ import {
   HardHat,
   AlertCircle,
   Building2,
-  Network
+  Network,
+  Menu,
+  Sun,
+  Moon,
+  Monitor
 } from 'lucide-react';
 import {
   BarChart,
@@ -73,13 +77,13 @@ import { DataPreviewTable } from '@/components/dashboard/data-preview-table';
 import { LandRecord, CalibrationRule, processRecords, TaxRateMap, ProcessingReport, RecordStatusType, normalizePin, getModeOfConveyance, normalizeNameForMatch, getJaroWinklerSimilarity, extractArpNumeric } from '@/lib/processor';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import * as XLSX from 'xlsx-js-style';
+import { writeEnhancedXLSX } from '@/lib/excel-enhancer';
 import { BarangayConfig, initialLocationSettings } from '@/lib/locations';
 import { ModeToggle } from '@/components/mode-toggle';
 import { useTheme } from 'next-themes';
 import { RecordDetailModal } from '@/components/dashboard/record-detail-modal';
 import { AboutModal } from '@/components/dashboard/about-modal';
 import { ProcessingReportModal } from '@/components/dashboard/processing-report-modal';
-import { AuditLogTab } from '@/components/dashboard/audit-log-tab';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -111,13 +115,24 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ExportSettingsModal, ExportFinalSettings } from '@/components/dashboard/export-settings-modal';
 import { AbstractExportModal, AbstractExportSettings } from '@/components/dashboard/abstract-export-modal';
 import { PermitExportModal, PermitExportSettings, PermitMatchStatus } from '@/components/dashboard/permit-export-modal';
 import { ThreeYearExportModal } from '@/components/dashboard/three-year-export-modal';
 import { useNotification } from '@/contexts/NotificationContext';
-import { SettingsOverlay, LOCAL_STORAGE_KEY, defaultTaxRates } from '@/components/dashboard/settings-overlay';
+import { SettingsOverlay, LOCAL_STORAGE_KEY, defaultTaxRates, hydrateDeferredValues, CURRENT_DEFAULTS_VERSION } from '@/components/dashboard/settings-overlay';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { parseFile } from '@/lib/importer';
 import { ThreeYearReportRow, buildThreeYearReportData, exportThreeYearReport } from '@/lib/three-year-report-engine';
@@ -263,7 +278,7 @@ const ImportManager = ({ mode, manifest, onAdd, onDelete, onClearAll }: { mode: 
 };
 
 export default function Home() {
-  const { theme, resolvedTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -300,7 +315,13 @@ export default function Home() {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.locationSettings) setLocationSettings(parsed.locationSettings);
+        if (parsed.locationSettings) {
+          const hydrated = hydrateDeferredValues(parsed.locationSettings, parsed.defaultsVersion);
+          setLocationSettings(hydrated);
+          if (parsed.defaultsVersion !== CURRENT_DEFAULTS_VERSION) {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ ...parsed, defaultsVersion: CURRENT_DEFAULTS_VERSION, locationSettings: hydrated }));
+          }
+        }
         if (parsed.taxRates) setTaxRates(parsed.taxRates);
       }
     } catch (error) {
@@ -349,7 +370,7 @@ export default function Home() {
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   const [isDirectImporting, setIsDirectImporting] = useState(false);
   const [directImportProgress, setDirectImportProgress] = useState({ current: 0, total: 0, mode: 'raw' as any });
-  const [viewMode, setViewMode] = useState<'results' | 'archive' | 'analytics' | 'audit' | 'flow'>('results');
+  const [viewMode, setViewMode] = useState<'results' | 'archive' | 'analytics' | 'flow'>('results');
   const [showDetailedResults, setShowDetailedResults] = useState(false);
   const [showSummary, setShowSummary] = useState(true);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
@@ -414,6 +435,10 @@ export default function Home() {
     "MARKET VALUE (2028)": true,
     "ASSESSED VALUE (2028)": true,
     "YEARLY TAX (2028 CAP)": true,
+    "UNIT VALUE (DEFERRED 2011 GR)": true,
+    "MARKET VALUE (DEFERRED 2011 GR)": true,
+    "ASSESSED VALUE (DEFERRED 2011 GR)": true,
+    "YEARLY TAX (DEFERRED 2011 GR)": true,
     "UNIT VALUE": true,
     "MARKET VALUE": true,
     "ASSESSED VALUE": true,
@@ -853,17 +878,20 @@ export default function Home() {
       totalImported: rawData.length + journalData.length + permitData.length,
       duplicatesRemoved: previewData.filter(r => r.statusLabel === 'DUPLICATE').length,
       finalCount: active.length,
-      totalMarketValue: filteredValid.reduce((sum, r) => sum + (r[mvField as keyof LandRecord] as number || 0), 0),
-      totalAssessedValue: filteredValid.reduce((sum, r) => sum + (r[avField as keyof LandRecord] as number || 0), 0),
-      totalYearlyTax: filteredValid.reduce((sum, r) => sum + (r[ytField as keyof LandRecord] as number || 0), 0),
+      totalMarketValue: isProcessed ? filteredValid.reduce((sum, r) => sum + (r[mvField as keyof LandRecord] as number || 0), 0) : 0,
+      totalAssessedValue: isProcessed ? filteredValid.reduce((sum, r) => sum + (r[avField as keyof LandRecord] as number || 0), 0) : 0,
+      totalYearlyTax: isProcessed ? filteredValid.reduce((sum, r) => sum + (r[ytField as keyof LandRecord] as number || 0), 0) : 0,
       totalErrors: errors,
       // Year breakdowns for popover display
-      totalMarketValue2028: filteredValid.reduce((sum, r) => sum + (r.marketValue2028 || 0), 0),
-      totalMarketValue2029: filteredValid.reduce((sum, r) => sum + (r.marketValue2029 || 0), 0),
-      totalAssessedValue2028: filteredValid.reduce((sum, r) => sum + (r.assessedValue2028 || 0), 0),
-      totalAssessedValue2029: filteredValid.reduce((sum, r) => sum + (r.assessedValue2029 || 0), 0),
-      totalYearlyTax2028: filteredValid.reduce((sum, r) => sum + (r.yearlyTax2028 || 0), 0),
-      totalYearlyTax2029: filteredValid.reduce((sum, r) => sum + (r.yearlyTax2029 || 0), 0),
+      totalMarketValue2028: isProcessed ? filteredValid.reduce((sum, r) => sum + (r.marketValue2028 || 0), 0) : 0,
+      totalMarketValueDeferred: isProcessed ? filteredValid.reduce((sum, r) => sum + (r.marketValueDeferred || 0), 0) : 0,
+      totalMarketValue2029: isProcessed ? filteredValid.reduce((sum, r) => sum + (r.marketValue2029 || 0), 0) : 0,
+      totalAssessedValue2028: isProcessed ? filteredValid.reduce((sum, r) => sum + (r.assessedValue2028 || 0), 0) : 0,
+      totalAssessedValueDeferred: isProcessed ? filteredValid.reduce((sum, r) => sum + (r.assessedValueDeferred || 0), 0) : 0,
+      totalAssessedValue2029: isProcessed ? filteredValid.reduce((sum, r) => sum + (r.assessedValue2029 || 0), 0) : 0,
+      totalYearlyTax2028: isProcessed ? filteredValid.reduce((sum, r) => sum + (r.yearlyTax2028 || 0), 0) : 0,
+      totalYearlyTaxDeferred: isProcessed ? filteredValid.reduce((sum, r) => sum + (r.yearlyTaxDeferred || 0), 0) : 0,
+      totalYearlyTax2029: isProcessed ? filteredValid.reduce((sum, r) => sum + (r.yearlyTax2029 || 0), 0) : 0,
     };
   }, [previewData, rawData, journalData, permitData, threeYearSalesData, taxViewMode, processedData.length, workflowMode, joinedAbstractData, joinedPermitData, joinedThreeYearData]);
 
@@ -947,14 +975,22 @@ export default function Home() {
   }, [processedData, previewData, joinedAbstractData, joinedPermitData, joinedThreeYearData, workflowMode, sourceFileFilter, barangayFilter, taxabilityFilter]);
 
   const filteredDisplayData = useMemo(() => {
+    const rawQuery = searchQuery.trim().toLowerCase();
+    const tokens = rawQuery ? rawQuery.split(/\s+/).filter(Boolean) : [];
+    const stripPunct = (s: string) => s.replace(/[-\s_./]/g, '');
+
+    const matchesSmartText = (haystack: string, token: string) => {
+      if (haystack.includes(token)) return true;
+      const cleanToken = stripPunct(token);
+      return cleanToken.length >= 3 && stripPunct(haystack).includes(cleanToken);
+    };
+
     if ((isAbstract || isBuildingPermit || isThreeYearReport) && viewMode === 'results') {
       const baseData: any[] = isAbstract ? joinedAbstractData : isThreeYearReport ? joinedThreeYearData : joinedPermitData;
-      const query = searchQuery.toLowerCase();
       return baseData.filter(record => {
         if (sourceFileFilter !== 'all' && record.sourceFile !== sourceFileFilter) return false;
         if (barangayFilter !== 'all' && (record.barangayName || 'UNMAPPED') !== barangayFilter) return false;
         if (statusFilter !== 'all') {
-          // Derive the canonical status of the record
           const recJoined  = record.isJoined;
           const recOther   = (record as any).isOtherUnmapped;
           const recSdReview = (record as any).isSdReview;
@@ -965,15 +1001,44 @@ export default function Home() {
           if (statusFilter === 'SD Review'      && !recSdReview) return false;
           if (statusFilter === 'Other/Unmapped' && !recOther) return false;
         }
-        if (query) {
+        if (tokens.length > 0) {
           if (searchField === 'all') {
-            return record.arpNo?.toLowerCase().includes(query) || record.date?.toLowerCase().includes(query) || record.acctName?.toLowerCase().includes(query) || (record as any).rollAddress?.toLowerCase().includes(query) || record.location?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || (record as any).rollTctNo?.toLowerCase().includes(query) || record.buildingPermitNo?.toLowerCase().includes(query) || (record as any).kindGroup?.toLowerCase().includes(query) || (record as any).salesClassification?.toLowerCase().includes(query);
+            const fields = [
+              record.arpNo,
+              record.previous,
+              record.newArpNo,
+              record.pin,
+              record.date,
+              record.acctName,
+              record.address,
+              record.location,
+              record.barangayName,
+              record.update,
+              record.kind,
+              record.au,
+              (record as any).rollArp,
+              (record as any).rollOwner,
+              (record as any).rollAddress,
+              (record as any).rollLotNo,
+              (record as any).rollTctNo,
+              (record as any).cancelledOwner,
+              (record as any).cancelledTctNo,
+              (record as any).notary,
+              (record as any).docFileNo,
+              record.buildingPermitNo,
+              (record as any).useOfOccupancy,
+              (record as any).kindGroup,
+              (record as any).salesClassification,
+              record.sourceFile,
+            ].filter(Boolean).map(v => String(v).toLowerCase());
+            return tokens.every(token => fields.some(f => matchesSmartText(f, token)));
           } else {
             let value = (record as any)[searchField];
             if (searchField === 'location' && isThreeYearReport) {
               value = (record as any).rollAddress || record.location;
             }
-            return String(value || '').toLowerCase().includes(query);
+            const strVal = String(value || '').toLowerCase();
+            return tokens.every(token => matchesSmartText(strVal, token));
           }
         }
         return true;
@@ -985,14 +1050,30 @@ export default function Home() {
     const filtered = baseData.filter(record => {
       if (sourceFileFilter !== 'all' && record.sourceFile !== sourceFileFilter) return false;
       if (barangayFilter !== 'all' && (record.barangayName || 'UNMAPPED') !== barangayFilter) return false;
-      const query = searchQuery.toLowerCase();
       let matchesSearch = true;
-      if (query) {
+      if (tokens.length > 0) {
         if (searchField === 'all') {
-          matchesSearch = !!(record.acctName?.toLowerCase().includes(query) || record.pin?.toLowerCase().includes(query) || record.arpNo?.toLowerCase().includes(query) || record.location?.toLowerCase().includes(query) || record.address?.toLowerCase().includes(query) || record.au?.toLowerCase().includes(query) || record.taxability?.toLowerCase().includes(query) || record.sourceFile?.toLowerCase().includes(query));
+          const fields = [
+            record.date,
+            record.arpNo,
+            record.pin,
+            record.previous,
+            record.newArpNo,
+            record.update,
+            record.taxability,
+            record.acctName,
+            record.address,
+            record.location,
+            record.barangayName,
+            record.kind,
+            record.au,
+            record.statusLabel,
+            record.sourceFile,
+          ].filter(Boolean).map(v => String(v).toLowerCase());
+          matchesSearch = tokens.every(token => fields.some(f => matchesSmartText(f, token)));
         } else {
-          const value = record[searchField as keyof LandRecord];
-          matchesSearch = String(value || '').toLowerCase().includes(query);
+          const strVal = String(record[searchField as keyof LandRecord] || '').toLowerCase();
+          matchesSearch = tokens.every(token => matchesSmartText(strVal, token));
         }
       }
       if (!matchesSearch) return false;
@@ -1077,8 +1158,10 @@ export default function Home() {
       if (!silent) {
         setProcessingStep('complete');
         setTimeout(() => {
-          setIsProcessing(false); setProcessingStep('idle');
-          showSuccessModal({ title: "Engine Analysis Complete", message: `${report.validCount} records have been successfully calibrated. Please conduct a manual review of all results to ensure final data integrity before export.`, onDownload: () => setIsExportSettingsOpen(true), onViewResult: () => { setViewMode('results'); } });
+          setIsProcessing(false);
+          setProcessingStep('idle');
+          setViewMode('results');
+          showSuccessToast(`${report.validCount.toLocaleString()} records calibrated successfully.`);
         }, 800);
       }
     });
@@ -1269,25 +1352,41 @@ export default function Home() {
   const runProcess = async () => { const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData, ...exemptData]; if (combined.length === 0) return; runProcessWithData(combined, combined.length, importedFileName); };
 
   const handleSaveRecord = useCallback((updatedRecord: LandRecord, silent = false) => {
-    setSelectedRecord(null); setComparisonRecord(null); if (!silent) setIsProcessing(true);
+    setSelectedRecord(null); setComparisonRecord(null);
     // Joined rows (permit / 3yr) have a composite id but store the original in _sourceId
     const sourceId = (updatedRecord as any)._sourceId ?? updatedRecord.id;
     const matchFn = (r: LandRecord) => r.id === updatedRecord.id || r.id === sourceId;
+
+    const nextRawData = rawData.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r);
+    const nextJournalData = journalData.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r);
+    const nextSalesData = salesData.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r);
+    const nextCancelledData = cancelledData.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r);
+    const nextPermitData = permitData.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r);
+    const nextThreeYearSalesData = threeYearSalesData.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r);
+    const nextExemptData = exemptData.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r);
+
     startTransition(() => {
-      setRawData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
-      setJournalData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
-      setSalesData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
-      setCancelledData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
-      setPermitData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
-      setThreeYearSalesData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
-      setExemptData(prev => prev.map(r => matchFn(r) ? { ...updatedRecord, id: r.id } : r));
-      setTimeout(() => {
-        const combined = [...rawData, ...journalData, ...salesData, ...cancelledData, ...permitData, ...exemptData];
-        if (processedData.length > 0) { runProcessWithData(combined, combined.length, importedFileName, silent); }
-        else { const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, importedFileName, exemptPins); setPreviewData(allWithDuplicateMarkers); if (!silent) setIsProcessing(false); }
-      }, silent ? 0 : 10);
+      setRawData(nextRawData);
+      setJournalData(nextJournalData);
+      setSalesData(nextSalesData);
+      setCancelledData(nextCancelledData);
+      setPermitData(nextPermitData);
+      setThreeYearSalesData(nextThreeYearSalesData);
+      setExemptData(nextExemptData);
+
+      const combined = [...nextRawData, ...nextJournalData, ...nextSalesData, ...nextCancelledData, ...nextPermitData, ...nextExemptData];
+      if (processedData.length > 0) {
+        runProcessWithData(combined, combined.length, importedFileName, true);
+      } else {
+        const { allWithDuplicateMarkers } = processRecords(combined, [], locationSettings, taxRates, { removeDuplicates: false, applyCalibration: false, systemCleanup: false }, importedFileName, exemptPins);
+        setPreviewData(allWithDuplicateMarkers);
+      }
     });
-  }, [rawData, journalData, salesData, cancelledData, permitData, exemptData, processedData.length, importedFileName, locationSettings, taxRates, exemptPins]);
+
+    if (!silent) {
+      toast({ title: "Record Updated", description: "Changes have been saved successfully." });
+    }
+  }, [rawData, journalData, salesData, cancelledData, permitData, threeYearSalesData, exemptData, processedData.length, importedFileName, locationSettings, taxRates, exemptPins]);
 
   const handleArchiveRecord = useCallback((record: LandRecord) => { handleSaveRecord({ ...record, isManualArchive: true }, true); toast({ title: "Record Archived", description: "The record has been moved to the Archive tab." }); }, [handleSaveRecord]);
   const handleUnarchiveRecord = useCallback((record: LandRecord) => { handleSaveRecord({ ...record, isManualArchive: false }, true); toast({ title: "Record Restored", description: "The record has been moved back to the Results tab." }); }, [handleSaveRecord]);
@@ -1362,6 +1461,10 @@ export default function Home() {
         marketValue2028: "MARKET VALUE (2028)",
         assessedValue2028: "ASSESSED VALUE (2028)",
         yearlyTax2028: "YEARLY TAX (2028 CAP)",
+        unitValueDeferred: "UNIT VALUE (DEFERRED 2011 GR)",
+        marketValueDeferred: "MARKET VALUE (DEFERRED 2011 GR)",
+        assessedValueDeferred: "ASSESSED VALUE (DEFERRED 2011 GR)",
+        yearlyTaxDeferred: "YEARLY TAX (DEFERRED 2011 GR)",
         unitValue: "UNIT VALUE",
         marketValue: "MARKET VALUE",
         assessedValue: "ASSESSED VALUE",
@@ -1406,6 +1509,11 @@ export default function Home() {
         ["TOTAL YEARLY TAX (2028):", fmt(sum(taxableRecords, 'yearlyTax2028Uncapped'))],
         ["TOTAL YEARLY TAX (2028 capped at 6%):", fmt(sum(taxableRecords, 'yearlyTax2028'))],
         [],
+        ["DEFERRED (2011 GR)"],
+        ["TOTAL MARKET VALUE (DEFERRED):", fmt(sum(taxableRecords, 'marketValueDeferred'))],
+        ["TOTAL ASSESSED VALUE (DEFERRED):", fmt(sum(taxableRecords, 'assessedValueDeferred'))],
+        ["TOTAL YEARLY TAX (DEFERRED):", fmt(sum(taxableRecords, 'yearlyTaxDeferred'))],
+        [],
         ["RPVARA (2029)"],
         ["TOTAL MARKET VALUE (2029):", fmt(sum(taxableRecords, 'marketValue2029'))],
         ["TOTAL ASSESSED VALUE (2029):", fmt(sum(taxableRecords, 'assessedValue2029'))],
@@ -1416,6 +1524,10 @@ export default function Home() {
         ["CURRENT (2028)"],
         ["TOTAL MARKET VALUE (2028):", fmt(sum(exemptRecords, 'marketValue2028'))],
         ["TOTAL ASSESSED VALUE (2028):", fmt(sum(exemptRecords, 'assessedValue2028'))],
+        [],
+        ["DEFERRED (2011 GR)"],
+        ["TOTAL MARKET VALUE (DEFERRED):", fmt(sum(exemptRecords, 'marketValueDeferred'))],
+        ["TOTAL ASSESSED VALUE (DEFERRED):", fmt(sum(exemptRecords, 'assessedValueDeferred'))],
         [],
         ["RPVARA (2029)"],
         ["TOTAL MARKET VALUE (2029):", fmt(sum(exemptRecords, 'marketValue2029'))],
@@ -1504,66 +1616,65 @@ export default function Home() {
 
       // --- Comparative Summary Report on SMV Sheet ---
       {
-        // Group by barangay and sum year values
-        const smvByBrgy = new Map<string, { mv28: number; mv29: number; av28: number; av29: number; tax28: number; tax29: number }>();
+        // Group by barangay and sum year values (2028, Deferred 2011 GR, 2029 & 2030)
+        const smvByBrgy = new Map<string, { mv28: number; mvDef: number; mv29: number; av28: number; avDef: number; av29: number; tax28: number; taxDef: number; tax29: number }>();
         finalOutputList.forEach(r => {
           const brgy = (r.barangayName || 'UNMAPPED').toUpperCase();
-          if (!smvByBrgy.has(brgy)) smvByBrgy.set(brgy, { mv28: 0, mv29: 0, av28: 0, av29: 0, tax28: 0, tax29: 0 });
+          if (!smvByBrgy.has(brgy)) smvByBrgy.set(brgy, { mv28: 0, mvDef: 0, mv29: 0, av28: 0, avDef: 0, av29: 0, tax28: 0, taxDef: 0, tax29: 0 });
           const entry = smvByBrgy.get(brgy)!;
-          entry.mv28  += r.marketValue2028  || 0;
-          entry.mv29  += r.marketValue2029  || 0;
-          entry.av28  += r.assessedValue2028 || 0;
-          entry.av29  += r.assessedValue2029 || 0;
-          entry.tax28 += r.yearlyTax2028    || 0;
-          entry.tax29 += r.yearlyTax2029    || 0;
+          entry.mv28   += r.marketValue2028       || 0;
+          entry.mvDef  += r.marketValueDeferred   || 0;
+          entry.mv29   += r.marketValue2029       || 0;
+          entry.av28   += r.assessedValue2028     || 0;
+          entry.avDef  += r.assessedValueDeferred || 0;
+          entry.av29   += r.assessedValue2029     || 0;
+          entry.tax28  += r.yearlyTax2028         || 0;
+          entry.taxDef += r.yearlyTaxDeferred     || 0;
+          entry.tax29  += r.yearlyTax2029         || 0;
         });
 
         const numFmt = (v: number) => v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // Build AOA: col A=name, B=mv28, C=mv29, D=av28, E=av29, F=tax28, G=tax29
+        // Build AOA: col A=name, B-D=MV, E-G=AV, H-J=Tax
         const smvRows: any[][] = [
-          // Row 0 (xlsx row 1): empty
-          ["", "", "", "", "", "", ""],
-          // Row 1 (xlsx row 2): title
-          ["", "COMPARATIVE SUMMARY REPORT ON SMV", "", "", "", "", ""],
-          // Row 2 (xlsx row 3): group headers
-          ["BARANGAY", "MARKET VALUE", "", "ASSESSED VALUE", "", "YEARLY TAX", ""],
-          // Row 3 (xlsx row 4): year headers
-          ["", "2028", "2029 & 2030", "2028", "2029 & 2030", "2028 (CAPPED AT 6%)", "2029 & 2030"],
-          // Data rows start at row 4 (xlsx row 5)
+          ["", "", "", "", "", "", "", "", "", ""],
+          ["", "COMPARATIVE SUMMARY REPORT ON SMV", "", "", "", "", "", "", "", ""],
+          ["BARANGAY", "MARKET VALUE", "", "", "ASSESSED VALUE", "", "", "YEARLY TAX", "", ""],
+          ["", "2028", "DEFERRED (2011 GR)", "2029 & 2030", "2028", "DEFERRED (2011 GR)", "2029 & 2030", "2028 (CAPPED AT 6%)", "DEFERRED (2011 GR)", "2029 & 2030"],
           ...Array.from(smvByBrgy.entries())
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([brgy, d]) => [
               brgy,
               numFmt(d.mv28),
+              numFmt(d.mvDef),
               numFmt(d.mv29),
               numFmt(d.av28),
+              numFmt(d.avDef),
               numFmt(d.av29),
               numFmt(d.tax28),
+              numFmt(d.taxDef),
               numFmt(d.tax29),
             ]),
         ];
 
         const wsSMV = XLSX.utils.aoa_to_sheet(smvRows);
 
-        // Column widths: A=22, B-G=22
-        wsSMV['!cols'] = [{ wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }];
+        wsSMV['!cols'] = Array.from({ length: 10 }, () => ({ wch: 22 }));
 
         // Merges:
-        // Title B2:G2 (r=1, c=1..6)
+        // Title B2:J2 (r=1, c=1..9)
         // BARANGAY A3:A4 (r=2..3, c=0)
-        // MARKET VALUE B3:C3 (r=2, c=1..2)
-        // ASSESSED VALUE D3:E3 (r=2, c=3..4)
-        // YEARLY TAX F3:G3 (r=2, c=5..6)
+        // MARKET VALUE B3:D3 (r=2, c=1..3)
+        // ASSESSED VALUE E3:G3 (r=2, c=4..6)
+        // YEARLY TAX H3:J3 (r=2, c=7..9)
         wsSMV['!merges'] = [
-          { s: { r: 1, c: 1 }, e: { r: 1, c: 6 } }, // Title
-          { s: { r: 2, c: 0 }, e: { r: 3, c: 0 } }, // BARANGAY header (vertical merge)
-          { s: { r: 2, c: 1 }, e: { r: 2, c: 2 } }, // MARKET VALUE header
-          { s: { r: 2, c: 3 }, e: { r: 2, c: 4 } }, // ASSESSED VALUE header
-          { s: { r: 2, c: 5 }, e: { r: 2, c: 6 } }, // YEARLY TAX header
+          { s: { r: 1, c: 1 }, e: { r: 1, c: 9 } },
+          { s: { r: 2, c: 0 }, e: { r: 3, c: 0 } },
+          { s: { r: 2, c: 1 }, e: { r: 2, c: 3 } },
+          { s: { r: 2, c: 4 }, e: { r: 2, c: 6 } },
+          { s: { r: 2, c: 7 }, e: { r: 2, c: 9 } },
         ];
 
-        // Helper to set cell style
         const setCell = (cell: string, v: any, s: any) => {
           wsSMV[cell] = { v, t: typeof v === 'number' ? 'n' : 's', s };
         };
@@ -1572,44 +1683,41 @@ export default function Home() {
         const allBorders = { top: borderThin, bottom: borderThin, left: borderThin, right: borderThin };
         const boldCenter = { font: { bold: true }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true }, border: allBorders };
 
-        // Title cell (B2 = r1c1)
         setCell('B2', 'COMPARATIVE SUMMARY REPORT ON SMV', {
           font: { bold: true, sz: 13 },
           alignment: { horizontal: 'center', vertical: 'center' },
           border: allBorders,
         });
-        // Also set merged empty cells with border
-        ['C2','D2','E2','F2','G2'].forEach(c => setCell(c, '', { border: allBorders }));
+        ['C2','D2','E2','F2','G2','H2','I2','J2'].forEach(c => setCell(c, '', { border: allBorders }));
 
-        // BARANGAY header (A3 = r2c0, merged A3:A4)
         setCell('A3', 'BARANGAY', boldCenter);
         setCell('A4', '', { border: allBorders });
 
-        // Group headers row 3 (r=2): B3, D3, F3
         setCell('B3', 'MARKET VALUE', boldCenter);
-        setCell('C3', '', { border: allBorders });
-        setCell('D3', 'ASSESSED VALUE', boldCenter);
-        setCell('E3', '', { border: allBorders });
-        setCell('F3', 'YEARLY TAX', boldCenter);
-        setCell('G3', '', { border: allBorders });
+        ['C3','D3'].forEach(c => setCell(c, '', { border: allBorders }));
+        setCell('E3', 'ASSESSED VALUE', boldCenter);
+        ['F3','G3'].forEach(c => setCell(c, '', { border: allBorders }));
+        setCell('H3', 'YEARLY TAX', boldCenter);
+        ['I3','J3'].forEach(c => setCell(c, '', { border: allBorders }));
 
-        // Year headers row 4 (r=3)
         const subHeaders = [
           { cell: 'B4', label: '2028' },
-          { cell: 'C4', label: '2029 & 2030' },
-          { cell: 'D4', label: '2028' },
-          { cell: 'E4', label: '2029 & 2030' },
-          { cell: 'F4', label: '2028 (CAPPED AT 6%)' },
+          { cell: 'C4', label: 'DEFERRED (2011 GR)' },
+          { cell: 'D4', label: '2029 & 2030' },
+          { cell: 'E4', label: '2028' },
+          { cell: 'F4', label: 'DEFERRED (2011 GR)' },
           { cell: 'G4', label: '2029 & 2030' },
+          { cell: 'H4', label: '2028 (CAPPED AT 6%)' },
+          { cell: 'I4', label: 'DEFERRED (2011 GR)' },
+          { cell: 'J4', label: '2029 & 2030' },
         ];
         subHeaders.forEach(sh => setCell(sh.cell, sh.label, boldCenter));
 
-        // Data rows: apply border + number alignment starting at xlsx row 5
         const dataStart = 5;
         const dataCount = smvByBrgy.size;
+        const cols = ['A','B','C','D','E','F','G','H','I','J'];
         for (let i = 0; i < dataCount; i++) {
           const xlRow = dataStart + i;
-          const cols = ['A','B','C','D','E','F','G'];
           cols.forEach((col, ci) => {
             const cellRef = `${col}${xlRow}`;
             if (wsSMV[cellRef]) {
@@ -1631,7 +1739,22 @@ export default function Home() {
       const statusPart = settings.statuses.join("-").replace(/\s+/g, '_');
       const codesPart = settings.updateCodes.join("-");
 
-      XLSX.writeFile(wb, `${geoPart}_${statusPart}_${codesPart}.xlsx`);
+      const headerRow1Based = topSummaryRows.length; // 1-based Excel row of activeHeaders
+      const lastDataRow1Based = headerRow1Based + formattedExport.length;
+      writeEnhancedXLSX(wb, `${geoPart}_${statusPart}_${codesPart}.xlsx`, {
+        tables: [
+          {
+            sheetIndex: 1,
+            headerRow: headerRow1Based,
+            lastRow: lastDataRow1Based,
+            headers: activeHeaders,
+            tableName: 'ExportResultsTable',
+          },
+        ],
+        freezes: [
+          { sheetIndex: 2, ySplit: 4 },
+        ],
+      });
       showSuccessToast(`Exported ${finalOutputList.length} records successfully.`);
     } catch (error: any) { toast({ variant: "destructive", title: "Export Failed", description: error.message }); }
     finally { setIsExporting(false); }
@@ -1716,7 +1839,9 @@ export default function Home() {
       }
 
       XLSX.utils.book_append_sheet(wb, ws, "AbstractReport");
-      XLSX.writeFile(wb, `AbstractReport-${new Date().toISOString().split('T')[0]}.xlsx`);
+      writeEnhancedXLSX(wb, `AbstractReport-${new Date().toISOString().split('T')[0]}.xlsx`, {
+        freezes: [{ sheetIndex: 1, ySplit: 5 }],
+      });
       showSuccessToast(`Exported ${abstractData.length} Abstract entries successfully.`);
     } catch (error: any) { toast({ variant: "destructive", title: "Abstract Export Failed", description: error.message }); }
     finally { setIsExporting(false); }
@@ -1800,7 +1925,9 @@ export default function Home() {
       }
 
       XLSX.utils.book_append_sheet(wb, ws, "BuildingPermits");
-      XLSX.writeFile(wb, `BuildingPermitAbstract-${new Date().toISOString().split('T')[0]}.xlsx`);
+      writeEnhancedXLSX(wb, `BuildingPermitAbstract-${new Date().toISOString().split('T')[0]}.xlsx`, {
+        freezes: [{ sheetIndex: 1, ySplit: 5 }],
+      });
       showSuccessToast(`Exported ${exportRows.length} Permit entries successfully.`);
     } catch (error: any) {
       toast({ variant: "destructive", title: "Permit Export Failed", description: error.message });
@@ -1859,6 +1986,8 @@ export default function Home() {
   const canPermitExport = (permitData.length > 0 && rawData.length > 0) || workflowMode === 'building-permit';
   const canThreeYearExport = (threeYearSalesData.length > 0 && rawData.length > 0) || workflowMode === 'three-year-report';
 
+  if (!mounted) return null;
+
   return (
     <div className="h-screen bg-background flex flex-col font-body overflow-hidden" suppressHydrationWarning>
       {/* Splash Screen Overlay */}
@@ -1869,35 +1998,19 @@ export default function Home() {
         )}
       >
         <div className="flex flex-col items-center justify-center">
-          <video
-            src="/video.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            controls={false}
-            ref={(el) => { if (el) el.playbackRate = 1.5; }}
-            className="w-[200px] h-[200px] md:w-[280px] md:h-[280px] object-contain mix-blend-multiply dark:hidden"
+          <img
+            src="/logo-intro.webp"
+            alt="City Assessor's Office Parañaque City Logo"
+            width={220}
+            height={220}
+            fetchPriority="high"
+            decoding="sync"
+            className="w-[180px] h-[180px] md:w-[220px] md:h-[220px] object-contain"
             style={{
-              animation: 'floatLogo 4s ease-in-out infinite'
+              animation: 'logoIntroPop 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards, floatLogo 3.5s ease-in-out 0.7s infinite'
             }}
           />
-          <video
-            src="/darkmode.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            controls={false}
-            ref={(el) => { if (el) el.playbackRate = 1.5; }}
-            className="w-[200px] h-[200px] md:w-[280px] md:h-[280px] object-contain hidden dark:block"
-            style={{
-              animation: 'floatLogo 4s ease-in-out infinite',
-              WebkitMaskImage: 'radial-gradient(ellipse at center, black 70%, transparent 100%)',
-              maskImage: 'radial-gradient(ellipse at center, black 70%, transparent 100%)'
-            }}
-          />
-          <h1 className="text-5xl md:text-6xl font-black tracking-tighter leading-none mt-4 animate-in slide-in-from-bottom-8 fade-in duration-1000">
+          <h1 className="text-5xl md:text-6xl font-black tracking-tighter leading-none mt-6 animate-in slide-in-from-bottom-8 fade-in duration-1000">
             <span className="text-foreground">DataLink</span>
             <span className="text-primary ml-2">Parañaque</span>
           </h1>
@@ -1917,49 +2030,27 @@ export default function Home() {
       <input type="file" id="permit-file-input" ref={permitFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'permits')} />
       <input type="file" id="three-year-sales-file-input" ref={threeYearSalesFileInputRef} className="hidden" accept=".xlsx, .xls, .csv" multiple onChange={(e) => handleDirectImport(e, 'three-year-sales')} />
 
-      <header className="bg-card/80 backdrop-blur-lg border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-lg shrink-0 z-50">
-        <div className="flex items-center gap-[5px]">
-          <video
-            src="/video.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            controls={false}
-            className="w-[76px] h-[76px] -my-2 object-contain mix-blend-multiply cursor-pointer hover:scale-110 transition-transform dark:hidden"
-            onClick={(e) => {
-              const vid = e.currentTarget;
-              vid.playbackRate = 6;
-              if ((vid as any).spinTimeout) clearTimeout((vid as any).spinTimeout);
-              (vid as any).spinTimeout = setTimeout(() => {
-                if (vid) vid.playbackRate = 1;
-              }, 1000);
-            }}
-          />
-          <video
-            src="/darkmode.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            controls={false}
-            className="w-[76px] h-[76px] -my-2 object-contain cursor-pointer hover:scale-110 transition-transform hidden dark:block"
-            onClick={(e) => {
-              const vid = e.currentTarget;
-              vid.playbackRate = 6;
-              if ((vid as any).spinTimeout) clearTimeout((vid as any).spinTimeout);
-              (vid as any).spinTimeout = setTimeout(() => {
-                if (vid) vid.playbackRate = 1;
-              }, 1000);
-            }}
+      <header className="bg-card/80 backdrop-blur-lg border-b border-white/10 h-16 px-3 sm:px-4 lg:px-6 flex items-center justify-between gap-3 shadow-sm shrink-0 z-50">
+        <div className="flex items-center gap-2.5 shrink-0">
+          <img
+            src="/logo-header.webp"
+            alt="City Assessor's Office Parañaque City Logo"
+            width={56}
+            height={56}
+            decoding="async"
+            onClick={() => setIsAboutOpen(true)}
+            className="w-14 h-14 object-contain cursor-pointer hover:scale-105 transition-transform active:scale-95"
           />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-[5px] cursor-pointer hover:opacity-80 transition-all active:scale-95 group" onClick={() => setIsAboutOpen(true)}>
                   <div className="flex items-center" style={{ marginLeft: '0px' }}>
-                    <h1 className="text-[32px] font-black tracking-tighter leading-none">
-                      <span className="text-foreground">DataLink</span>
+                    <h1
+                      className="text-[30px] leading-[36px] font-extrabold tracking-tight"
+                      style={{ fontFamily: "'Inter', sans-serif" }}
+                    >
+                      <span className="text-[#020817] dark:text-foreground">DataLink</span>
                       <span className="text-primary ml-1.5">Parañaque</span>
                     </h1>
                   </div>
@@ -1969,20 +2060,115 @@ export default function Home() {
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="flex items-center gap-1.5">
-          {workflowMode !== 'idle' && <Button variant="ghost" onClick={() => clearWorkspace()} className="mr-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary hover:bg-primary/10 gap-2 transition-all"><ChevronLeft className="w-3.5 h-3.5" /> Switch Engine</Button>}
-          {showDetailedResults && <div className="flex items-center gap-2 mr-3 px-4 border-r border-border/40"><TooltipProvider><Tooltip><TooltipTrigger asChild><div className="flex items-center gap-3"><Label htmlFor="summary-toggle" className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground cursor-pointer hover:text-primary transition-colors">Show Summary</Label><Switch id="summary-toggle" checked={showSummary} onCheckedChange={setShowSummary} className="data-[state=checked]:bg-primary scale-90" /></div></TooltipTrigger><TooltipContent>Toggle Dashboard KPI Overview</TooltipContent></Tooltip></TooltipProvider></div>}
-          {deferredPrompt && <Button variant="ghost" size="icon" onClick={handleInstallClick} className="hover:bg-muted"><Download className="w-5 h-5" /></Button>}
-          <Button variant="ghost" size="icon" onClick={toggleFullScreen} className="hover:bg-muted">{isFullScreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}</Button>
-          <ModeToggle />
-          <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)} className={cn("transition-all hover:bg-muted", isSettingsOpen && "bg-primary text-white hover:bg-emerald-700")}><Settings className="w-5 h-5" /></Button></TooltipTrigger><TooltipContent>Shortcut: Ctrl + Alt + S</TooltipContent></Tooltip></TooltipProvider>
+
+        <div className="flex items-center gap-3 shrink-0">
+          {workflowMode === 'standard' && showDetailedResults && (
+            <div className="flex items-center gap-1 bg-muted/80 dark:bg-zinc-900/80 p-0.5 rounded-lg border border-border/50 shadow-inner">
+              <Button
+                onClick={() => setTaxViewMode('T')}
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-8 px-3 text-xs font-bold uppercase tracking-wider gap-1.5 transition-all",
+                  taxViewMode === 'T'
+                    ? "bg-[#16A249] text-white shadow-sm hover:bg-[#138a3e] hover:text-white"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/80 dark:hover:bg-zinc-800/80"
+                )}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" /> Taxable
+              </Button>
+              <Button
+                onClick={() => setTaxViewMode('E')}
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-8 px-3 text-xs font-bold uppercase tracking-wider gap-1.5 transition-all",
+                  taxViewMode === 'E'
+                    ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500 hover:text-white"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/80 dark:hover:bg-zinc-800/80"
+                )}
+              >
+                <Database className="w-3.5 h-3.5" /> Exempted
+              </Button>
+            </div>
+          )}
+          {showDetailedResults && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="summary-toggle" className="text-xs font-bold uppercase tracking-wider text-muted-foreground cursor-pointer hover:text-primary transition-colors">Summary</Label>
+                    <Switch id="summary-toggle" checked={showSummary} onCheckedChange={setShowSummary} className="data-[state=checked]:bg-primary scale-90" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>Toggle Dashboard KPI Overview</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 px-3 gap-2 text-xs font-bold uppercase tracking-wider">
+                <Menu className="w-4 h-4" />
+                <span>Menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {workflowMode !== 'idle' && (
+                <>
+                  <DropdownMenuItem onSelect={() => clearWorkspace()} className="cursor-pointer font-medium">
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Switch Engine</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              <DropdownMenuItem onSelect={() => setTimeout(() => setIsSettingsOpen(true), 0)} className="cursor-pointer font-medium">
+                <Settings className="w-4 h-4" />
+                <span>Settings</span>
+                <DropdownMenuShortcut>Ctrl+Alt+S</DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="cursor-pointer font-medium">
+                  {resolvedTheme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                  <span>Theme</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => setTheme("light")} className={cn("cursor-pointer", theme === "light" && "font-bold text-primary")}>
+                    <Sun className="w-4 h-4" />
+                    <span>Light</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")} className={cn("cursor-pointer", theme === "dark" && "font-bold text-primary")}>
+                    <Moon className="w-4 h-4" />
+                    <span>Dark</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("system")} className={cn("cursor-pointer", theme === "system" && "font-bold text-primary")}>
+                    <Monitor className="w-4 h-4" />
+                    <span>System</span>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem onClick={toggleFullScreen} className="cursor-pointer font-medium">
+                {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                <span>{isFullScreen ? "Exit Fullscreen" : "Fullscreen"}</span>
+              </DropdownMenuItem>
+              {deferredPrompt && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleInstallClick} className="cursor-pointer font-medium text-primary">
+                    <Download className="w-4 h-4" />
+                    <span>Install App</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 flex flex-col p-6 overflow-hidden gap-4 min-h-0">
+        <main className="flex-1 flex flex-col p-3 overflow-hidden gap-2.5 min-h-0">
           <Tabs value={viewMode} onValueChange={(val: any) => { setViewMode(val); setStatusFilter('all'); }} className="flex-1 flex flex-col min-h-0">
-            {workflowMode === 'idle' && viewMode !== 'audit' ? (
+            {workflowMode === 'idle' ? (
               <div className="flex-1 flex flex-col items-center justify-center h-full py-12 scrollbar-vertical-custom overflow-y-auto relative">
                 <div className="text-center space-y-3 mb-16 shrink-0 w-full relative">
                   <h2 className="text-6xl font-black uppercase tracking-tight text-foreground relative">Select Engine Workflow</h2>
@@ -1995,7 +2181,7 @@ export default function Home() {
                   <Card className="p-10 border-white/10 bg-card hover:bg-violet-600/5 hover:border-violet-500/50 transition-all cursor-pointer group shadow-2xl flex flex-col items-center text-center h-full" onClick={() => { setWorkflowMode('three-year-report'); setThreeYearStep('roll'); }}><div className="w-20 h-20 rounded-3xl bg-violet-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner"><TrendingUp className="w-10 h-10 text-violet-600" /></div><h3 className="text-2xl font-black uppercase tracking-tight mb-4">3 Year Report</h3><p className="text-sm font-bold text-muted-foreground leading-relaxed mb-8">Joins Assessment Roll with Sales Data. Exports sorted by Lowest to Highest.</p><Button className="w-full h-14 bg-violet-600 hover:bg-violet-700 font-black uppercase text-xs tracking-widest mt-auto">Launch 3YR Engine</Button></Card>
                 </div>
               </div>
-            ) : (!showDetailedResults && viewMode !== 'audit') ? (
+            ) : (!showDetailedResults) ? (
               <div className="flex-1 flex flex-col items-center justify-center h-full py-12">
                 <div className="text-center space-y-3 mb-10 shrink-0">
                   <h2 className="text-5xl font-black uppercase tracking-tight text-foreground">
@@ -2030,21 +2216,19 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              <div className={cn("flex-1 flex flex-col min-h-0 transition-all duration-700 ease-in-out", showDetailedResults ? "gap-4 h-full" : "items-center justify-center h-full", isClearing && "animate-out fade-out zoom-out-95 duration-500 fill-mode-forwards")}>
-                <div className={cn("transition-all duration-700 ease-in-out w-full overflow-hidden", showDetailedResults ? "shrink-0" : "flex-1 flex items-center justify-center", !showSummary && showDetailedResults ? "max-h-0 opacity-0 pointer-events-none" : "max-h-[800px] opacity-100")}><div className={cn("transition-all duration-700 ease-in-out w-full", !showDetailedResults && "animate-in fade-in zoom-in-95 duration-1000")}><MetricOverview stats={stats} variant={showDetailedResults ? 'default' : 'hero'} taxViewMode={taxViewMode} onTaxViewModeChange={setTaxViewMode} workflowMode={workflowMode} /></div></div>
-                {!showDetailedResults && viewMode !== 'audit' ? (
+              <div className={cn("flex-1 flex flex-col min-h-0 transition-all duration-700 ease-in-out", showDetailedResults ? "gap-2 h-full" : "items-center justify-center h-full", isClearing && "animate-out fade-out zoom-out-95 duration-500 fill-mode-forwards")}>
+                <div className={cn("transition-all duration-700 ease-in-out w-full overflow-hidden", showDetailedResults ? "shrink-0" : "flex-1 flex items-center justify-center", !showSummary && showDetailedResults ? "max-h-0 opacity-0 pointer-events-none" : "max-h-[800px] opacity-100")}><div className={cn("transition-all duration-700 ease-in-out w-full", !showDetailedResults && "animate-in fade-in zoom-in-95 duration-1000")}><MetricOverview stats={stats} variant={showDetailedResults ? 'default' : 'hero'} taxViewMode={taxViewMode} onTaxViewModeChange={setTaxViewMode} workflowMode={workflowMode} isProcessed={processedData.length > 0} /></div></div>
+                {!showDetailedResults ? (
                   <div className="shrink-0 flex flex-col items-center justify-center pb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300"><Button size="lg" onClick={() => setShowDetailedResults(true)} className="h-16 px-16 bg-primary hover:bg-emerald-700 text-white font-black uppercase tracking-[0.25em] text-xs shadow-2xl transition-all active:scale-95 group">Show Overall Results & Analysis<ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform" /></Button></div>
                 ) : (
                   <Card className="flex-1 overflow-hidden flex flex-col min-h-0 shadow-xl border-white/5 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="p-3 bg-muted/30 border-b flex flex-col xl:flex-row items-center justify-between gap-4 shrink-0">
-                      <TabsList className="bg-background border"><TabsTrigger value="results" className={cn("data-[state=active]:text-white h-9 text-xs font-bold px-4", workflowMode === 'three-year-report' ? "data-[state=active]:bg-violet-600" : "data-[state=active]:bg-primary")}><TableIcon className="w-3.5 h-3.5 mr-2" /> {workflowMode === 'abstract' ? 'Joined Preview' : workflowMode === 'building-permit' ? 'Permit Join Preview' : workflowMode === 'three-year-report' ? '3YR Join Preview' : 'Results'}</TabsTrigger>{workflowMode !== 'abstract' && workflowMode !== 'building-permit' && workflowMode !== 'three-year-report' ? (<><TabsTrigger value="archive" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Archive className="w-3.5 h-3.5 mr-2" /> Archive</TabsTrigger><TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><BarChart3 className="w-3.5 h-3.5 mr-2" /> Analytics</TabsTrigger><TabsTrigger value="audit" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><ShieldCheck className="w-3.5 h-3.5 mr-2" /> Audit Log</TabsTrigger><TabsTrigger value="flow" className="data-[state=active]:bg-slate-700 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Network className="w-3.5 h-3.5 mr-2" /> Data Flow</TabsTrigger></>) : (<><TabsTrigger value="analytics" className={cn("data-[state=active]:text-white h-9 text-xs font-bold px-4", workflowMode === 'three-year-report' ? "data-[state=active]:bg-violet-600" : "data-[state=active]:bg-blue-600")}><BarChart3 className="w-3.5 h-3.5 mr-2" /> Relational Analytics</TabsTrigger><TabsTrigger value="flow" className="data-[state=active]:bg-slate-700 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Network className="w-3.5 h-3.5 mr-2" /> Data Flow</TabsTrigger></>)}</TabsList>
-                      {viewMode !== 'analytics' && viewMode !== 'audit' && (
+                    <div className="px-3 py-2 bg-muted/30 border-b flex flex-col xl:flex-row items-center justify-between gap-2.5 shrink-0">
+                      <TabsList className="bg-background border"><TabsTrigger value="results" className={cn("data-[state=active]:text-white h-9 text-xs font-bold px-4", workflowMode === 'three-year-report' ? "data-[state=active]:bg-violet-600" : "data-[state=active]:bg-primary")}><TableIcon className="w-3.5 h-3.5 mr-2" /> {workflowMode === 'abstract' ? 'Joined Preview' : workflowMode === 'building-permit' ? 'Permit Join Preview' : workflowMode === 'three-year-report' ? '3YR Join Preview' : 'Results'}</TabsTrigger>{workflowMode !== 'abstract' && workflowMode !== 'building-permit' && workflowMode !== 'three-year-report' ? (<><TabsTrigger value="archive" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Archive className="w-3.5 h-3.5 mr-2" /> Archive</TabsTrigger><TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white h-9 text-xs font-bold px-4"><BarChart3 className="w-3.5 h-3.5 mr-2" /> Analytics</TabsTrigger><TabsTrigger value="flow" className="data-[state=active]:bg-slate-700 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Network className="w-3.5 h-3.5 mr-2" /> Data Flow</TabsTrigger></>) : (<><TabsTrigger value="analytics" className={cn("data-[state=active]:text-white h-9 text-xs font-bold px-4", workflowMode === 'three-year-report' ? "data-[state=active]:bg-violet-600" : "data-[state=active]:bg-blue-600")}><BarChart3 className="w-3.5 h-3.5 mr-2" /> Relational Analytics</TabsTrigger><TabsTrigger value="flow" className="data-[state=active]:bg-slate-700 data-[state=active]:text-white h-9 text-xs font-bold px-4"><Network className="w-3.5 h-3.5 mr-2" /> Data Flow</TabsTrigger></>)}</TabsList>
+                      {viewMode !== 'analytics' && (
                         <div className="flex flex-1 items-center gap-2 w-full max-w-[1400px]">
-                          <div className="flex items-center gap-2 flex-1 min-w-0"><Select value={searchField} onValueChange={setSearchField}><SelectTrigger className="w-[120px] h-9 text-xs font-bold uppercase shrink-0"><SelectValue placeholder="In" /></SelectTrigger><SelectContent>{workflowMode === 'abstract' ? (<><SelectItem value="all">All Fields</SelectItem><SelectItem value="arpNo">ARP No.</SelectItem><SelectItem value="date">Date</SelectItem><SelectItem value="acctName">Transfer (To)</SelectItem><SelectItem value="rollAddress">Reg. Address</SelectItem><SelectItem value="location">Location</SelectItem><SelectItem value="pin">PIN</SelectItem><SelectItem value="rollTctNo">TCT No.</SelectItem></>) : workflowMode === 'building-permit' ? (<><SelectItem value="all">All Fields</SelectItem><SelectItem value="buildingPermitNo">Permit No.</SelectItem><SelectItem value="acctName">Owner</SelectItem><SelectItem value="location">Property Location</SelectItem><SelectItem value="dateIssued">Date Issued</SelectItem></>) : workflowMode === 'three-year-report' ? (<><SelectItem value="all">All Fields</SelectItem><SelectItem value="kindGroup">Kind of Property</SelectItem><SelectItem value="acctName">Name of New Owner</SelectItem><SelectItem value="arpNo">ARPN/PIN</SelectItem><SelectItem value="location">Location</SelectItem><SelectItem value="salesClassification">Classification</SelectItem></>) : (<><SelectItem value="all">All Fields</SelectItem><SelectItem value="date">Date</SelectItem><SelectItem value="arpNo">ARP No#</SelectItem><SelectItem value="pin">PIN</SelectItem><SelectItem value="acctName">Account</SelectItem><SelectItem value="address">Address</SelectItem><SelectItem value="update">Update</SelectItem><SelectItem value="taxability">Taxability</SelectItem><SelectItem value="kind">Kind</SelectItem><SelectItem value="au">AU</SelectItem></>)}</SelectContent></Select><div className="relative flex-1 min-w-0"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder={`Search property records...`} className="pl-9 text-sm h-9 w-full" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} /></div></div>
+                          <div className="flex items-center gap-2 flex-1 min-w-0"><Select value={searchField} onValueChange={setSearchField}><SelectTrigger className="w-[120px] h-9 text-xs font-bold uppercase shrink-0"><SelectValue placeholder="In" /></SelectTrigger><SelectContent>{workflowMode === 'abstract' ? (<><SelectItem value="all">All Fields</SelectItem><SelectItem value="arpNo">ARP No.</SelectItem><SelectItem value="date">Date</SelectItem><SelectItem value="acctName">Transfer (To)</SelectItem><SelectItem value="rollAddress">Reg. Address</SelectItem><SelectItem value="location">Location</SelectItem><SelectItem value="pin">PIN</SelectItem><SelectItem value="rollTctNo">TCT No.</SelectItem></>) : workflowMode === 'building-permit' ? (<><SelectItem value="all">All Fields</SelectItem><SelectItem value="buildingPermitNo">Permit No.</SelectItem><SelectItem value="acctName">Owner</SelectItem><SelectItem value="location">Property Location</SelectItem><SelectItem value="dateIssued">Date Issued</SelectItem></>) : workflowMode === 'three-year-report' ? (<><SelectItem value="all">All Fields</SelectItem><SelectItem value="kindGroup">Kind of Property</SelectItem><SelectItem value="acctName">Name of New Owner</SelectItem><SelectItem value="arpNo">ARPN/PIN</SelectItem><SelectItem value="location">Location</SelectItem><SelectItem value="salesClassification">Classification</SelectItem></>) : (<><SelectItem value="all">All Fields</SelectItem><SelectItem value="date">Date</SelectItem><SelectItem value="arpNo">ARP No#</SelectItem><SelectItem value="pin">PIN</SelectItem><SelectItem value="previous">Previous</SelectItem><SelectItem value="newArpNo">New ARP#</SelectItem><SelectItem value="acctName">Account</SelectItem><SelectItem value="address">Address</SelectItem><SelectItem value="location">Location</SelectItem><SelectItem value="update">Update</SelectItem><SelectItem value="taxability">Taxability</SelectItem><SelectItem value="kind">Kind</SelectItem><SelectItem value="au">AU</SelectItem></>)}</SelectContent></Select><div className="relative flex-1 min-w-0"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder={`Search property records...`} className="pl-9 text-sm h-9 w-full" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} /></div></div>
                           {uniqueBarangays.length > 1 && (<Select value={barangayFilter} onValueChange={setBarangayFilter}><SelectTrigger className="w-[180px] h-9 text-xs font-bold uppercase shrink-0"><MapPin className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="Barangay" /></SelectTrigger><SelectContent><SelectItem value="all">All Barangays</SelectItem>{uniqueBarangays.map(brgy => (<SelectItem key={brgy} value={brgy}>{brgy}</SelectItem>))}</SelectContent></Select>)}
                           {uniqueSourceFiles.length > 1 && (<Select value={sourceFileFilter} onValueChange={setSourceFileFilter}><SelectTrigger className="w-[150px] h-9 text-xs font-bold uppercase shrink-0"><Files className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="File Source" /></SelectTrigger><SelectContent><SelectItem value="all">All Files</SelectItem>{uniqueSourceFiles.map(file => (<SelectItem key={file} value={file}>{file}</SelectItem>))}</SelectContent></Select>)}
-                          {workflowMode !== 'abstract' && workflowMode !== 'building-permit' && workflowMode !== 'three-year-report' && (<Select value={sortBy} onValueChange={(val: any) => { setSortBy(val); setStatusFilter('all'); }}><SelectTrigger className="w-[160px] h-9 text-xs font-bold uppercase shrink-0"><ArrowUpDown className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="Sort By" /></SelectTrigger><SelectContent><SelectItem value="pin">Sort by PIN</SelectItem><SelectItem value="arpNo">Sort by ARP No#</SelectItem></SelectContent></Select>)}
-                          <Select value={statusFilter} onValueChange={setStatusFilter}><SelectTrigger className="w-[160px] h-9 text-xs font-bold uppercase shrink-0"><Filter className="w-3.5 h-3.5 mr-1" /><SelectValue placeholder="Status" /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem>{(workflowMode === 'abstract' || workflowMode === 'building-permit' || workflowMode === 'three-year-report') ? (<><SelectItem value="Linked">Linked Records</SelectItem><SelectItem value="No Match">Unlinked Records</SelectItem><SelectItem value="Under Review">Under Review</SelectItem>{workflowMode === 'three-year-report' && <SelectItem value="SD Review">SD Review</SelectItem>}{workflowMode === 'three-year-report' && <SelectItem value="Other/Unmapped">Other / Unmapped</SelectItem>}</>) : (dynamicStatusOptions.sort().map(opt => (<SelectItem key={opt} value={opt}>{opt}</SelectItem>)))}</SelectContent></Select>
                           <div className="flex gap-2 items-center shrink-0">
                             <ImportManager mode="raw" manifest={rawFileManifest} onAdd={() => rawFileInputRef.current?.click()} onDelete={(name) => deleteFile(name, 'raw')} onClearAll={() => clearFiles('raw')} />
                             <ImportManager mode="exempt" manifest={exemptFileManifest} onAdd={() => exemptFileInputRef.current?.click()} onDelete={(name) => deleteFile(name, 'exempt')} onClearAll={() => clearFiles('exempt')} />
@@ -2057,24 +2241,39 @@ export default function Home() {
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 overflow-hidden min-h-0">
-                      <TabsContent value="results" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col"><DataPreviewTable data={filteredDisplayData} isProcessed={processedData.length > 0} onRowClick={handleRowClick} workflowMode={workflowMode as any} /></TabsContent>
-                      {workflowMode !== 'abstract' && workflowMode !== 'building-permit' && workflowMode !== 'three-year-report' && (<TabsContent value="archive" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col"><DataPreviewTable data={filteredDisplayData} isProcessed={true} onRowClick={handleRowClick} showLabels /></TabsContent>)}
-                      <TabsContent value="analytics" className="m-0 h-full p-6 overflow-y-auto scrollbar-vertical-custom bg-muted/5 data-[state=active]:flex data-[state=active]:flex-col"><AnalyticsView analyticsData={analyticsData} onExplain={setExplainType} onExpand={setExpandedChart} taxabilityFilter={taxabilityFilter} onTaxabilityFilterChange={setTaxabilityFilter} workflowMode={workflowMode === 'building-permit' || workflowMode === 'three-year-report' ? 'standard' : (workflowMode as any)} /></TabsContent>
-                      <TabsContent value="audit" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col"><AuditLogTab reports={processingReports} onClearHistory={() => { setProcessingReports([]); toast({ title: "History Purged", description: "Audit logs cleared permanently." }); }} onDeleteReport={(id) => { setProcessingReports(prev => prev.filter(r => r.id !== id)); toast({ title: "Log Deleted", description: "Audit entry has been removed." }); }} /></TabsContent>
-                      <TabsContent value="flow" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col"><DataFlowTab workflowMode={workflowMode} /></TabsContent>
+                    <div className="flex-1 overflow-hidden min-h-0 flex">
+                      <div className="flex-1 min-w-0 overflow-hidden h-full">
+                        <TabsContent value="results" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col"><DataPreviewTable data={filteredDisplayData} isProcessed={processedData.length > 0} onRowClick={handleRowClick} workflowMode={workflowMode as any} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} statusOptions={(workflowMode === 'abstract' || workflowMode === 'building-permit' || workflowMode === 'three-year-report') ? [{ value: 'Linked', label: 'Linked Records' }, { value: 'No Match', label: 'Unlinked Records' }, { value: 'Under Review', label: 'Under Review' }, ...(workflowMode === 'three-year-report' ? [{ value: 'SD Review', label: 'SD Review' }, { value: 'Other/Unmapped', label: 'Other / Unmapped' }] : [])] : dynamicStatusOptions.sort().map(opt => ({ value: opt, label: opt }))} /></TabsContent>
+                        {workflowMode !== 'abstract' && workflowMode !== 'building-permit' && workflowMode !== 'three-year-report' && (<TabsContent value="archive" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col"><DataPreviewTable data={filteredDisplayData} isProcessed={processedData.length > 0} onRowClick={handleRowClick} showLabels statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} statusOptions={dynamicStatusOptions.sort().map(opt => ({ value: opt, label: opt }))} /></TabsContent>)}
+                        <TabsContent value="analytics" className="m-0 h-full p-3 overflow-y-auto scrollbar-vertical-custom bg-muted/5 data-[state=active]:flex data-[state=active]:flex-col"><AnalyticsView analyticsData={analyticsData} onExplain={setExplainType} onExpand={setExpandedChart} taxabilityFilter={taxabilityFilter} onTaxabilityFilterChange={setTaxabilityFilter} workflowMode={workflowMode === 'building-permit' || workflowMode === 'three-year-report' ? 'standard' : (workflowMode as any)} /></TabsContent>
+                        <TabsContent value="flow" className="m-0 h-full data-[state=active]:flex data-[state=active]:flex-col"><DataFlowTab workflowMode={workflowMode} /></TabsContent>
+                      </div>
+                      {viewMode !== 'analytics' && viewMode !== 'flow' && (
+                        <RecordDetailModal
+                          record={selectedRecord}
+                          comparisonRecord={comparisonRecord}
+                          open={!!selectedRecord}
+                          onOpenChange={(isOpen) => { if (!isOpen) { setSelectedRecord(null); setComparisonRecord(null); } }}
+                          onSave={handleSaveRecord}
+                          onArchive={handleArchiveRecord}
+                          onUnarchive={handleUnarchiveRecord}
+                          onDelete={handleDeleteRecord}
+                          workflowMode={workflowMode}
+                          isProcessed={processedData.length > 0}
+                        />
+                      )}
                     </div>
                   </Card>
                 )}
 
-                <div className="mb-4 flex items-center justify-between bg-card p-3 rounded-3xl shadow-2xl border border-white/10 shrink-0 transition-all duration-700 ease-in-out px-6">
-                  <div className="flex items-center gap-4">
+                <div className={cn("flex items-center justify-between bg-card shadow-lg border border-white/10 shrink-0 transition-all duration-700 ease-in-out", showDetailedResults ? "py-2 px-4 rounded-2xl" : "mb-4 p-3 px-6 rounded-3xl shadow-2xl")}>
+                  <div className="flex items-center gap-3">
                     {workflowMode === 'standard' && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="outline" onClick={() => setIsExportSettingsOpen(true)} size="sm" className={cn("font-black uppercase tracking-widest border-primary/30 text-primary hover:bg-muted transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]")} disabled={isExporting}>
-                              <FileDown className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> {isExporting ? "Generating..." : "Export Data"}
+                            <Button variant="outline" onClick={() => setIsExportSettingsOpen(true)} size="sm" className={cn("font-bold uppercase tracking-wider border-primary/30 text-primary hover:bg-muted transition-all", showDetailedResults ? "h-9 px-4 text-xs" : "h-14 px-8 text-sm")} disabled={isExporting}>
+                              <FileDown className="w-4 h-4 mr-2" /> {isExporting ? "Generating..." : "Export Data"}
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>Standard Report Export</TooltipContent>
@@ -2085,8 +2284,8 @@ export default function Home() {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="outline" onClick={() => setIsAbstractExportModalOpen(true)} size="sm" className={cn("font-black uppercase tracking-widest transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]", canAbstractExport ? "border-blue-500/30 text-blue-600 hover:bg-blue-50" : "opacity-30 border-muted text-muted-foreground")} disabled={isExporting || !canAbstractExport}>
-                              <ArrowRightLeft className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> Abstract Export
+                            <Button variant="outline" onClick={() => setIsAbstractExportModalOpen(true)} size="sm" className={cn("font-bold uppercase tracking-wider transition-all", showDetailedResults ? "h-9 px-4 text-xs" : "h-14 px-8 text-sm", canAbstractExport ? "border-blue-500/30 text-blue-600 hover:bg-blue-50" : "opacity-30 border-muted text-muted-foreground")} disabled={isExporting || !canAbstractExport}>
+                              <ArrowRightLeft className="w-4 h-4 mr-2" /> Abstract Export
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>{canAbstractExport ? "Generate Abstract of Transactions (Roll + Journal Join)" : "Requires both Assessment Roll and Journal data staged"}</TooltipContent>
@@ -2097,8 +2296,8 @@ export default function Home() {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="outline" onClick={() => setIsPermitExportModalOpen(true)} size="sm" className={cn("font-black uppercase tracking-widest transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]", canPermitExport ? "border-orange-500/30 text-orange-600 hover:bg-orange-50" : "opacity-30 border-muted text-muted-foreground")} disabled={isExporting || !canPermitExport}>
-                              <HardHat className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> Permit Export
+                            <Button variant="outline" onClick={() => setIsPermitExportModalOpen(true)} size="sm" className={cn("font-bold uppercase tracking-wider transition-all", showDetailedResults ? "h-9 px-4 text-xs" : "h-14 px-8 text-sm", canPermitExport ? "border-orange-500/30 text-orange-600 hover:bg-orange-50" : "opacity-30 border-muted text-muted-foreground")} disabled={isExporting || !canPermitExport}>
+                              <HardHat className="w-4 h-4 mr-2" /> Permit Export
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>{canPermitExport ? "Generate Abstract of Building Permits (Roll + Permit Join)" : "Requires both Assessment Roll and Permit Log staged"}</TooltipContent>
@@ -2109,18 +2308,18 @@ export default function Home() {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="outline" onClick={() => setIsThreeYearExportModalOpen(true)} size="sm" className={cn("font-black uppercase tracking-widest transition-all", showDetailedResults ? "h-10 px-5 text-[10px]" : "h-14 px-8 text-[12px]", canThreeYearExport ? "border-violet-500/30 text-violet-600 hover:bg-violet-600" : "opacity-30 border-muted text-muted-foreground")} disabled={isExporting || !canThreeYearExport}>
-                              <TrendingUp className={cn(showDetailedResults ? "w-3.5 h-3.5 mr-2" : "w-4 h-4 mr-2")} /> 3YR Export
+                            <Button variant="outline" onClick={() => setIsThreeYearExportModalOpen(true)} size="sm" className={cn("font-bold uppercase tracking-wider transition-all", showDetailedResults ? "h-9 px-4 text-xs" : "h-14 px-8 text-sm", canThreeYearExport ? "border-violet-500/30 text-violet-600 hover:bg-violet-600" : "opacity-30 border-muted text-muted-foreground")} disabled={isExporting || !canThreeYearExport}>
+                              <TrendingUp className="w-4 h-4 mr-2" /> 3YR Export
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>{canThreeYearExport ? "Generate 3 Year Report of Lowest to Highest" : "Requires both Assessment Roll and Sales Data staged"}</TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     )}
-                    <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="sm" onClick={() => setIsClearConfirmOpen(true)} className="font-black uppercase text-[10px] tracking-widest text-muted-foreground hover:text-red-600 hover:bg-muted transition-all flex items-center gap-2"><Trash2 className="w-4 h-4" /> Clear Session</Button></TooltipTrigger><TooltipContent>Reset Session Data</TooltipContent></Tooltip></TooltipProvider>
+                    <TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="sm" onClick={() => setIsClearConfirmOpen(true)} className={cn("font-bold uppercase text-xs tracking-wider text-muted-foreground hover:text-red-600 hover:bg-muted transition-all flex items-center gap-2", showDetailedResults && "h-9 px-3")}><Trash2 className="w-4 h-4" /> Clear Session</Button></TooltipTrigger><TooltipContent>Reset Session Data</TooltipContent></Tooltip></TooltipProvider>
                   </div>
-                  <div className="flex gap-4 items-center">
-                    {workflowMode === 'standard' && viewMode !== 'analytics' && viewMode !== 'audit' && (<TooltipProvider><Tooltip><TooltipTrigger asChild><Button size="lg" className={cn("bg-primary hover:bg-emerald-700 text-white font-black uppercase tracking-widest shadow-2xl transition-all active:scale-95", showDetailedResults ? "h-10 px-6 text-[10px]" : "h-14 px-10 text-[12px]")} disabled={isProcessing} onClick={() => setIsRunProcessorDialogOpen(true)}>{isProcessing ? "Processing Batch..." : "Run Batch Processor"}</Button></TooltipTrigger><TooltipContent>Run engine analysis sequence</TooltipContent></Tooltip></TooltipProvider>)}
+                  <div className="flex gap-3 items-center">
+                    {workflowMode === 'standard' && viewMode !== 'analytics' && (<TooltipProvider><Tooltip><TooltipTrigger asChild><Button size="lg" className={cn("bg-[#16A249] hover:bg-[#138a3e] text-white font-bold uppercase tracking-wider shadow-md transition-all active:scale-95", showDetailedResults ? "h-9 px-5 text-xs" : "h-14 px-10 text-sm shadow-2xl")} disabled={isProcessing} onClick={() => setIsRunProcessorDialogOpen(true)}>{isProcessing ? "Processing Batch..." : "Run Batch Processor"}</Button></TooltipTrigger><TooltipContent>Run engine analysis sequence</TooltipContent></Tooltip></TooltipProvider>)}
                   </div>
                 </div>
               </div>
@@ -2157,8 +2356,16 @@ export default function Home() {
         <DialogContent className="sm:max-w-md bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl"><DialogHeader><DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2"><Cpu className="w-5 h-5 text-primary" /> Run Batch Processor</DialogTitle><DialogDescription className="text-sm font-bold text-muted-foreground leading-relaxed">The engine will now perform a multi-pass validation sequence including system cleanup, deduplication, and financial calibration.</DialogDescription></DialogHeader><div className="py-4"><CalibrationSidebar options={options} setOptions={setOptions} rules={rules} setRules={setRules} /></div><DialogFooter className="gap-3"><Button variant="ghost" onClick={() => setIsRunProcessorDialogOpen(false)} className="font-black uppercase text-xs h-10 px-6">Cancel</Button><Button onClick={() => { setIsRunProcessorDialogOpen(false); runProcess(); }} className="bg-primary hover:bg-emerald-700 text-white font-black uppercase text-xs h-10 px-8 shadow-lg shadow-primary/20">Execute Engine</Button></DialogFooter></DialogContent>
       </Dialog>
 
-      <Sheet open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <SheetContent side="right" className="sm:max-w-[1200px] w-[95vw] p-0 border-none bg-card shadow-2xl"><SheetHeader className="sr-only"><SheetTitle>Configuration Panel</SheetTitle><SheetHeader><SheetTitle>Configuration Panel</SheetTitle><SheetDescription>Update global settings and calibration rules.</SheetDescription></SheetHeader></SheetHeader><SettingsOverlay onClose={() => setIsSettingsOpen(false)} onSaveSettings={handleSaveSettings} locationSettings={locationSettings} taxRates={taxRates} /></SheetContent>
+      <Sheet
+        open={isSettingsOpen}
+        onOpenChange={(open) => {
+          setIsSettingsOpen(open);
+          if (!open) {
+            document.body.style.pointerEvents = '';
+          }
+        }}
+      >
+        <SheetContent side="right" className="sm:max-w-[1200px] w-[95vw] p-0 border-none bg-card shadow-2xl"><SheetHeader className="sr-only"><SheetTitle>Configuration Panel</SheetTitle><SheetHeader><SheetTitle>Configuration Panel</SheetTitle><SheetDescription>Update global settings and calibration rules.</SheetDescription></SheetHeader></SheetHeader><SettingsOverlay onClose={() => { setIsSettingsOpen(false); document.body.style.pointerEvents = ''; }} onSaveSettings={handleSaveSettings} locationSettings={locationSettings} taxRates={taxRates} /></SheetContent>
       </Sheet>
 
       <AlertDialog open={isClearConfirmOpen} onOpenChange={setIsClearConfirmOpen}><AlertDialogContent className="bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl"><AlertDialogHeader><AlertDialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2"><Trash2 className="w-4 h-4 text-red-600" /> Confirm Session Reset</AlertDialogTitle><AlertDialogDescription className="text-sm font-bold text-muted-foreground leading-relaxed">Are you sure you want to clear your current workspace? All property records and processing results in this session will be permanently removed.<br /><br /><span className="text-red-600/80 font-black uppercase tracking-tighter">Note: Your administrative audit logs will not be affected.</span></AlertDialogDescription></AlertDialogHeader><AlertDialogFooter className="gap-3"><AlertDialogCancel className="font-black uppercase text-xs h-10 px-6 hover:bg-muted hover:text-foreground">Cancel</AlertDialogCancel><AlertDialogAction onClick={() => { setIsClearConfirmOpen(false); clearWorkspace(); }} className="bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs h-10 px-8 shadow-lg shadow-red-500/10 transition-all">Wipe Session Data</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
@@ -2187,7 +2394,6 @@ export default function Home() {
       <ThreeYearExportModal open={isThreeYearExportModalOpen} onOpenChange={setIsThreeYearExportModalOpen} data={joinedThreeYearData} onExport={handleThreeYearExport} isExporting={isExporting} />
       <AboutModal open={isAboutOpen} onOpenChange={setIsAboutOpen} />
       <ProcessingReportModal report={latestReport} open={isReportOpen} onOpenChange={setIsReportOpen} />
-      <RecordDetailModal record={selectedRecord} comparisonRecord={comparisonRecord} open={!!selectedRecord} onOpenChange={(isOpen) => { if (!isOpen) { setSelectedRecord(null); setComparisonRecord(null); } }} onSave={handleSaveRecord} onArchive={handleArchiveRecord} onUnarchive={handleUnarchiveRecord} onDelete={handleDeleteRecord} workflowMode={workflowMode} />
     </div>
   );
 }

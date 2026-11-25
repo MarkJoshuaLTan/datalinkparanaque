@@ -2,62 +2,347 @@
   "name": "San Martin",
   "barangayCode": "012",
   "sections": [
-    { "section": "001", "location": "SITIO MALUGAY", "unitValue": 18300 },
-    { "section": "001-{044}", "location": "EAST SERVICE ROAD (IBA STREET)", "unitValue": 85200 },
-    { "section": "002", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "003-{(021 TO 024),060,061,063,066,071}", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "003", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "004-{014,015,(037 TO 039),041,(043 TO 047)}", "location": "EAST SERVICE ROAD (IBA STREET)", "unitValue": 85200 },
-    { "section": "004", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "005", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "006", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "007-{(001 TO 003)}", "location": "DAANG HARI", "unitValue": 64400 },
-    { "section": "007", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "008-{(001 TO 019)}", "location": "DAANG HARI", "unitValue": 64400 },
-    { "section": "008", "location": "MARIAN PARK INDUSTRIAL SUBD.", "unitValue": 64400 },
-    { "section": "009-{(071 TO 075),(077 TO 087),099,100}", "location": "DAANG HARI", "unitValue": 64400 },
-    { "section": "009", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "010", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "011", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "011-{001,037,056,057,(060 TO 062)}", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "012-{001,049,050,(058 TO 060),106,107}", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "012", "location": "UNITED HIILLS VILLAGE I", "unitValue": 33700 },
-    { "section": "013", "location": "MAKATI SOUTH HILLS SUBD.", "unitValue": 33700 },
-    { "section": "014", "location": "MARIAN PARK SUBD.", "unitValue": 64400 },
-    { "section": "015-{009,010,(029 TO 032)}", "location": "DAANG HARI", "unitValue": 64400 },
-    { "section": "015", "location": "UNITED HIILLS VILLAGE III", "unitValue": 33700 },
-    { "section": "016", "location": "MARIAN LAKEVIEW SUBD.", "unitValue": 45800 },
-    { "section": "017", "location": "UNITED HILLS VILLAGE I, II, & III", "unitValue": 33700 },
-    { "section": "018-{001,044,045,065}", "location": "EAST SERVICE ROAD (IBA STREET)", "unitValue": 85200 },
-    { "section": "018", "location": "UNITED HILLS VILLAGE I, II, & III", "unitValue": 33700 },
-    { "section": "019-{(001 TO 014),109}", "location": "EAST SERVICE ROAD (IBA STREET)", "unitValue": 85200 },
-    { "section": "019", "location": "UNITED HILLS VILLAGE I, II, & III", "unitValue": 33700 },
-    { "section": "020", "location": "UNITED HILLS VILLAGE I, II, & III", "unitValue": 33700 },
-    { "section": "021-{001,008,013}", "location": "EAST SERVICE ROAD (IBA STREET)", "unitValue": 85200 },
-    { "section": "021", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "022-{007,008}", "location": "EAST SERVICE ROAD (IBA STREET)", "unitValue": 85200 },
-    { "section": "022", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "023-{001,002,005,(023 TO 031),038,039}", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "023", "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING", "unitValue": 18300 },
-    { "section": "024", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "024-{004}", "location": "DAANG HARI", "unitValue": 64400 },
-    { "section": "025-{(015 TO 058)}", "location": "TINZEL HOMES", "unitValue": 33700 },
-    { "section": "025", "location": "BAEZ STREET / DAAN HARI", "unitValue": 64400 },
-    { "section": "025-{011,012,062,(068 TO 070)}", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "025-{064,077,078}", "location": "DAANG HARI", "unitValue": 64400 },
-    { "section": "026-{005}", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "026", "location": "DAANG HARI", "unitValue": 64400 },
-    { "section": "027", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "027-{003}", "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING", "unitValue": 18300 },
-    { "section": "028", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "028-{001}", "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING", "unitValue": 18300 },
-    { "section": "029", "location": "SOUTH SUPER HIGHWAY", "unitValue": 85200 },
-    { "section": "030", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "031", "location": "EAST SERVICE ROAD / SSHI-WAY", "unitValue": 85200 },
-    { "section": "034", "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING", "unitValue": 18300 },
-    { "section": "035", "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING", "unitValue": 18300 },
-    { "section": "036", "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING", "unitValue": 18300 },
-    { "section": "037", "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING", "unitValue": 18300 },
-    { "section": "038", "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING", "unitValue": 18300 }
+    {
+      "section": "001",
+      "location": "SITIO MALUGAY",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "001-{044}",
+      "location": "EAST SERVICE ROAD (IBA STREET)",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "002",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "003-{(021 TO 024),060,061,063,066,071}",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "003",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "004-{014,015,(037 TO 039),041,(043 TO 047)}",
+      "location": "EAST SERVICE ROAD (IBA STREET)",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "004",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{(001 TO 003)}",
+      "location": "DAANG HARI",
+      "unitValue": 64400,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "007",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "008-{(001 TO 019)}",
+      "location": "DAANG HARI",
+      "unitValue": 64400,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "008",
+      "location": "MARIAN PARK INDUSTRIAL SUBD.",
+      "unitValue": 64400,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "009-{(071 TO 075),(077 TO 087),099,100}",
+      "location": "DAANG HARI",
+      "unitValue": 64400,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "009",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{001,037,056,057,(060 TO 062)}",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "012-{001,049,050,(058 TO 060),106,107}",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "012",
+      "location": "UNITED HIILLS VILLAGE I",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013",
+      "location": "MAKATI SOUTH HILLS SUBD.",
+      "unitValue": 33700,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "014",
+      "location": "MARIAN PARK SUBD.",
+      "unitValue": 64400,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "015-{009,010,(029 TO 032)}",
+      "location": "DAANG HARI",
+      "unitValue": 64400,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "015",
+      "location": "UNITED HIILLS VILLAGE III",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016",
+      "location": "MARIAN LAKEVIEW SUBD.",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017",
+      "location": "UNITED HILLS VILLAGE I, II, & III",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{001,044,045,065}",
+      "location": "EAST SERVICE ROAD (IBA STREET)",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "018",
+      "location": "UNITED HILLS VILLAGE I, II, & III",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{(001 TO 014),109}",
+      "location": "EAST SERVICE ROAD (IBA STREET)",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "019",
+      "location": "UNITED HILLS VILLAGE I, II, & III",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020",
+      "location": "UNITED HILLS VILLAGE I, II, & III",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{001,008,013}",
+      "location": "EAST SERVICE ROAD (IBA STREET)",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "021",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "022-{007,008}",
+      "location": "EAST SERVICE ROAD (IBA STREET)",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "022",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "023-{001,002,005,(023 TO 031),038,039}",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "023",
+      "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "024",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "024-{004}",
+      "location": "DAANG HARI",
+      "unitValue": 64400,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "025-{(015 TO 058)}",
+      "location": "TINZEL HOMES",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "025",
+      "location": "BAEZ STREET / DAAN HARI",
+      "unitValue": 64400,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "025-{011,012,062,(068 TO 070)}",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "025-{064,077,078}",
+      "location": "DAANG HARI",
+      "unitValue": 64400,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "026-{005}",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "026",
+      "location": "DAANG HARI",
+      "unitValue": 64400,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "027",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "027-{003}",
+      "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "028",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "028-{001}",
+      "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "029",
+      "location": "SOUTH SUPER HIGHWAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "030",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "031",
+      "location": "EAST SERVICE ROAD / SSHI-WAY",
+      "unitValue": 85200,
+      "deferredUnitValue": 5000
+    },
+    {
+      "section": "034",
+      "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "035",
+      "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "036",
+      "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "037",
+      "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "038",
+      "location": "DEVELOPMENT AREAS INTENDED FOR SOCIALIZED HOUSING",
+      "unitValue": 18300,
+      "deferredUnitValue": 1200
+    }
   ]
 }

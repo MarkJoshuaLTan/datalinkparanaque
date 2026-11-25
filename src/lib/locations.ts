@@ -26,6 +26,7 @@ export interface SectionConfig {
   section: string;
   location: string;
   unitValue?: number;
+  deferredUnitValue?: number;
 }
 
 // This is the structure for a full barangay's settings, including all its sections

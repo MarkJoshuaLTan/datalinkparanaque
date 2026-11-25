@@ -1,51 +1,48 @@
-
 "use client";
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  Cell, 
-  Pie, 
-  PieChart, 
-  Legend, 
-  CartesianGrid 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Cell,
+  Pie,
+  PieChart,
+  Legend,
+  CartesianGrid
 } from 'recharts';
-import { 
-  ChartContainer, 
-  ChartTooltip, 
+import {
+  ChartContainer,
+  ChartTooltip,
   ChartTooltipContent,
   type ChartConfig
 } from '@/components/ui/chart';
-import { 
-  CheckCircle2, 
-  MapPin, 
-  RefreshCw, 
-  Database, 
-  Lightbulb, 
+import {
+  CheckCircle2,
+  MapPin,
+  RefreshCw,
+  Database,
+  Lightbulb,
   Maximize2,
   Filter,
   Link2,
   Building2,
   HardHat,
   TrendingUp,
-  Construction,
-  ShieldCheck,
-  AlertCircle
+  ShieldCheck
 } from 'lucide-react';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/components/ui/select';
 
-const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
+const COLORS = ['#16A249', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
 
 const analyticsChartConfig = {
   value: {
@@ -76,9 +73,9 @@ interface AnalyticsViewProps {
   workflowMode?: 'standard' | 'abstract' | 'building-permit';
 }
 
-export function AnalyticsView({ 
-  analyticsData, 
-  onExplain, 
+export function AnalyticsView({
+  analyticsData,
+  onExplain,
   onExpand,
   taxabilityFilter,
   onTaxabilityFilterChange,
@@ -88,25 +85,25 @@ export function AnalyticsView({
   const isPermit = workflowMode === 'building-permit';
 
   return (
-    <div className="space-y-8 pb-10 max-w-7xl mx-auto w-full">
-      <div className="flex items-center justify-between bg-card p-4 rounded-xl border border-white/10 shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-blue-600/10 text-blue-600">
-            <Filter className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-tight leading-none">
+    <div className="flex flex-col flex-1 min-h-0 gap-3 w-full h-full">
+      {/* Compact Scope Bar */}
+      <div className="flex items-center justify-between gap-3 bg-card px-3.5 py-2 rounded-lg border border-border shrink-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
+          <div className="flex items-center gap-2 flex-wrap min-w-0">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
               {isPermit ? 'Audit Scope' : (isAbstract ? 'Relational Scope' : 'Analysis Scope')}
             </h3>
-            <p className="text-[10px] font-bold text-muted-foreground mt-1 uppercase tracking-widest">
+            <span className="text-muted-foreground hidden sm:inline">•</span>
+            <p className="text-xs font-medium text-muted-foreground hidden sm:inline truncate">
               {isPermit ? 'Analytics for linked permit logs' : (isAbstract ? 'Audit analytics by tax status' : 'Filter analytics by tax status')}
             </p>
           </div>
         </div>
         {(!isPermit && !isAbstract) && (
-          <div className="w-[200px]">
+          <div className="w-[180px] shrink-0">
             <Select value={taxabilityFilter} onValueChange={onTaxabilityFilterChange}>
-              <SelectTrigger className="h-10 text-xs font-black uppercase tracking-widest">
+              <SelectTrigger className="h-8 text-xs font-bold uppercase tracking-wider">
                 <SelectValue placeholder="Taxability" />
               </SelectTrigger>
               <SelectContent>
@@ -119,168 +116,193 @@ export function AnalyticsView({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card className="p-6 border-white/5 bg-card shadow-2xl overflow-hidden flex flex-col group">
-          <div className="flex items-center justify-between mb-8">
-            <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
+      {/* Full-Bleed 2x2 Viewport-Maximized Chart Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-3 flex-1 min-h-0">
+        {/* 1. Property Usage Distribution */}
+        <Card className="p-3.5 border border-border bg-card shadow-sm overflow-hidden flex flex-col min-h-[240px] lg:min-h-0">
+          <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+            <h4 className="text-xs font-bold uppercase flex items-center gap-2 tracking-wider text-foreground truncate">
               {isPermit ? (
-                <><HardHat className="w-4.5 h-4.5 text-primary" /> Occupancy Distribution</>
+                <><HardHat className="w-4 h-4 text-[#16A249] shrink-0" /> Occupancy Distribution</>
               ) : isAbstract ? (
-                <><Building2 className="w-4.5 h-4.5 text-primary" /> Asset Classification</>
+                <><Building2 className="w-4 h-4 text-[#16A249] shrink-0" /> Asset Classification</>
               ) : (
-                <><CheckCircle2 className="w-4.5 h-4.5 text-primary" /> Property Usage Distribution</>
+                <><CheckCircle2 className="w-4 h-4 text-[#16A249] shrink-0" /> Property Usage Distribution</>
               )}
             </h4>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => onExplain('usage')}
-                className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                className="h-7 px-2.5 text-xs font-semibold text-foreground hover:text-[#16A249]"
               >
-                <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
+                <Lightbulb className="w-3.5 h-3.5 mr-1 text-[#16A249]" /> Explain
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => onExpand('usage')}
-                className="h-8 w-8 bg-muted/20 hover:bg-primary hover:text-white transition-all"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                title="Expand chart"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </Button>
             </div>
           </div>
-          <div className="h-[300px] w-full">
-            <ChartContainer config={analyticsChartConfig}>
-              <BarChart data={analyticsData.auChart} margin={{ top: 20, right: 20, left: 10, bottom: 40 }}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.05} />
-                <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} angle={-45} textAnchor="end" interval={0} tick={{ fill: 'hsl(var(--muted-foreground))', fontWeight: 'bold' }} />
-                <YAxis fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+          <div className="flex-1 min-h-0 w-full">
+            <ChartContainer config={analyticsChartConfig} className="h-full w-full !aspect-auto">
+              <BarChart data={analyticsData.auChart} margin={{ top: 8, right: 12, left: 0, bottom: 28 }}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.12} />
+                <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} angle={-35} textAnchor="end" interval={0} tick={{ fill: 'hsl(var(--muted-foreground))', fontWeight: 600 }} />
+                <YAxis fontSize={11} tickLine={false} axisLine={false} width={48} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="value" radius={[6, 6, 0, 0]}>{analyticsData.auChart.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}</Bar>
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                  {analyticsData.auChart.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                </Bar>
               </BarChart>
             </ChartContainer>
           </div>
         </Card>
-        
-        <Card className="p-6 border-white/5 bg-card shadow-2xl overflow-hidden flex flex-col group">
-          <div className="flex items-center justify-between mb-8">
-            <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
-              <MapPin className="w-4.5 h-4.5 text-primary" /> {isPermit ? 'Permitting Hotspots' : (isAbstract ? 'Transaction Hotspots' : 'Barangay Distribution')}
+
+        {/* 2. Barangay Distribution */}
+        <Card className="p-3.5 border border-border bg-card shadow-sm overflow-hidden flex flex-col min-h-[240px] lg:min-h-0">
+          <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+            <h4 className="text-xs font-bold uppercase flex items-center gap-2 tracking-wider text-foreground truncate">
+              <MapPin className="w-4 h-4 text-[#16A249] shrink-0" /> {isPermit ? 'Permitting Hotspots' : (isAbstract ? 'Transaction Hotspots' : 'Barangay Distribution')}
             </h4>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => onExplain('barangay')}
-                className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                className="h-7 px-2.5 text-xs font-semibold text-foreground hover:text-[#16A249]"
               >
-                <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
+                <Lightbulb className="w-3.5 h-3.5 mr-1 text-[#16A249]" /> Explain
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => onExpand('barangay')}
-                className="h-8 w-8 bg-muted/20 hover:bg-primary hover:text-white transition-all"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                title="Expand chart"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </Button>
             </div>
           </div>
-          <div className="h-[300px] w-full">
-            <ChartContainer config={analyticsChartConfig}>
-              <BarChart data={analyticsData.barangayChart} margin={{ top: 20, right: 20, left: 10, bottom: 40 }}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.05} />
-                <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} angle={-45} textAnchor="end" interval={0} tick={{ fill: 'hsl(var(--muted-foreground))', fontWeight: 'bold' }} />
-                <YAxis fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+          <div className="flex-1 min-h-0 w-full">
+            <ChartContainer config={analyticsChartConfig} className="h-full w-full !aspect-auto">
+              <BarChart data={analyticsData.barangayChart} margin={{ top: 8, right: 12, left: 0, bottom: 28 }}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.12} />
+                <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} angle={-35} textAnchor="end" interval={0} tick={{ fill: 'hsl(var(--muted-foreground))', fontWeight: 600 }} />
+                <YAxis fontSize={11} tickLine={false} axisLine={false} width={48} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="value" radius={[6, 6, 0, 0]}>{analyticsData.barangayChart.map((entry, index) => <Cell key={`cell-brgy-${index}`} fill={COLORS[(index + 4) % COLORS.length]} />)}</Bar>
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                  {analyticsData.barangayChart.map((entry, index) => <Cell key={`cell-brgy-${index}`} fill={COLORS[(index + 4) % COLORS.length]} />)}
+                </Bar>
               </BarChart>
             </ChartContainer>
           </div>
         </Card>
 
-        <Card className="p-6 border-white/5 bg-card shadow-2xl overflow-hidden flex flex-col group">
-          <div className="flex items-center justify-between mb-8">
-            <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
+        {/* 3. Update Code Distribution */}
+        <Card className="p-3.5 border border-border bg-card shadow-sm overflow-hidden flex flex-col min-h-[240px] lg:min-h-0">
+          <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+            <h4 className="text-xs font-bold uppercase flex items-center gap-2 tracking-wider text-foreground truncate">
               {isPermit ? (
-                <><ShieldCheck className="w-4.5 h-4.5 text-primary" /> Match Precision Ratio</>
+                <><ShieldCheck className="w-4 h-4 text-[#16A249] shrink-0" /> Match Precision Ratio</>
               ) : isAbstract ? (
-                <><Link2 className="w-4.5 h-4.5 text-primary" /> Join Success Rate</>
+                <><Link2 className="w-4 h-4 text-[#16A249] shrink-0" /> Join Success Rate</>
               ) : (
-                <><RefreshCw className="w-4.5 h-4.5 text-primary" /> Update Code Distribution</>
+                <><RefreshCw className="w-4 h-4 text-[#16A249] shrink-0" /> Update Code Distribution</>
               )}
             </h4>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => onExplain('update')}
-                className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                className="h-7 px-2.5 text-xs font-semibold text-foreground hover:text-[#16A249]"
               >
-                <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
+                <Lightbulb className="w-3.5 h-3.5 mr-1 text-[#16A249]" /> Explain
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => onExpand('update')}
-                className="h-8 w-8 bg-muted/20 hover:bg-primary hover:text-white transition-all"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                title="Expand chart"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </Button>
             </div>
           </div>
-          <div className="h-[300px] w-full">
-            <ChartContainer config={analyticsChartConfig}>
-              <BarChart data={analyticsData.updateChart} margin={{ top: 20, right: 20, left: 10, bottom: 40 }}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.05} />
-                <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} angle={-45} textAnchor="end" interval={0} tick={{ fill: 'hsl(var(--muted-foreground))', fontWeight: 'bold' }} />
-                <YAxis fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+          <div className="flex-1 min-h-0 w-full">
+            <ChartContainer config={analyticsChartConfig} className="h-full w-full !aspect-auto">
+              <BarChart data={analyticsData.updateChart} margin={{ top: 8, right: 12, left: 0, bottom: 28 }}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.12} />
+                <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} angle={-35} textAnchor="end" interval={0} tick={{ fill: 'hsl(var(--muted-foreground))', fontWeight: 600 }} />
+                <YAxis fontSize={11} tickLine={false} axisLine={false} width={48} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="value" radius={[6, 6, 0, 0]}>{analyticsData.updateChart.map((entry, index) => <Cell key={`cell-upd-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />)}</Bar>
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                  {analyticsData.updateChart.map((entry, index) => <Cell key={`cell-upd-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />)}
+                </Bar>
               </BarChart>
             </ChartContainer>
           </div>
         </Card>
 
-        <Card className="p-6 border-white/5 bg-card shadow-2xl flex flex-col group relative overflow-hidden">
-          <div className="flex items-center justify-between mb-8">
-            <h4 className="text-sm font-black uppercase flex items-center gap-2.5 tracking-widest text-muted-foreground">
+        {/* 4. Market Value Breakdown */}
+        <Card className="p-3.5 border border-border bg-card shadow-sm overflow-hidden flex flex-col min-h-[240px] lg:min-h-0">
+          <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+            <h4 className="text-xs font-bold uppercase flex items-center gap-2 tracking-wider text-foreground truncate">
               {isPermit ? (
-                <><TrendingUp className="w-4.5 h-4.5 text-primary" /> Investment Concentration</>
+                <><TrendingUp className="w-4 h-4 text-[#16A249] shrink-0" /> Investment Concentration</>
               ) : isAbstract ? (
-                <><TrendingUp className="w-4.5 h-4.5 text-primary" /> Fiscal Profile Ratio</>
+                <><TrendingUp className="w-4 h-4 text-[#16A249] shrink-0" /> Fiscal Profile Ratio</>
               ) : (
-                <><Database className="w-4.5 h-4.5 text-primary" /> Market Value Breakdown</>
+                <><Database className="w-4 h-4 text-[#16A249] shrink-0" /> Market Value Breakdown</>
               )}
             </h4>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => onExplain('market')}
-                className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                className="h-7 px-2.5 text-xs font-semibold text-foreground hover:text-[#16A249]"
               >
-                <Lightbulb className="w-3.5 h-3.5 mr-1.5" /> Explain
+                <Lightbulb className="w-3.5 h-3.5 mr-1 text-[#16A249]" /> Explain
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => onExpand('market')}
-                className="h-8 w-8 bg-muted/20 hover:bg-primary hover:text-white transition-all"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                title="Expand chart"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </Button>
             </div>
           </div>
-          <div className="h-[300px] w-full">
-            <ChartContainer config={marketChartConfig}>
+          <div className="flex-1 min-h-0 w-full">
+            <ChartContainer config={marketChartConfig} className="h-full w-full !aspect-auto">
               <PieChart>
-                <Pie data={analyticsData.marketChart} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={8} dataKey="value" stroke="none" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}>
+                <Pie
+                  data={analyticsData.marketChart}
+                  cx="50%"
+                  cy="48%"
+                  innerRadius="48%"
+                  outerRadius="76%"
+                  paddingAngle={6}
+                  dataKey="value"
+                  stroke="none"
+                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                >
                   {analyticsData.marketChart.map((entry, index) => <Cell key={`cell-market-${index}`} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ paddingTop: '24px', fontSize: '11px', fontWeight: 'bold' }}/>
+                <Legend verticalAlign="bottom" height={28} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 600 }} />
               </PieChart>
             </ChartContainer>
           </div>

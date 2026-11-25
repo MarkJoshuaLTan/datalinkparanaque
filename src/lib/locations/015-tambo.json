@@ -1,89 +1,498 @@
-
 {
   "name": "Tambo",
   "barangayCode": "015",
   "sections": [
-    { "section": "001-{001,002,048,049}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "001-{(004 TO 014),(057 TO 102)}", "location": "T ALONZO", "unitValue": 91900 },
-    { "section": "001-{015,016,018,020,021,051,052}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "001", "location": "J ABAD SANTOS", "unitValue": 91900 },
-    { "section": "002", "location": "BAYVIEW DR", "unitValue": 91900 },
-    { "section": "003-{(008 TO 009),012,(013 TO 030),(037 TO 039)}", "location": "16TH STREET", "unitValue": 28900 },
-    { "section": "003", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "004", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{006,007,008,028,029,030,031,032,037,038}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{(016 TO 025),047,048}", "location": "KATIGBAK DRIVE", "unitValue": 28900 },
-    { "section": "005-{(002 TO 005)}", "location": "L AVELINO ST", "unitValue": 33700 },
-    { "section": "005", "location": "BAYVIEW DR", "unitValue": 91900 },
-    { "section": "006-{(022 TO 039),047}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "006", "location": "BAYVIEW DR", "unitValue": 91900 },
-    { "section": "007-{(061 TO 067)}", "location": "MIA RD", "unitValue": 228900 },
-    { "section": "007-{001,(036 TO 044),047,059,(068 TO 070),(075 TO 077)}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "007", "location": "LOS TAMARAOS VILL (SUNSET VILL)", "unitValue": 91900 },
-    { "section": "008-{(044 TO 060)}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "008-{063,064,097,065,066}", "location": "MIA RD", "unitValue": 228900 },
-    { "section": "008", "location": "LOS TAMARAOS VILL (SUNSET VILL)", "unitValue": 91900 },
-    { "section": "009-{(105 TO 114)}", "location": "BAYPORT", "unitValue": 130900 },
-    { "section": "009-{056,(059 TO 063)}", "location": "MIA RD", "unitValue": 228900 },
-    { "section": "009-{(038 TO 050)}", "location": "SANDEJAS ST", "unitValue": 23100 },
-    { "section": "009-{(014 TO 031),(087 TO 090),(093 TO 095),(102 TO 104)}", "location": "PAULINO ST", "unitValue": 23100 },
-    { "section": "009-{(002 TO 006),(009 TO 011),057,091,096,097,100,101}", "location": "BATAAN ST", "unitValue": 39300 },
-    { "section": "009", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "010-{002,(004 TO 010),037,038}", "location": "GEN SEGUNDO ST", "unitValue": 23100 },
-    { "section": "010-{(015 TO 018),(020 TO 022),041,042,044,053,(055 TO 057),187,(189 TO 191)}", "location": "G MENDOZA ST", "unitValue": 23100 },
-    { "section": "010-{(128 TO 168)}", "location": "P. VERGEL ST", "unitValue": 23100 },
-    { "section": "010-{(170 TO 184),188}", "location": "BALUYOT ST", "unitValue": 23100 },
-    { "section": "010", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "011-{(003 TO 006),009,010,070,071,(073 TO 079),(170 TO 173),(177 TO 180)}", "location": "MIA RD", "unitValue": 228900 },
-    { "section": "011-{069,(083 TO 086),(184 TO 191),(219 TO 223)}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "011-{(046 TO 048),(052 TO 059),065,(130 TO 144),150,151,(167 TO 169),(174 TO 176)}", "location": "C SANTOS ST", "unitValue": 72700 },
-    { "section": "011-{(017 TO 036),148,149}", "location": "TAMARAW COURT", "unitValue": 39300 },
-    { "section": "011", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "012-{(003 TO 007),(008 TO 011),061,062}", "location": "MERALCO CMPD", "unitValue": 85200 },
-    { "section": "012-{(015 TO 027)}", "location": "PASCUAL CMPD", "unitValue": 39300 },
-    { "section": "012-{(031 TO 039),060,068}", "location": "LOPEZ DE LEON ST ALLEY", "unitValue": 23100 },
-    { "section": "012", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "013-{(050 TO 054),(111 TO 132)}", "location": "J FERMIN ST", "unitValue": 23100 },
-    { "section": "013-{(067 TO 094),(030 TO 036),(103 TO 110),(133 TO 141)}", "location": "KABESANG CILIO ST", "unitValue": 23100 },
-    { "section": "013", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "014-{003,005,006,008,012,033,027,016,025,026,034,035}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "014", "location": "INTERIOR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "015", "location": "VILLAMAR 1ST & 2ND ST", "unitValue": 72700 },
-    { "section": "016-{(001 TO 006)}", "location": "ARIAS COMPD", "unitValue": 28900 },
-    { "section": "016-{037}", "location": "VILLAMAR 1ST & 2ND ST", "unitValue": 72700 },
-    { "section": "016-{040}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "016-{007,018,019,044,045,049,050}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016-{(008 TO 012),(014 TO 017)}", "location": "INTERIOR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016", "location": "MCDONOUGH ST", "unitValue": 23100 },
-    { "section": "017", "location": "CONCORDE SUBD", "unitValue": 91900 },
-    { "section": "018", "location": "CONCORDE SUBD", "unitValue": 91900 },
-    { "section": "019", "location": "GOODWILL SUBD", "unitValue": 23100 },
-    { "section": "020-{025,(105 TO 107),(135 TO 138),(165 TO 166)}", "location": "CONCORDE SUBD", "unitValue": 91900 },
-    { "section": "020", "location": "SUNRISE ST", "unitValue": 91900 },
-    { "section": "021-{(001 TO 004)}", "location": "MIA RD", "unitValue": 33700 },
-    { "section": "021", "location": "SUNRISE ST", "unitValue": 91900 },
-    { "section": "022-{(023 TO 030),(075 TO 077),085}", "location": "P MAYUGA ST", "unitValue": 33700 },
-    { "section": "022-{017,018,031,078,079,047,051,044,048}", "location": "MIA RD", "unitValue": 228900 },
-    { "section": "022-{(001 TO 016)}", "location": "SUNRISE ST", "unitValue": 91900 },
-    { "section": "022", "location": "MAYUGA ST", "unitValue": 23100 },
-    { "section": "023", "location": "BAYVIEW GARDEN HOMES II", "unitValue": 58200 },
-    { "section": "024", "location": "BAYVIEW GARDEN HOMES I", "unitValue": 58200 },
-    { "section": "025", "location": "VILLA CAROLINA", "unitValue": 39300 },
-    { "section": "026-{101,102,114,115}", "location": "MACAPAGAL BLVD", "unitValue": 228900 },
-    { "section": "026", "location": "MARINA EAST SUBD", "unitValue": 91900 },
-    { "section": "027", "location": "MARINA EAST SUBD", "unitValue": 91900 },
-    { "section": "028-{117}", "location": "MACAPAGAL AVENUE", "unitValue": 228900 },
-    { "section": "028", "location": "MARINA EAST SUBD", "unitValue": 91900 },
-    { "section": "033", "location": "BAYVIEW GARDENHOMES", "unitValue": 228900 },
-    { "section": "036", "location": "ASEANA BUSINESS PARK/MACAPAGAL AVE", "unitValue": 228900 },
-    { "section": "038-{001,038,060,063,(066 TO 068),071}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "038-{023,024,(028 TO 036),052,056,058,061,062}", "location": "MAYUGA STREET (ALLEY)", "unitValue": 23100 },
-    { "section": "038-{046,047,051,069,070,(072 TO 074)}", "location": "RIVERVIEW COMPOUND", "unitValue": 23100 },
-    { "section": "038", "location": "GABRIEL STREET", "unitValue": 23100 },
-    { "section": "039-{(008 TO 010),013,015,(020 TO 024),030}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "039", "location": "AGRIPINA STREET", "unitValue": 23100 },
-    { "section": "040", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "041", "location": "PITX", "unitValue": 228900 },
-    { "section": "044", "location": "COASTAL RD", "unitValue": 228900 }
+    {
+      "section": "001-{001,002,048,049}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "001-{(004 TO 014),(057 TO 102)}",
+      "location": "T ALONZO",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "001-{015,016,018,020,021,051,052}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "001",
+      "location": "J ABAD SANTOS",
+      "unitValue": 91900,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "002",
+      "location": "BAYVIEW DR",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "003-{(008 TO 009),012,(013 TO 030),(037 TO 039)}",
+      "location": "16TH STREET",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "003",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "004",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{006,007,008,028,029,030,031,032,037,038}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{(016 TO 025),047,048}",
+      "location": "KATIGBAK DRIVE",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "005-{(002 TO 005)}",
+      "location": "L AVELINO ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005",
+      "location": "BAYVIEW DR",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{(022 TO 039),047}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "006",
+      "location": "BAYVIEW DR",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{(061 TO 067)}",
+      "location": "MIA RD",
+      "unitValue": 228900,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "007-{001,(036 TO 044),047,059,(068 TO 070),(075 TO 077)}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "007",
+      "location": "LOS TAMARAOS VILL (SUNSET VILL)",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "008-{(044 TO 060)}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "008-{063,064,097,065,066}",
+      "location": "MIA RD",
+      "unitValue": 228900,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "008",
+      "location": "LOS TAMARAOS VILL (SUNSET VILL)",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{(105 TO 114)}",
+      "location": "BAYPORT",
+      "unitValue": 130900,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "009-{056,(059 TO 063)}",
+      "location": "MIA RD",
+      "unitValue": 228900,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "009-{(038 TO 050)}",
+      "location": "SANDEJAS ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "009-{(014 TO 031),(087 TO 090),(093 TO 095),(102 TO 104)}",
+      "location": "PAULINO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "009-{(002 TO 006),(009 TO 011),057,091,096,097,100,101}",
+      "location": "BATAAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "009",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "010-{002,(004 TO 010),037,038}",
+      "location": "GEN SEGUNDO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "010-{(015 TO 018),(020 TO 022),041,042,044,053,(055 TO 057),187,(189 TO 191)}",
+      "location": "G MENDOZA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "010-{(128 TO 168)}",
+      "location": "P. VERGEL ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "010-{(170 TO 184),188}",
+      "location": "BALUYOT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "010",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "011-{(003 TO 006),009,010,070,071,(073 TO 079),(170 TO 173),(177 TO 180)}",
+      "location": "MIA RD",
+      "unitValue": 228900,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "011-{069,(083 TO 086),(184 TO 191),(219 TO 223)}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "011-{(046 TO 048),(052 TO 059),065,(130 TO 144),150,151,(167 TO 169),(174 TO 176)}",
+      "location": "C SANTOS ST",
+      "unitValue": 72700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{(017 TO 036),148,149}",
+      "location": "TAMARAW COURT",
+      "unitValue": 39300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "011",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "012-{(003 TO 007),(008 TO 011),061,062}",
+      "location": "MERALCO CMPD",
+      "unitValue": 85200,
+      "deferredUnitValue": 6000
+    },
+    {
+      "section": "012-{(015 TO 027)}",
+      "location": "PASCUAL CMPD",
+      "unitValue": 39300,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{(031 TO 039),060,068}",
+      "location": "LOPEZ DE LEON ST ALLEY",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "012",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "013-{(050 TO 054),(111 TO 132)}",
+      "location": "J FERMIN ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "013-{(067 TO 094),(030 TO 036),(103 TO 110),(133 TO 141)}",
+      "location": "KABESANG CILIO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "013",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "014-{003,005,006,008,012,033,027,016,025,026,034,035}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "014",
+      "location": "INTERIOR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "015",
+      "location": "VILLAMAR 1ST & 2ND ST",
+      "unitValue": 72700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{(001 TO 006)}",
+      "location": "ARIAS COMPD",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "016-{037}",
+      "location": "VILLAMAR 1ST & 2ND ST",
+      "unitValue": 72700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{040}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "016-{007,018,019,044,045,049,050}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{(008 TO 012),(014 TO 017)}",
+      "location": "INTERIOR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016",
+      "location": "MCDONOUGH ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "017",
+      "location": "CONCORDE SUBD",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018",
+      "location": "CONCORDE SUBD",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019",
+      "location": "GOODWILL SUBD",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "020-{025,(105 TO 107),(135 TO 138),(165 TO 166)}",
+      "location": "CONCORDE SUBD",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020",
+      "location": "SUNRISE ST",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{(001 TO 004)}",
+      "location": "MIA RD",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021",
+      "location": "SUNRISE ST",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "022-{(023 TO 030),(075 TO 077),085}",
+      "location": "P MAYUGA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "022-{017,018,031,078,079,047,051,044,048}",
+      "location": "MIA RD",
+      "unitValue": 228900,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "022-{(001 TO 016)}",
+      "location": "SUNRISE ST",
+      "unitValue": 91900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "022",
+      "location": "MAYUGA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "023",
+      "location": "BAYVIEW GARDEN HOMES II",
+      "unitValue": 58200,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "024",
+      "location": "BAYVIEW GARDEN HOMES I",
+      "unitValue": 58200,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "025",
+      "location": "VILLA CAROLINA",
+      "unitValue": 39300,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "026-{101,102,114,115}",
+      "location": "MACAPAGAL BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "026",
+      "location": "MARINA EAST SUBD",
+      "unitValue": 91900,
+      "deferredUnitValue": 7000
+    },
+    {
+      "section": "027",
+      "location": "MARINA EAST SUBD",
+      "unitValue": 91900,
+      "deferredUnitValue": 7000
+    },
+    {
+      "section": "028-{117}",
+      "location": "MACAPAGAL AVENUE",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "028",
+      "location": "MARINA EAST SUBD",
+      "unitValue": 91900,
+      "deferredUnitValue": 7000
+    },
+    {
+      "section": "033",
+      "location": "BAYVIEW GARDENHOMES",
+      "unitValue": 228900,
+      "deferredUnitValue": 15000
+    },
+    {
+      "section": "036",
+      "location": "ASEANA BUSINESS PARK/MACAPAGAL AVE",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "038-{001,038,060,063,(066 TO 068),071}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "038-{023,024,(028 TO 036),052,056,058,061,062}",
+      "location": "MAYUGA STREET (ALLEY)",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "038-{046,047,051,069,070,(072 TO 074)}",
+      "location": "RIVERVIEW COMPOUND",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "038",
+      "location": "GABRIEL STREET",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "039-{(008 TO 010),013,015,(020 TO 024),030}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "039",
+      "location": "AGRIPINA STREET",
+      "unitValue": 23100,
+      "deferredUnitValue": 1200
+    },
+    {
+      "section": "040",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "041",
+      "location": "PITX",
+      "unitValue": 228900,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "044",
+      "location": "COASTAL RD",
+      "unitValue": 228900,
+      "deferredUnitValue": 10000
+    }
   ]
 }

@@ -63,6 +63,7 @@ const columnLabels = [
   "DATE", "ARP NO#", "PIN", "PREVIOUS", "NEW ARP NO#", "UPDATE", "TAXABILITY", "ACCTNAME", "ADDRESS", 
   "LOCATION", "KIND", "AU", "LAND AREA", 
   "UNIT VALUE (2028)", "MARKET VALUE (2028)", "ASSESSED VALUE (2028)", "YEARLY TAX (2028 CAP)",
+  "UNIT VALUE (DEFERRED 2011 GR)", "MARKET VALUE (DEFERRED 2011 GR)", "ASSESSED VALUE (DEFERRED 2011 GR)", "YEARLY TAX (DEFERRED 2011 GR)",
   "UNIT VALUE", "MARKET VALUE", "ASSESSED VALUE", "YEARLY TAX", "RECORD STATUS"
 ];
 
@@ -268,10 +269,8 @@ export function ExportSettingsModal({
       >
         <div className="p-8 shrink-0">
           <DialogHeader className="text-left">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="bg-primary/20 p-3 rounded-xl border border-primary/20">
-                <FileDown className="text-primary w-7 h-7" />
-              </div>
+            <div className="flex items-center gap-3.5 mb-2">
+              <FileDown className="text-primary w-7 h-7 shrink-0" />
               <div>
                 <DialogTitle className="text-3xl font-black text-foreground uppercase tracking-tight leading-none">
                   Smart Export Controller
@@ -312,7 +311,7 @@ export function ExportSettingsModal({
                       id={`exp-col-${col}`} 
                       checked={exportColumns[col]} 
                       onCheckedChange={() => onColumnToggle(col)}
-                      className="border-primary/40 data-[state=checked]:bg-primary w-4.5 h-4.5"
+                      className="border-primary/40 data-[state=checked]:bg-primary w-4 h-4 shrink-0"
                     />
                     <label htmlFor={`exp-col-${col}`} className="text-xs font-black uppercase cursor-pointer text-foreground/70 group-hover:text-primary transition-colors select-none truncate">
                       {col}
@@ -343,7 +342,7 @@ export function ExportSettingsModal({
                           id={`exp-brgy-${brgy}`} 
                           checked={selectedBarangays.includes(brgy)} 
                           onCheckedChange={() => toggleBarangay(brgy)}
-                          className="w-4.5 h-4.5"
+                          className="w-4 h-4 shrink-0"
                         />
                         <label htmlFor={`exp-brgy-${brgy}`} className="text-xs font-bold cursor-pointer truncate select-none text-foreground/80 group-hover:text-primary transition-colors">
                           {brgy}
@@ -375,7 +374,7 @@ export function ExportSettingsModal({
                               id={`exp-kind-${kind}`} 
                               checked={selectedKinds.includes(kind)} 
                               onCheckedChange={() => toggleKind(kind)}
-                              className="w-4.5 h-4.5"
+                              className="w-4 h-4 shrink-0"
                             />
                             <label htmlFor={`exp-kind-${kind}`} className="text-[11px] font-black cursor-pointer truncate uppercase select-none text-foreground/80 group-hover:text-primary transition-colors">
                               {KIND_LABELS[kind] || kind}
@@ -404,7 +403,7 @@ export function ExportSettingsModal({
                               id={`exp-tax-${tax}`} 
                               checked={selectedTaxabilities.includes(tax)} 
                               onCheckedChange={() => toggleTaxability(tax)}
-                              className="w-4.5 h-4.5"
+                              className="w-4 h-4 shrink-0"
                             />
                             <label htmlFor={`exp-tax-${tax}`} className="text-[11px] font-black cursor-pointer truncate uppercase select-none text-foreground/80 group-hover:text-primary transition-colors">
                               {tax === 'T' ? 'Taxable (T)' : 'Exempted (E)'}
@@ -436,7 +435,7 @@ export function ExportSettingsModal({
                                 id={`exp-upd-${code}`} 
                                 checked={selectedUpdateCodes.includes(code)} 
                                 onCheckedChange={() => toggleUpdateCode(code)}
-                                className="w-4.5 h-4.5"
+                                className="w-4 h-4 shrink-0"
                               />
                               <label htmlFor={`exp-upd-${code}`} className="text-[11px] font-black cursor-pointer truncate uppercase select-none text-foreground/80 group-hover:text-primary transition-colors">
                                 {code || 'NONE'}
@@ -496,54 +495,58 @@ export function ExportSettingsModal({
                       <Button variant="link" size="sm" onClick={clearAllApproved} className="text-[10px] font-black uppercase text-muted-foreground h-auto p-0 hover:text-emerald-600">Clear</Button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                    {approvedStatuses.map(status => (
-                      <div key={status} className="flex items-center gap-3 group">
-                        <Checkbox 
-                          id={`exp-stat-${status}`} 
-                          checked={selectedStatuses.includes(status)} 
-                          onCheckedChange={() => toggleStatus(status)}
-                          className="w-4 h-4 border-emerald-500/40"
-                        />
-                        <label htmlFor={`exp-stat-${status}`} className="text-[11px] font-black uppercase cursor-pointer flex items-center justify-between w-full select-none group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                          <span className="truncate mr-2">{status}</span>
-                          <Badge variant="outline" className="h-4.5 px-1.5 text-[9px] font-black bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800 shadow-none shrink-0">
-                            {data.filter(r => r.statusLabel === status && selectedBarangays.includes(r.barangayName || 'UNMAPPED') && selectedKinds.includes(r.kind?.trim().toUpperCase() || '') && selectedTaxabilities.includes(r.taxability || 'T') && selectedUpdateCodes.includes(r.update?.trim().toUpperCase() || '')).length}
-                          </Badge>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  <Card className="bg-muted/10 p-5 shadow-inner border-white/5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {approvedStatuses.map(status => (
+                        <div key={status} className="flex items-center gap-3 group">
+                          <Checkbox 
+                            id={`exp-stat-${status}`} 
+                            checked={selectedStatuses.includes(status)} 
+                            onCheckedChange={() => toggleStatus(status)}
+                            className="w-4 h-4"
+                          />
+                          <label htmlFor={`exp-stat-${status}`} className="text-xs font-bold uppercase cursor-pointer flex items-center justify-between w-full select-none text-foreground/80 group-hover:text-primary transition-colors">
+                            <span className="truncate mr-2">{status}</span>
+                            <Badge variant="outline" className="px-2 py-0.5 text-xs font-bold tabular-nums bg-background text-foreground border-border shadow-none shrink-0">
+                              {data.filter(r => r.statusLabel === status && selectedBarangays.includes(r.barangayName || 'UNMAPPED') && selectedKinds.includes(r.kind?.trim().toUpperCase() || '') && selectedTaxabilities.includes(r.taxability || 'T') && selectedUpdateCodes.includes(r.update?.trim().toUpperCase() || '')).length}
+                            </Badge>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-wider flex items-center gap-2">
                       <Trash2 className="w-3.5 h-3.5 text-orange-500" /> Administrative Archive
                     </h4>
                     <div className="flex gap-3">
-                      <Button variant="link" size="sm" onClick={selectAllArchive} className="text-[10px] font-black uppercase text-muted-foreground h-auto p-0 hover:text-orange-600">Select All</Button>
-                      <Button variant="link" size="sm" onClick={clearAllArchive} className="text-[10px] font-black uppercase text-muted-foreground h-auto p-0 hover:text-orange-600">Clear</Button>
+                      <Button variant="link" size="sm" onClick={selectAllArchive} className="text-xs font-bold uppercase text-muted-foreground h-auto p-0 hover:text-primary">Select All</Button>
+                      <Button variant="link" size="sm" onClick={clearAllArchive} className="text-xs font-bold uppercase text-muted-foreground h-auto p-0 hover:text-primary">Clear</Button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-xl bg-orange-500/5 border border-orange-500/10">
-                    {archiveStatuses.map(status => (
-                      <div key={status} className="flex items-center gap-3 group">
-                        <Checkbox 
-                          id={`exp-stat-${status}`} 
-                          checked={selectedStatuses.includes(status)} 
-                          onCheckedChange={() => toggleStatus(status)}
-                          className="w-4 h-4 border-orange-500/40"
-                        />
-                        <label htmlFor={`exp-stat-${status}`} className="text-[11px] font-black uppercase cursor-pointer flex items-center justify-between w-full select-none group-hover:text-orange-700 dark:group-hover:text-orange-400 transition-colors">
-                          <span className="truncate mr-2">{status}</span>
-                          <Badge variant="outline" className="h-4.5 px-1.5 text-[9px] font-black bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-800 shadow-none shrink-0">
-                            {data.filter(r => r.statusLabel === status && selectedBarangays.includes(r.barangayName || 'UNMAPPED') && selectedKinds.includes(r.kind?.trim().toUpperCase() || '') && selectedTaxabilities.includes(r.taxability || 'T') && selectedUpdateCodes.includes(r.update?.trim().toUpperCase() || '')).length}
-                          </Badge>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  <Card className="bg-muted/10 p-5 shadow-inner border-white/5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {archiveStatuses.map(status => (
+                        <div key={status} className="flex items-center gap-3 group">
+                          <Checkbox 
+                            id={`exp-stat-${status}`} 
+                            checked={selectedStatuses.includes(status)} 
+                            onCheckedChange={() => toggleStatus(status)}
+                            className="w-4 h-4"
+                          />
+                          <label htmlFor={`exp-stat-${status}`} className="text-xs font-bold uppercase cursor-pointer flex items-center justify-between w-full select-none text-foreground/80 group-hover:text-primary transition-colors">
+                            <span className="truncate mr-2">{status}</span>
+                            <Badge variant="outline" className="px-2 py-0.5 text-xs font-bold tabular-nums bg-background text-foreground border-border shadow-none shrink-0">
+                              {data.filter(r => r.statusLabel === status && selectedBarangays.includes(r.barangayName || 'UNMAPPED') && selectedKinds.includes(r.kind?.trim().toUpperCase() || '') && selectedTaxabilities.includes(r.taxability || 'T') && selectedUpdateCodes.includes(r.update?.trim().toUpperCase() || '')).length}
+                            </Badge>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
                 </div>
               </div>
             </section>

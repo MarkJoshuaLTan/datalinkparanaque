@@ -2,613 +2,3653 @@
   "name": "Baclaran",
   "barangayCode": "002",
   "sections": [
-    { "section": "001", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "001-{003}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "002-{(001 TO 008),016,052,053,058,059}", "location": "FB HARRISON", "unitValue": 85200 },
-    { "section": "002-{013,014,031,027,(054 TO 057),060}", "location": "TAFT AVE", "unitValue": 85200 },
-    { "section": "002", "location": "A.GUARRA EXT", "unitValue": 48700 },
-    { "section": "003-{(001 TO 025)}", "location": "RIVERSIDE ST", "unitValue": 23100 },
-    { "section": "003-{(026 TO 084)}", "location": "BAGONG LIPUNAN ST", "unitValue": 23100 },
-    { "section": "003-{086,087,088}", "location": "BAGONG SIKAT ST", "unitValue": 23100 },
-    { "section": "003", "location": "BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "003-{(109 TO 111),(113 TO 115),117,118}", "location": "BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "003-{116}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "003-{(120 TO 153)}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "003-{154}", "location": "BAGONG ILOG ST", "unitValue": 28900 },
-    { "section": "003-{(156 TO 169)}", "location": "TAFT AVE", "unitValue": 85200 },
-    { "section": "003-{175,(177 TO 190),193}", "location": "E.RODRIGUEZ ST", "unitValue": 23100 },
-    { "section": "003-{191,194,195}", "location": "TAFT AVE", "unitValue": 85200 },
-    { "section": "003-{204,205}", "location": "BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "003-{206,207}", "location": "BAGONG LIPUNAN ST", "unitValue": 23100 },
-    { "section": "003-{208,209}", "location": "BAGONG ISLA ST", "unitValue": 23100 },
-    { "section": "003-{211}", "location": "TAFT AVE", "unitValue": 85200 },
-    { "section": "003-{214,215}", "location": "BAGONG LIPUNAN ST", "unitValue": 23100 },
-    { "section": "003-{216,217}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "003-{220,221,223,224}", "location": "BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "003-{225,226}", "location": "E.RODRIGUEZ ST", "unitValue": 23100 },
-    { "section": "004-{(008 TO 011),(013 TO 016)}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "004-{(017 TO 021)}", "location": "BAGONG ILOG ST", "unitValue": 28900 },
-    { "section": "004-{(023 TO 032)}", "location": "E.RODRIGUEZ ST", "unitValue": 23100 },
-    { "section": "004-{033}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "004-{034}", "location": "BAGONG ISLA ST", "unitValue": 23100 },
-    { "section": "004-{035}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "004-{037,039}", "location": "TAFT AVE", "unitValue": 85200 },
-    { "section": "004", "location": "E.RODRIGUEZ ST", "unitValue": 23100 },
-    { "section": "004-{022,069}", "location": "BAGONG ILOG ST COR E.RODRIGUEZ ST", "unitValue": 28900 },
-    { "section": "004-{073}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "004-{(074 TO 077)}", "location": "BAGONG ISLA ST", "unitValue": 23100 },
-    { "section": "004-{078}", "location": "E.RODRIGUEZ ST", "unitValue": 23100 },
-    { "section": "004-{105}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "004-{106,107}", "location": "TAFT AVE", "unitValue": 85200 },
-    { "section": "004-{108}", "location": "E.RODRIGUEZ ST", "unitValue": 23100 },
-    { "section": "004-{109,110}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{001,003,005,007,008}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "005-{(011 TO 014)}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "005-{015}", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "005-{016}", "location": "REDEMPTORIST RD COR GG CRUZ ST", "unitValue": 85200 },
-    { "section": "005-{017,018}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "005-{019,029}", "location": "EVANGELISTA ST", "unitValue": 53400 },
-    { "section": "005-{020,030}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "005-{031}", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "005-{032,033}", "location": "REDEMPTORIST RD COR J.GABRIEL ST", "unitValue": 85200 },
-    { "section": "005-{(034 TO 037)}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "005-{040,042}", "location": "A.GUARRA ST COR J.GABRIEL ST", "unitValue": 48700 },
-    { "section": "005-{041,043}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "005-{(044 TO 052)}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "005-{053,056}", "location": "REDEMPTORIST RD COR J.GABRIEL ST", "unitValue": 85200 },
-    { "section": "005-{054,055}", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "005-{057,059}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "005-{058,060,061}", "location": "EVANGELISTA ST", "unitValue": 53400 },
-    { "section": "005-{(063 TO 067)}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "005-{068}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "005-{069}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{070 TO 072}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{073,074}", "location": "REDEMPTORIST RD COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{(075 TO 079)}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{080,081}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "005-{082}", "location": "A.GUARRA ST COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{083,084,085,087}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "005", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{102,104}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{105}", "location": "REDEMPTORIST RD COR GG CRUZ ST", "unitValue": 85200 },
-    { "section": "005-{106}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "005-{108}", "location": "INT QUIRINO AVE", "unitValue": 130900 },
-    { "section": "005-{109}", "location": "INT J GABRIEL ST", "unitValue": 33700 },
-    { "section": "005-{(110 TO 124)}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "005-{125}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "005-{126}", "location": "GG CRUZ ST COR CALLE REDEMPTORIST", "unitValue": 53400 },
-    { "section": "005-{127}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "005-{128}", "location": "CALLE REDEMPTORIST COR J GABRIEL ST", "unitValue": 53400 },
-    { "section": "005-{129,130,131}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "005-{132,133}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "005-{134}", "location": "EVANGELISTA ST", "unitValue": 53400 },
-    { "section": "005-{135,136}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "006-{001}", "location": "LT GARCIA ST", "unitValue": 45800 },
-    { "section": "006-{002}", "location": "A.GUARRA ST COR LT GARCIA ST", "unitValue": 48700 },
-    { "section": "006-{(003 TO 009)}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "006-{(011 TO 025)}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "006-{026}", "location": "A.GUARRA ST COR GG CRUZ ST", "unitValue": 48700 },
-    { "section": "006-{027}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "006-{028}", "location": "GG CRUZ ST COR BAYANIHAN ST", "unitValue": 33700 },
-    { "section": "006-{(029 TO 051)}", "location": "BAYANIHAN ST", "unitValue": 33700 },
-    { "section": "006-{052}", "location": "BAYANIHAN ST COR LT GARCIA ST", "unitValue": 45800 },
-    { "section": "006-{053}", "location": "LT GARCIA ST", "unitValue": 45800 },
-    { "section": "006-{054}", "location": "REDEMPTORIST RD COR LT GARCIA ST", "unitValue": 85200 },
-    { "section": "006-{(055 TO 078)}", "location": "BAYANIHAN ST", "unitValue": 33700 },
-    { "section": "006-{079}", "location": "BAYANIHAN ST COR GG CRUZ ST", "unitValue": 33700 },
-    { "section": "006-{080,081}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "006-{(083 TO 095)}", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "006-{097,098}", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "006-{109}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "006-{111,112,113,115,116}", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "006-{117}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "006-{119}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "006-{120,121}", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "006-{123}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "006-{124}", "location": "REDEMPTORIST RD COR GG CRUZ ST", "unitValue": 85200 },
-    { "section": "006", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "006-{127}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "007-{(001 TO 008)}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "007-{010}", "location": "A.GUARRA ST COR LT GARCIA ST", "unitValue": 45800 },
-    { "section": "007-{(011 TO 014)}", "location": "BAYANIHAN ST", "unitValue": 33700 },
-    { "section": "007-{(015 TO 020)}", "location": "BAYANIHAN ST", "unitValue": 33700 },
-    { "section": "007-{021}", "location": "BAYANIHAN ST COR LT GARCIA ST", "unitValue": 45800 },
-    { "section": "007-{022}", "location": "REDEMPTORIST RD COR LT GARCIA ST", "unitValue": 85200 },
-    { "section": "007", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "007-{029}", "location": "ROXAS BLVD COR A.GUARRA ST", "unitValue": 228900 },
-    { "section": "007-{030}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "007-{(031 TO 034)}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "007-{035,037}", "location": "ROXAS BLVD COR BAYANIHAN ST", "unitValue": 228900 },
-    { "section": "007-{038}", "location": "BAYANIHAN ST", "unitValue": 33700 },
-    { "section": "007-{039}", "location": "ROXAS BLVD COR REDEMPTORIST RD", "unitValue": 228900 },
-    { "section": "007-{041}", "location": "A.GUARRA ST", "unitValue": 48700 },
-    { "section": "007-{042}", "location": "BAYANIHAN ST", "unitValue": 33700 },
-    { "section": "008", "location": "REDEMPTORIST RD", "unitValue": 85200 },
-    { "section": "009-{001}", "location": "O.PEÑA ST", "unitValue": 39300 },
-    { "section": "009-{002}", "location": "O.PEÑA ST COR L.GABRIEL ST", "unitValue": 39300 },
-    { "section": "009-{003,004,007,009,010}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "009-{011}", "location": "L.GABRIEL ST COR DIMASALANG ST", "unitValue": 39300 },
-    { "section": "009-{013}", "location": "DIMASALANG ST COR MACTAN ST", "unitValue": 39300 },
-    { "section": "009", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "009-{034}", "location": "DIMASALANG ST COR MACTAN ST", "unitValue": 39300 },
-    { "section": "009-{035,036,037}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "009-{038}", "location": "DIMASALANG ST COR LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "009-{(039 TO 049),077}", "location": "LT GARCIA ST", "unitValue": 45800 },
-    { "section": "009-{050,075}", "location": "LT GARCIA ST COR O.PEÑA ST", "unitValue": 45800 },
-    { "section": "009-{051}", "location": "O.PEÑA ST", "unitValue": 39300 },
-    { "section": "009-{(052 TO 057)}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "009-{026,062}", "location": "O.PEÑA ST COR MACTAN ST", "unitValue": 39300 },
-    { "section": "009-{063,067,069}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "009-{065,066}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "009-{068}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "009-{070}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "009-{071}", "location": "O.PEÑA ST", "unitValue": 39300 },
-    { "section": "009-{072}", "location": "O.PEÑA ST COR MACTAN ST", "unitValue": 39300 },
-    { "section": "009-{073,074}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "009-{076}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "010-{001,106}", "location": "O.PEÑA ST COR UNIDA ST", "unitValue": 39300 },
-    { "section": "010-{002,004}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "010-{003}", "location": "LT GARCIA", "unitValue": 45800 },
-    { "section": "010-{006}", "location": "O.PEÑA ST", "unitValue": 39300 },
-    { "section": "010-{007}", "location": "O.PEÑA ST COR LT GARCIA ST", "unitValue": 45800 },
-    { "section": "010-{(008 TO 015)}", "location": "LT GARCIA ST", "unitValue": 45800 },
-    { "section": "010-{017}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "010-{(019 TO 023),025,028,030}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "010", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "010-{046,105}", "location": "DIMASALANG ST COR UNIDA ST", "unitValue": 39300 },
-    { "section": "010-{049}", "location": "DIMASALANG ST COR LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "010-{055,056,057,059,060,061,062}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "010-{063,064}", "location": "O.PEÑA ST COR LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "010-{(066 TO 079)}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "010-{080}", "location": "DIMASALANG ST COR LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "010-{(082 TO 085),087,100}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "010-{090,112}", "location": "O.PEÑA ST COR GG CRUZ ST", "unitValue": 39300 },
-    { "section": "010-{091,092,093,094}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "010-{101,102,103}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "010-{104,111}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "010-{108,109,110}", "location": "O.PEÑA ST", "unitValue": 39300 },
-    { "section": "010-{113,118,119,120}", "location": "LT GARCIA ST", "unitValue": 45800 },
-    { "section": "010-{114}", "location": "DIMASALANG ST COR LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "010-{115,116}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "010-{117}", "location": "O.PEÑA ST", "unitValue": 39300 },
-    { "section": "010-{121,122,123,124,125}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "010-{126,127,128}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "010-{129,130}", "location": "O.PEÑA ST", "unitValue": 39300 },
-    { "section": "010-{131,132,(135 TO 137)}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "010-{133}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "010-{134}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "011-{001,(005 TO 015)}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "011-{002}", "location": "CALLE REDEMPTORIST COR GG CRUZ ST", "unitValue": 53400 },
-    { "section": "011-{003,004}", "location": "CALLE REDEMPTORIST", "unitValue": 53400 },
-    { "section": "011-{017,019,021,023,036}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "011-{024}", "location": "GG CRUZ ST COR DIMASALANG ST", "unitValue": 39300 },
-    { "section": "011-{026}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "011-{027}", "location": "J GABRIEL ST COR DIMASALANG ST", "unitValue": 39300 },
-    { "section": "011-{(028 TO 035),(037 TO 041)}", "location": "J GABRIELS T", "unitValue": 33700 },
-    { "section": "011-{(043 TO 049)}", "location": "J GABRIELS T", "unitValue": 33700 },
-    { "section": "011-{051,054}", "location": "CALLE REDEMPTORIST COR J GABRIEL ST", "unitValue": 53400 },
-    { "section": "011-{053}", "location": "CALLE REDEMPTORIST", "unitValue": 53400 },
-    { "section": "011-{(055 TO 059),061,062}", "location": "J GABRIEL ST", "unitValue": 33700 },
-    { "section": "011-{064,067,082}", "location": "INT J GABRIEL ST", "unitValue": 33700 },
-    { "section": "011-{(068 TO 073)}", "location": "J GABRIEL ST", "unitValue": 33700 },
-    { "section": "011-{074}", "location": "J GABRIEL ST COR DIMASALANG ST", "unitValue": 39300 },
-    { "section": "011", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "011-{077}", "location": "QUIRINO AVE COR DIMASALANG ST", "unitValue": 130900 },
-    { "section": "011-{086}", "location": "QUIRINO AVE COR CALLE REDEMPTORIST", "unitValue": 130900 },
-    { "section": "011-{087}", "location": "CALLE REDEMPTORIST", "unitValue": 53400 },
-    { "section": "011-{088}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "011-{089,101,102,103}", "location": "J GABRIEL ST", "unitValue": 33700 },
-    { "section": "011-{090,093,094,100}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "011-{098,099}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "011-{104,105}", "location": "CALLE REDEMPTORIST", "unitValue": 53400 },
-    { "section": "011-{106,107}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "011-{108,109,110}", "location": "J GABRIEL ST", "unitValue": 33700 },
-    { "section": "011-{111,112}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "012-{002}", "location": "BAGONG ILOG ST", "unitValue": 28900 },
-    { "section": "012-{004}", "location": "BAGONG ILOG ST COR BAGONG BUHAY ST", "unitValue": 28900 },
-    { "section": "012-{005}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "012-{006}", "location": "MABUHAY ST COR BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "012-{(009 TO 013)}", "location": "MABUHAY ST", "unitValue": 23100 },
-    { "section": "012-{014,016}", "location": "QUIRINO AVE COR MABUHAY ST", "unitValue": 130900 },
-    { "section": "012-{015,017}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "012-{(018 TO 025)}", "location": "MABUHAY ST", "unitValue": 23100 },
-    { "section": "012-{026}", "location": "MABUHAY ST COR BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "012-{027,029}", "location": "MABUHAY ST", "unitValue": 23100 },
-    { "section": "012-{028,030}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "012-{031}", "location": "12 DE JUNIO ST", "unitValue": 23100 },
-    { "section": "012-{032}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "012-{034}", "location": "MABUHAY ST", "unitValue": 23100 },
-    { "section": "012-{035,114}", "location": "INT 12 DE JUNIO ST", "unitValue": 23100 },
-    { "section": "012-{036,037,038,041}", "location": "12 DE JUNIO ST", "unitValue": 23100 },
-    { "section": "012-{043,045}", "location": "QUIRINO AVE COR 12 DE JUNIO ST", "unitValue": 130900 },
-    { "section": "012-{046,047,049}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "012-{048,(050 TO 056)}", "location": "12 DE JUNIO ST", "unitValue": 23100 },
-    { "section": "012-{057}", "location": "12 DE JUNIO ST COR BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "012-{061}", "location": "DIMASALNG ST COR BAGONG BUHAY ST", "unitValue": 39300 },
-    { "section": "012-{062,063,066}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "012-{065}", "location": "INT DIMASALANG ST", "unitValue": 39300 },
-    { "section": "012", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "012-{(097 TO 102)}", "location": "12 DE JUNIO ST", "unitValue": 23100 },
-    { "section": "012-{103}", "location": "QUIRINO AVE COR BAGONG ILOG ST", "unitValue": 130900 },
-    { "section": "012-{104,105,106}", "location": "BAGONG ILOG ST", "unitValue": 28900 },
-    { "section": "012-{107,108,109}", "location": "12 DE JUNIO ST", "unitValue": 23100 },
-    { "section": "012-{110,112}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "012-{111,115}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "012-{116,117,118}", "location": "BAGONG ILOG ST", "unitValue": 28900 },
-    { "section": "012-{119,120,121,122}", "location": "MABUHAY ST", "unitValue": 23100 },
-    { "section": "012-{(123 TO 127)}", "location": "12 DE JUNIO ST", "unitValue": 23100 },
-    { "section": "012-{(128 TO 131)}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "013-{(001 TO 011)}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "013-{013,014}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "013-{016}", "location": "BAGONG BUHAY ST COR DIMASALANG ST", "unitValue": 39300 },
-    { "section": "013-{017}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "013-{018}", "location": "DIMASALANG ST COR BAGONG SILANG ST", "unitValue": 39300 },
-    { "section": "013-{(019 TO 031),034,035}", "location": "BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "013-{036,037}", "location": "BAGONG SILANG ST COR BAGONG ILOG ST", "unitValue": 28100 },
-    { "section": "013-{(038 TO 040),042,043,(045 TO 050)}", "location": "BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "013-{051}", "location": "BAGONG SILANG ST COR DIMASALANG ST", "unitValue": 39300 },
-    { "section": "013-{052}", "location": "DIMASALANG ST COR BAGONG ILOG ST", "unitValue": 39300 },
-    { "section": "013-{(053 TO 059),(063 TO 067)}", "location": "BAGONG ILOG ST", "unitValue": 28900 },
-    { "section": "013-{068}", "location": "BAGONG ILOG ST COR BAGONG SILANG ST", "unitValue": 28900 },
-    { "section": "013-{(069 TO 074),(076 TO 085)}", "location": "BAGONG ILOG ST", "unitValue": 28900 },
-    { "section": "013-{086}", "location": "BAGONG ILOG ST COR DIMASALANG ST", "unitValue": 28900 },
-    { "section": "013-{087}", "location": "DIMASALANG ST COR BAGONG PAG-ASA ST", "unitValue": 39300 },
-    { "section": "013-{(088 TO 095),(099 TO 103)}", "location": "BAGONG PAG-ASA ST", "unitValue": 23100 },
-    { "section": "013-{104,105}", "location": "BAGONG PAG-ASA ST COR BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "013", "location": "BAGONG PAG-ASA ST", "unitValue": 23100 },
-    { "section": "013-{124}", "location": "BAGONG PAG-ASA ST COR DIMASALANG ST", "unitValue": 39300 },
-    { "section": "013-{125,126}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "013-{127}", "location": "DIMASALANG ST COR BAGONG SIKAT", "unitValue": 39300 },
-    { "section": "013-{128,(130 TO 132),(134 TO 148)}", "location": "BAGONG SIKAT ST", "unitValue": 23100 },
-    { "section": "013-{149}", "location": "BAGONG SIKAT ST COR BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "013-{(150 TO 155)}", "location": "BAGONG SIKAT ST", "unitValue": 23100 },
-    { "section": "013-{(156 TO 171)}", "location": "BAGONG SIKAT ST", "unitValue": 23100 },
-    { "section": "013-{172}", "location": "BAGONG SIKAT ST COR DIMASALANG ST", "unitValue": 39300 },
-    { "section": "013-{173,182,185,186,187,189}", "location": "BAGONG SIKAT ST", "unitValue": 23100 },
-    { "section": "013-{(194 TO 196),198,199,200}", "location": "BAGONG SIKAT ST", "unitValue": 23100 },
-    { "section": "013-{201,202}", "location": "BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "013-{(203 TO 205)}", "location": "BAGONG SIKAT ST", "unitValue": 23100 },
-    { "section": "013-{206,207,214,215}", "location": "BAGONG PAG-ASA ST", "unitValue": 23100 },
-    { "section": "013-{208,209,212,213}", "location": "BAGONG ILOG ST", "unitValue": 28900 },
-    { "section": "013-{216,217,218,219}", "location": "BAGONG ILOG ST", "unitValue": 28900 },
-    { "section": "013-{220,221,222,223}", "location": "BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "013-{224,225,226}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "013-{227,228}", "location": "BAGONG SIKAT ST", "unitValue": 23100 },
-    { "section": "013-{229}", "location": "BAGONG PAG-ASA ST", "unitValue": 23100 },
-    { "section": "013-{(231 TO 234)}", "location": "BAGONG BUHAY ST", "unitValue": 23100 },
-    { "section": "013-{235,236}", "location": "BAGONG PAG-ASA ST", "unitValue": 23100 },
-    { "section": "013-{237,238,239,240}", "location": "BAGONG SILANG ST", "unitValue": 23100 },
-    { "section": "014-{001}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "014-{006}", "location": "DIMASALANG ST COR BAGONG SIKAT ST", "unitValue": 39300 },
-    { "section": "014", "location": "BAGONG SIKAT ST", "unitValue": 23100 },
-    { "section": "014-{024}", "location": "SANTIAGO ST", "unitValue": 23100 },
-    { "section": "015-{001}", "location": "QUIRINO AVE COR DIMASALANG ST", "unitValue": 130900 },
-    { "section": "015-{002,005,006}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "015-{003,004,028,029}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "015-{009,010,011,013}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "015-{014}", "location": "QUIRINO AVE COR PINAGLABANAN ST", "unitValue": 130900 },
-    { "section": "015-{015}", "location": "PINAGLABANAN ST", "unitValue": 53400 },
-    { "section": "015-{016}", "location": "PINAGLABANAN ST COR STA RITA EXT", "unitValue": 53400 },
-    { "section": "015-{(017 TO 025)}", "location": "PINAGLABANAN ST", "unitValue": 53400 },
-    { "section": "015-{026}", "location": "DIMASALANG ST COR PINAGLABANAN ST", "unitValue": 53400 },
-    { "section": "015-{(030 TO 046)}", "location": "STA RITA EXT", "unitValue": 28900 },
-    { "section": "015-{047}", "location": "STA RITA EXT COR PINAGLABANAN ST", "unitValue": 53400 },
-    { "section": "015-{048,049}", "location": "PINAGLABANAN ST", "unitValue": 53400 },
-    { "section": "015-{050}", "location": "PINAGLABANAN ST COR SANCHEZ ST", "unitValue": 53400 },
-    { "section": "015-{051,052,(054 TO 066),068}", "location": "SANCHEZ ST", "unitValue": 23100 },
-    { "section": "015-{067,070,071}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "015-{069}", "location": "DIMASALANG ST COR SANCHEZ ST", "unitValue": 39300 },
-    { "section": "015-{072}", "location": "DIMASALANG ST COR STA RITA EXT", "unitValue": 39300 },
-    { "section": "015-{073,075}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "015-{074}", "location": "DIMASALANG ST COR SANCHEZ ST", "unitValue": 39300 },
-    { "section": "015-{076}", "location": "SANCHEZ ST", "unitValue": 23100 },
-    { "section": "015-{077,078,079}", "location": "INT SANCHEZ ST", "unitValue": 23100 },
-    { "section": "015-{080,(084 TO 088)}", "location": "SANCHEZ ST", "unitValue": 23100 },
-    { "section": "015-{089}", "location": "PINAGLABANAN ST COR SANCHEZ ST", "unitValue": 53400 },
-    { "section": "015-{090,091}", "location": "PINAGLABANAN ST", "unitValue": 53400 },
-    { "section": "015-{092}", "location": "PINAGLABANAN ST COR ESPIRITU ST", "unitValue": 53400 },
-    { "section": "015", "location": "ESPIRITU ST", "unitValue": 23100 },
-    { "section": "015-{110,113,114}", "location": "ESPIRITU ST", "unitValue": 23100 },
-    { "section": "015-{112}", "location": "INT ESPIRITU ST", "unitValue": 23100 },
-    { "section": "015-{116}", "location": "INT DIMASALANG ST", "unitValue": 39300 },
-    { "section": "015-{117,121,122}", "location": "ESPIRITU ST", "unitValue": 23100 },
-    { "section": "015-{118,119,120,123,124}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "015-{126}", "location": "DIMASALANG ST COR ESPIRITU ST", "unitValue": 39300 },
-    { "section": "015-{(127 TO 140)}", "location": "ESPIRITU ST", "unitValue": 23100 },
-    { "section": "015-{141}", "location": "ESPIRITU ST COR PINAGLABANAN ST", "unitValue": 53400 },
-    { "section": "015-{142}", "location": "PINAGLABANAN ST", "unitValue": 53400 },
-    { "section": "015-{143,144}", "location": "ESPIRITU ST", "unitValue": 23100 },
-    { "section": "015-{146}", "location": "INT SANCHEZ ST", "unitValue": 23100 },
-    { "section": "015-{148,149,152,154}", "location": "ESPIRITU ST", "unitValue": 23100 },
-    { "section": "015-{150}", "location": "STA RITA EXT", "unitValue": 28900 },
-    { "section": "015-{153,155}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "015-{(156 TO 159)}", "location": "SANCHEZ ST", "unitValue": 23100 },
-    { "section": "015-{160}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "015-{161,162}", "location": "SANCHEZ ST", "unitValue": 23100 },
-    { "section": "016-{001}", "location": "DIMASALANG ST COR GG CRUZ ST", "unitValue": 39300 },
-    { "section": "016-{002}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "016-{003,(010 TO 018)}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "016-{019}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "016-{020,021,022}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "016-{023}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "016", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "016-{042,046}", "location": "J.GABRIEL ST COR DIMASALANG ST", "unitValue": 33900 },
-    { "section": "016-{043,044}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "016-{045,048,049}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "016-{(060 TO 065),(068 TO 071)}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "016-{072}", "location": "J.GABRIEL ST COR C.RIVERA ST", "unitValue": 33700 },
-    { "section": "016-{073,074}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "016-{076,078,082}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016-{080}", "location": "INT QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016-{081}", "location": "INT J GABRIEL ST", "unitValue": 33700 },
-    { "section": "016-{083,084,085,088,089}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016-{090}", "location": "QUIRINO AVE COR DIMASALANG ST", "unitValue": 130900 },
-    { "section": "016-{091,092,093,095}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "016-{094}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "016-{096,097}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016-{099}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "016-{101,102,103,104,107}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016-{105,106}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "016-{108}", "location": "INT QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016-{109,110,111}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "016-{112}", "location": "QUIRINO AVE COR C.RIVERA ST", "unitValue": 130900 },
-    { "section": "016-{113}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "016-{114}", "location": "INT QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016-{115}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "016-{116,117}", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "016-{118}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "016-{119,120}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "017-{001}", "location": "DIMASALANG ST COR LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "017-{(002 TO 008),010,014}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "017-{013}", "location": "LT.GARCIA ST COR C.RIVERA ST", "unitValue": 45800 },
-    { "section": "017-{015,016}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "017-{017}", "location": "C.RIVERA ST COR UNIDA ST", "unitValue": 33700 },
-    { "section": "017-{(018 TO 027)}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "017-{028,031}", "location": "DIMASALANG ST COR UNIDA ST", "unitValue": 39300 },
-    { "section": "017", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "017-{046}", "location": "C.RIVERA ST COR UNIDA ST", "unitValue": 33700 },
-    { "section": "017-{047,048}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "017-{(053 TO 063)}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "017-{069}", "location": "DIMASALANG ST COR LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "017-{(071 TO 077)}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "017-{079}", "location": "LAPU-LAPU ST COR C.RIVERA ST", "unitValue": 45800 },
-    { "section": "017-{080}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "017-{082,083,(085 TO 091),101}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "017-{065,092,100}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "017-{099}", "location": "DIMASALANG ST COR GG CRUZ ST", "unitValue": 39300 },
-    { "section": "017-{106,107,109,110}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "017-{(113 TO 118)}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "017-{119}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "017-{120,121}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "017-{123,126}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "017-{124,125}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "017-{127}", "location": "C.RIVERA ST COR GG.CRUZ ST", "unitValue": 33700 },
-    { "section": "017-{128}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "017-{129,130}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "017-{131}", "location": "C.RIVERA ST COR LAPU-LAPU ST", "unitValue": 28900 },
-    { "section": "017-{132}", "location": "DIMASALANG ST COR LAPU-LAPU ST", "unitValue": 39300 },
-    { "section": "017-{133}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "017-{134,135}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "017-{136,137,138}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "017-{139,140}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "018-{001}", "location": "DIMASALANG ST COR L.GABRIELS ST", "unitValue": 39300 },
-    { "section": "018-{(003 TO 006),010}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "018-{011}", "location": "L.GABRIEL ST COR C.RIVERA ST", "unitValue": 33700 },
-    { "section": "018-{012}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "018-{013}", "location": "C.RIVERA ST COR MACTAN ST", "unitValue": 39300 },
-    { "section": "018-{016,(019 TO 022),024}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "018-{025,027}", "location": "MACTAN ST COR DIMASALANG ST", "unitValue": 39300 },
-    { "section": "018-{026}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "018", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "018-{042}", "location": "MACTAN ST COR C.RIVERA ST", "unitValue": 39300 },
-    { "section": "018-{043}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "018-{044}", "location": "C.RIVERA ST COR LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "018-{(045 TO 054),(057 TO 061)}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "018-{062}", "location": "LT.GARCIA ST COR DIMASALANG ST", "unitValue": 45800 },
-    { "section": "018-{063,064}", "location": "DIMASALANG ST", "unitValue": 39300 },
-    { "section": "018-{(065 TO 068)}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "018-{069,081}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "018-{071}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "018-{072}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "018-{082,083,084}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "018-{087,088,089,090}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "018-{091,092,093,094,(097 TO 109)}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "018-{(110 TO 116)}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "018-{117}", "location": "ROXAS BLVD COR C.RIVERA ST", "unitValue": 228900 },
-    { "section": "019-{001}", "location": "C.RIVERA ST COR L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "019-{(002 TO 009)}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "019-{011}", "location": "C.RIVERA ST COR J.CORREA ST", "unitValue": 33700 },
-    { "section": "019-{010}", "location": "J.CORREA ST COR MACTAN ST", "unitValue": 39300 },
-    { "section": "019-{012,014,016,017}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "019-{018,020}", "location": "MACTAN ST COR C.RIVERA ST", "unitValue": 39300 },
-    { "section": "019-{019}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "019-{(021 TO 029)}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "019-{032,033}", "location": "J.CORREA ST", "unitValue": 33700 },
-    { "section": "019-{034}", "location": "J.CORREA ST COR LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "019", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "019-{045}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "019-{047}", "location": "ROXAS BLVD COR C.RIVERA ST", "unitValue": 228900 },
-    { "section": "019-{048}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "019-{049,050,052,053}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "019-{058}", "location": "L.GABRIEL ST COR J.CORREA ST", "unitValue": 33700 },
-    { "section": "019-{060,061,065}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "019-{063}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "019-{072,073}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "019-{074}", "location": "C.RIVERA ST COR LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "019-{075}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "019-{076,077,086}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "019-{(078 TO 085)}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "019-{087}", "location": "MACTAN ST COR C.RIVERA ST", "unitValue": 39300 },
-    { "section": "019-{088,089}", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "019-{090}", "location": "ROXAS BLVD", "unitValue": 228900 },
-    { "section": "019-{091}", "location": "L.GABRIEL ST", "unitValue": 33700 },
-    { "section": "020-{001}", "location": "C.RIVERA ST COR LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "020-{002,003,005,006,008,009,(012 TO 017)}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "020-{018}", "location": "LT.GARCIA ST COR J.CORREA ST", "unitValue": 45800 },
-    { "section": "020-{019}", "location": "J.CORREA ST", "unitValue": 33700 },
-    { "section": "020-{021,023,024,025,(027 TO 031)}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "020-{032,034}", "location": "UNIDA ST COR C.RIVERA ST", "unitValue": 33700 },
-    { "section": "020-{033}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "020-{(036 TO 040),043}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "020-{045}", "location": "UNIDA ST COR J.CORREA ST", "unitValue": 33700 },
-    { "section": "020-{(046 TO 050)}", "location": "J.CORREA ST", "unitValue": 33700 },
-    { "section": "020", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{053}", "location": "J.CORREA ST COR LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{068,069}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "020-{070}", "location": "INT LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{067,071}", "location": "C.RIVERA ST COR LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{072,074 TO 077,079}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{(082 TO 085)}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{086}", "location": "LAPU-LAPU ST COR J.CORREA ST", "unitValue": 45800 },
-    { "section": "020-{087,088}", "location": "J.CORREA ST", "unitValue": 33700 },
-    { "section": "020-{091,093,(095 TO 097)}", "location": "G.G. CRUZ ST", "unitValue": 33700 },
-    { "section": "020-{094}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{100,101,102,104}", "location": "G.G. CRUZ ST", "unitValue": 33700 },
-    { "section": "020-{105}", "location": "G.G. CRUZ COR C.RIVERA ST", "unitValue": 33700 },
-    { "section": "020-{106}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "020-{(113 TO 116)}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "020-{(117 TO 119)}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{120,121}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{122}", "location": "UNIDA ST COR J.CORREA ST", "unitValue": 33700 },
-    { "section": "020-{128,129,130}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "020-{131 TO 133}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "020-{(133 TO 139)}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "020-{(140 TO 142),144}", "location": "G.G. CRUZ ST", "unitValue": 33700 },
-    { "section": "020-{145}", "location": "G.G. CRUZ ST COR J.CORREA ST", "unitValue": 33700 },
-    { "section": "020-{146}", "location": "J.CORREA ST COR UNIDA ST", "unitValue": 33700 },
-    { "section": "020-{147}", "location": "J.CORREA ST", "unitValue": 33700 },
-    { "section": "020-{148}", "location": "C.RIVERA ST COR UNIDA ST", "unitValue": 33700 },
-    { "section": "020-{149}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "020-{150,151}", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "021-{001}", "location": "C.RIVERA ST COR GG.CRUZ ST", "unitValue": 33700 },
-    { "section": "021-{(002 TO 008),086,087}", "location": "GG CRUZ ST", "unitValue": 33700 },
-    { "section": "021-{010}", "location": "GG CRUZ ST COR J. CORREA ST", "unitValue": 33700 },
-    { "section": "021-{011,012,050,051,053,054,(093 TO 095)}", "location": "J.CORREA ST", "unitValue": 33700 },
-    { "section": "021-{015,049}", "location": "J.GABRIEL ST COR J. CORREA ST", "unitValue": 33700 },
-    { "section": "021-{028,026}", "location": "C.RIVERA ST COR J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "021-{071}", "location": "C.RIVERA ST COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "021-{056}", "location": "J.CORREA ST COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "021-{027,068,072,073}", "location": "C.RIVERA ST", "unitValue": 28900 },
-    { "section": "021-{(057 TO 059),(061 TO 064),(066 TO 068),070,096}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "021", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "022-{014,015}", "location": "PINAGLABANAN ST COR STA. RITA EXT.", "unitValue": 53400 },
-    { "section": "022-{027,028}", "location": "PINAGLABANAN ST COR SANCHEZ ST", "unitValue": 53400 },
-    { "section": "022-{316}", "location": "SANTIAGO ST COR STA. RITA EXT.", "unitValue": 28900 },
-    { "section": "022-{020,050}", "location": "SANTIAGO ST COR SANCHEZ ST", "unitValue": 23100 },
-    { "section": "022-{016,017,029,044,046,047,055,081}", "location": "PINAGLABANAN ST", "unitValue": 53400 },
-    { "section": "022-{(010 TO 013),018,315}", "location": "STA. RITA EXT", "unitValue": 28900 },
-    { "section": "022-{(023 TO 025),031,032,(051 TO 053)}", "location": "SANCHEZ ST", "unitValue": 23100 },
-    { "section": "022-{034,087}", "location": "SANTIAGO ST", "unitValue": 23100 },
-    { "section": "022-{001}", "location": "PINAGLABANAN ST COR QUIRINO AVE", "unitValue": 53400 },
-    { "section": "022-{009}", "location": "STA. RITA EXT COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "022-{(002 TO 008),049,073,111}", "location": "STA. RITA EXT COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "022", "location": "ESPIRITU ST", "unitValue": 23100 },
-    { "section": "023", "location": "STA. RITA EXT", "unitValue": 23800 },
-    { "section": "023-{001}", "location": "STA. RITA EXT COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "023-{005}", "location": "DE JULIO ST COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "023-{007,020,022,027}", "location": "DE JULIO ST COR STA. RITA EXT", "unitValue": 28900 },
-    { "section": "023-{(002 TO 004)}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "023-{021,024,133,134}", "location": "DE JULIO ST", "unitValue": 28900 },
-    { "section": "023-{(057 TO 059),061,(063 TO 069),(078 TO 080),(117 TO 123)}", "location": "SANTIAGO ST", "unitValue": 23100 },
-    { "section": "024-{001}", "location": "DE JULIO ST COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "024-{031,038}", "location": "ARAGON ST COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "024-{055}", "location": "AIRPORT AVE COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "024-{(002 TO 007),046,056,093,094}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "024-{039,040,(043 TO 045),086}", "location": "AIRPORT AVE", "unitValue": 130900 },
-    { "section": "024", "location": "DE JULIO ST", "unitValue": 28900 },
-    { "section": "025-{001}", "location": "CORREA ST COR GG CRUZ", "unitValue": 33700 },
-    { "section": "025-{041,043}", "location": "CORREA ST COR J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "025-{093}", "location": "CORREA ST COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "025-{133}", "location": "M. ROXAS ST COR QUIRINO AVE", "unitValue": 130900 },
-    { "section": "025-{025,058}", "location": "M. ROXAS ST COR J.GABRIEL ST", "unitValue": 130900 },
-    { "section": "025-{020}", "location": "M. ROXAS ST COR GG CRUZ", "unitValue": 130900 },
-    { "section": "025-{002,005,042,092,094,108,109,124,125,129}", "location": "CORREA ST", "unitValue": 33700 },
-    { "section": "025-{067,068,071,072,(077 TO 079),(083 TO 085),(089 TO 092),126,127,136,137,151}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "025-{022,023,062,065,118,132}", "location": "M. ROXAS ST", "unitValue": 130900 },
-    { "section": "025-{003,008,(010 TO 012),014,(017 TO 019),028,029,034,038,100}", "location": "GG CRUZ", "unitValue": 33700 },
-    { "section": "025", "location": "J.GABRIEL ST", "unitValue": 33700 },
-    { "section": "026-{002}", "location": "CORREA ST COR LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "026-{102,026}", "location": "CORREA ST COR UNIDA ST", "unitValue": 33700 },
-    { "section": "026-{055,058}", "location": "CORREA ST COR LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "026-{092}", "location": "CORREA ST COR GG CRUZ", "unitValue": 33700 },
-    { "section": "026-{009}", "location": "AIRPORT ROAD COR LT.GARCIA ST", "unitValue": 130900 },
-    { "section": "026-{014,037}", "location": "AIRPORT ROAD COR UNIDA ST", "unitValue": 130900 },
-    { "section": "026-{040,069}", "location": "AIRPORT ROAD COR LAPU-LAPU ST", "unitValue": 130900 },
-    { "section": "026-{072}", "location": "AIRPORT ROAD COR GG CRUZ", "unitValue": 130900 },
-    { "section": "026-{(003 TO 008),010,011,025}", "location": "LT. GARCIA ST", "unitValue": 45800 },
-    { "section": "026-{012,038,039,110,111}", "location": "AIRPORT ROAD", "unitValue": 130900 },
-    { "section": "026-{073,074,077,079,080,083,089,090,093,(097 TO 099),(103 TO 109)}", "location": "GG CRUZ", "unitValue": 33700 },
-    { "section": "026-{(016 TO 022),(027 TO 036),050}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "026-{001,024,059,094,101}", "location": "CORREA ST", "unitValue": 33700 },
-    { "section": "026", "location": "LAPU-LAPU ST", "unitValue": 45800 },
-    { "section": "027-{004}", "location": "L. GABRIEL ST COR CORREA ST", "unitValue": 33700 },
-    { "section": "027-{026,028}", "location": "CORREA ST COR MACTAN ST", "unitValue": 39300 },
-    { "section": "027-{088}", "location": "AIRPORT ROAD COR L. GABRIEL ST", "unitValue": 130900 },
-    { "section": "027-{042}", "location": "AIRPORT ROAD COR MACTAN ST", "unitValue": 130900 },
-    { "section": "027-{049}", "location": "LT.GARCIA ST COR AIRPORT ROAD", "unitValue": 130900 },
-    { "section": "027-{006}", "location": "CORREA ST COR LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "027-{027,062,077,080}", "location": "CORREA ST", "unitValue": 33700 },
-    { "section": "027-{002,003,(005 TO 008),010,012}", "location": "L. GABRIEL ST", "unitValue": 33700 },
-    { "section": "027-{045,048,050,(055 TO 060),078,079,089,080}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "027-{001,013,043}", "location": "AIRPORT ROAD", "unitValue": 130900 },
-    { "section": "027", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "028-{003,102}", "location": "AIRPORT ROAD COR L. GABRIEL ST", "unitValue": 130900 },
-    { "section": "028-{033,035}", "location": "AIRPORT ROAD COR MACTAN ST", "unitValue": 130900 },
-    { "section": "028-{079}", "location": "AIRPORT ROAD COR LT.GARCIA ST", "unitValue": 130900 },
-    { "section": "028-{060}", "location": "T. CLAUDIO ST COR LT.GARCIA ST", "unitValue": 85200 },
-    { "section": "028-{015,059}", "location": "T. CLAUDIO ST COR MACTAN ST", "unitValue": 85200 },
-    { "section": "028-{014,098}", "location": "T. CLAUDIO ST COR L. GABRIEL ST", "unitValue": 85200 },
-    { "section": "028-{001,002,(004 TO 013),(084 TO 087),111,118}", "location": "L. GABRIEL ST", "unitValue": 33700 },
-    { "section": "028-{051,(060 TO 066),068,(074 TO 076),078,083,097,107,110,123,124,129}", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "028-{034,080}", "location": "AIRPORT ROAD", "unitValue": 130900 },
-    { "section": "028", "location": "MACTAN ST", "unitValue": 39300 },
-    { "section": "029-{001}", "location": "AIRPORT ROAD COR LT.GARCIA ST", "unitValue": 130900 },
-    { "section": "029-{027}", "location": "T. CLAUDIO ST COR LT.GARCIA ST", "unitValue": 85200 },
-    { "section": "029-{028}", "location": "T. CLAUDIO ST COR UNIDA ST", "unitValue": 85200 },
-    { "section": "029-{067}", "location": "AIRPORT ROAD COR UNIDA ST", "unitValue": 130900 },
-    { "section": "029-{050,068}", "location": "AIRPORT ROAD", "unitValue": 130900 },
-    { "section": "029-{(029 TO 039),041,046,047,049,054,055,057,065,066,074,075}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "029", "location": "LT.GARCIA ST", "unitValue": 45800 },
-    { "section": "030-{003,017,019}", "location": "AIRPORT ROAD COR UNIDA ST", "unitValue": 130900 },
-    { "section": "030-{009}", "location": "AIRPORT ROAD COR G.G. CRUZ ST", "unitValue": 130900 },
-    { "section": "030-{048}", "location": "UNIDA ST COR J. VIZCARRA ST", "unitValue": 33700 },
-    { "section": "030-{041,(043 TO 047),063,064}", "location": "J. VIZCARRA ST", "unitValue": 28900 },
-    { "section": "030-{004,018,(050 TO 053),058}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "030-{011,075}", "location": "G.G. CRUZ ST", "unitValue": 33700 },
-    { "section": "030", "location": "AIRPORT ROAD", "unitValue": 130900 },
-    { "section": "031-{001}", "location": "J. VIZCARRA ST COR UNIDA ST", "unitValue": 33700 },
-    { "section": "031-{016}", "location": "J. VIZCARRA ST COR G.G. CRUZ ST", "unitValue": 33700 },
-    { "section": "031-{017,043}", "location": "G.G. CRUZ ST COR ST. JOSEPH ST", "unitValue": 33700 },
-    { "section": "031-{024}", "location": "UNIDA ST COR ST. JOSEPH ST", "unitValue": 33700 },
-    { "section": "031-{036}", "location": "UNIDA ST COR ST. JOSEPH ST COR T. CLAUDIO ST", "unitValue": 85200 },
-    { "section": "031-{044}", "location": "T. CLAUDIO ST COR G.G. CRUZ ST", "unitValue": 85200 },
-    { "section": "031-{041,(053 TO 056)}", "location": "T. CLAUDIO ST", "unitValue": 85200 },
-    { "section": "031-{015}", "location": "G.G. CRUZ ST", "unitValue": 33700 },
-    { "section": "031-{023,025,026,059,060}", "location": "UNIDA ST", "unitValue": 33700 },
-    { "section": "031-{(003 TO 011),013,014,061,063}", "location": "J. VIZCARRA ST", "unitValue": 28900 },
-    { "section": "031", "location": "ST. JOSEPH ST", "unitValue": 28900 },
-    { "section": "032-{013,014,093,(095 TO 097),(101 TO 104),(106 TO 115),130,136,(139 TO 140)}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "032-{001,002,(004 TO 008),011,012,015,017,(065 TO 067),118,119,128,129,142}", "location": "AIRPORT ROAD", "unitValue": 130900 },
-    { "section": "032-{(118 TO 020),022,(024 TO 028),030,032,033,035,(037 TO 041),134,141,143}", "location": "G.G. CRUZ ST", "unitValue": 33700 },
-    { "section": "032", "location": "J GABRIEL", "unitValue": 33700 },
-    { "section": "033-{002,003,025,026,084,086,087,089,138,(145 TO 147)}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "033-{001,(004 TO 006),(008 TO 010),123,150,155,159}", "location": "AIRPORT ROAD", "unitValue": 130900 },
-    { "section": "033-{(060 TO 071),(076 TO 083),(090 TO 093),(095 TO 112),(134 TO 137),140,141,148,(156 TO 158),160}", "location": "17 DE MARZO ST", "unitValue": 28900 },
-    { "section": "033", "location": "22 DE MAYO ST", "unitValue": 23100 },
-    { "section": "035-{(001 TO 005),(042 TO 047),080}", "location": "R. CUSTODIO ST (KALIWANAGAN)", "unitValue": 28900 },
-    { "section": "035-{(048 TO 056),058,(060 TO 063),065}", "location": "T. ALONZO ST", "unitValue": 53400 },
-    { "section": "035-{032,(034 TO 038),040,061,066}", "location": "QUIRINO AVE", "unitValue": 130900 },
-    { "section": "035", "location": "T. CLAUDIO ST", "unitValue": 85200 },
-    { "section": "036-{009}", "location": "R. CUSTODIO ST (KALIWANAGAN)", "unitValue": 28900 },
-    { "section": "036-{015,029}", "location": "ROXAS BOULEVARD", "unitValue": 228900 },
-    { "section": "036-{001,016}", "location": "T. CLAUDIO ST", "unitValue": 85200 },
-    { "section": "036", "location": "T. ALONZO ST", "unitValue": 53400 },
-    { "section": "037-{004,007,008,041,046,(059 TO 062),094,150,152}", "location": "D. MACAPAGAL BLVD.", "unitValue": 228900 },
-    { "section": "037-{003,020,022,(041 TO 044),(046 TO 049),052,053,056,(066 TO 069),096,097,104,105,161}", "location": "BRADCO AVENUE, ASEANA BUSINESS PARK", "unitValue": 228900 },
-    { "section": "037-{045,050,087,095,098,101,110,125,127,146}", "location": "ROXAS BOULEVARD", "unitValue": 228900 },
-    { "section": "037-{021,023}", "location": "PROMENADE, ASEANA BUSINESS PARK", "unitValue": 228900 },
-    { "section": "037-{017,018,148}", "location": "BAY BLVD, ASEANA BUSINESS PARK", "unitValue": 228900 },
-    { "section": "037-{024,085,089,095}", "location": "ASEAN AVE, ASEANA BUSINESS PARK", "unitValue": 228900 },
-    { "section": "037", "location": "ASEANA BUSINESS PARK", "unitValue": 228900 }
+    {
+      "section": "001",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "001-{003}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "002-{(001 TO 008),016,052,053,058,059}",
+      "location": "FB HARRISON",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "002-{013,014,031,027,(054 TO 057),060}",
+      "location": "TAFT AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "002",
+      "location": "A.GUARRA EXT",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "003-{(001 TO 025)}",
+      "location": "RIVERSIDE ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{(026 TO 084)}",
+      "location": "BAGONG LIPUNAN ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{086,087,088}",
+      "location": "BAGONG SIKAT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003",
+      "location": "BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{(109 TO 111),(113 TO 115),117,118}",
+      "location": "BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{116}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{(120 TO 153)}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{154}",
+      "location": "BAGONG ILOG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{(156 TO 169)}",
+      "location": "TAFT AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "003-{175,(177 TO 190),193}",
+      "location": "E.RODRIGUEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "003-{191,194,195}",
+      "location": "TAFT AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "003-{204,205}",
+      "location": "BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{206,207}",
+      "location": "BAGONG LIPUNAN ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{208,209}",
+      "location": "BAGONG ISLA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{211}",
+      "location": "TAFT AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "003-{214,215}",
+      "location": "BAGONG LIPUNAN ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{216,217}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{220,221,223,224}",
+      "location": "BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "003-{225,226}",
+      "location": "E.RODRIGUEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "004-{(008 TO 011),(013 TO 016)}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "004-{(017 TO 021)}",
+      "location": "BAGONG ILOG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "004-{(023 TO 032)}",
+      "location": "E.RODRIGUEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "004-{033}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "004-{034}",
+      "location": "BAGONG ISLA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "004-{035}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "004-{037,039}",
+      "location": "TAFT AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "004",
+      "location": "E.RODRIGUEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "004-{022,069}",
+      "location": "BAGONG ILOG ST COR E.RODRIGUEZ ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "004-{073}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "004-{(074 TO 077)}",
+      "location": "BAGONG ISLA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "004-{078}",
+      "location": "E.RODRIGUEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "004-{105}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "004-{106,107}",
+      "location": "TAFT AVE",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "004-{108}",
+      "location": "E.RODRIGUEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "004-{109,110}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{001,003,005,007,008}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{(011 TO 014)}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{015}",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{016}",
+      "location": "REDEMPTORIST RD COR GG CRUZ ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{017,018}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{019,029}",
+      "location": "EVANGELISTA ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{020,030}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{031}",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{032,033}",
+      "location": "REDEMPTORIST RD COR J.GABRIEL ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{(034 TO 037)}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{040,042}",
+      "location": "A.GUARRA ST COR J.GABRIEL ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{041,043}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{(044 TO 052)}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{053,056}",
+      "location": "REDEMPTORIST RD COR J.GABRIEL ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{054,055}",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{057,059}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{058,060,061}",
+      "location": "EVANGELISTA ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{(063 TO 067)}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{068}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{069}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{070 TO 072}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{073,074}",
+      "location": "REDEMPTORIST RD COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{(075 TO 079)}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{080,081}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{082}",
+      "location": "A.GUARRA ST COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{083,084,085,087}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{102,104}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{105}",
+      "location": "REDEMPTORIST RD COR GG CRUZ ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{106}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{108}",
+      "location": "INT QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "005-{109}",
+      "location": "INT J GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{(110 TO 124)}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{125}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{126}",
+      "location": "GG CRUZ ST COR CALLE REDEMPTORIST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{127}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{128}",
+      "location": "CALLE REDEMPTORIST COR J GABRIEL ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{129,130,131}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{132,133}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{134}",
+      "location": "EVANGELISTA ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "005-{135,136}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "006-{001}",
+      "location": "LT GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{002}",
+      "location": "A.GUARRA ST COR LT GARCIA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{(003 TO 009)}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{(011 TO 025)}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{026}",
+      "location": "A.GUARRA ST COR GG CRUZ ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{027}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{028}",
+      "location": "GG CRUZ ST COR BAYANIHAN ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{(029 TO 051)}",
+      "location": "BAYANIHAN ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{052}",
+      "location": "BAYANIHAN ST COR LT GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{053}",
+      "location": "LT GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{054}",
+      "location": "REDEMPTORIST RD COR LT GARCIA ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "006-{(055 TO 078)}",
+      "location": "BAYANIHAN ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{079}",
+      "location": "BAYANIHAN ST COR GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{080,081}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{(083 TO 095)}",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "006-{097,098}",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "006-{109}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{111,112,113,115,116}",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "006-{117}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{119}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{120,121}",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "006-{123}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "006-{124}",
+      "location": "REDEMPTORIST RD COR GG CRUZ ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "006",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "006-{127}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{(001 TO 008)}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{010}",
+      "location": "A.GUARRA ST COR LT GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{(011 TO 014)}",
+      "location": "BAYANIHAN ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{(015 TO 020)}",
+      "location": "BAYANIHAN ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{021}",
+      "location": "BAYANIHAN ST COR LT GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{022}",
+      "location": "REDEMPTORIST RD COR LT GARCIA ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "007",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "007-{029}",
+      "location": "ROXAS BLVD COR A.GUARRA ST",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "007-{030}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "007-{(031 TO 034)}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{035,037}",
+      "location": "ROXAS BLVD COR BAYANIHAN ST",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "007-{038}",
+      "location": "BAYANIHAN ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{039}",
+      "location": "ROXAS BLVD COR REDEMPTORIST RD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "007-{041}",
+      "location": "A.GUARRA ST",
+      "unitValue": 48700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "007-{042}",
+      "location": "BAYANIHAN ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "008",
+      "location": "REDEMPTORIST RD",
+      "unitValue": 85200,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "009-{001}",
+      "location": "O.PEÑA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{002}",
+      "location": "O.PEÑA ST COR L.GABRIEL ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{003,004,007,009,010}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{011}",
+      "location": "L.GABRIEL ST COR DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{013}",
+      "location": "DIMASALANG ST COR MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{034}",
+      "location": "DIMASALANG ST COR MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{035,036,037}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{038}",
+      "location": "DIMASALANG ST COR LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{(039 TO 049),077}",
+      "location": "LT GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{050,075}",
+      "location": "LT GARCIA ST COR O.PEÑA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{051}",
+      "location": "O.PEÑA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{(052 TO 057)}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "009-{026,062}",
+      "location": "O.PEÑA ST COR MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{063,067,069}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "009-{065,066}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{068}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{070}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{071}",
+      "location": "O.PEÑA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{072}",
+      "location": "O.PEÑA ST COR MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{073,074}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "009-{076}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{001,106}",
+      "location": "O.PEÑA ST COR UNIDA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{002,004}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{003}",
+      "location": "LT GARCIA",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{006}",
+      "location": "O.PEÑA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{007}",
+      "location": "O.PEÑA ST COR LT GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{(008 TO 015)}",
+      "location": "LT GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{017}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{(019 TO 023),025,028,030}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{046,105}",
+      "location": "DIMASALANG ST COR UNIDA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{049}",
+      "location": "DIMASALANG ST COR LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{055,056,057,059,060,061,062}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{063,064}",
+      "location": "O.PEÑA ST COR LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{(066 TO 079)}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{080}",
+      "location": "DIMASALANG ST COR LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{(082 TO 085),087,100}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{090,112}",
+      "location": "O.PEÑA ST COR GG CRUZ ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{091,092,093,094}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{101,102,103}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{104,111}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{108,109,110}",
+      "location": "O.PEÑA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{113,118,119,120}",
+      "location": "LT GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{114}",
+      "location": "DIMASALANG ST COR LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{115,116}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{117}",
+      "location": "O.PEÑA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{121,122,123,124,125}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{126,127,128}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{129,130}",
+      "location": "O.PEÑA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{131,132,(135 TO 137)}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{133}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "010-{134}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{001,(005 TO 015)}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{002}",
+      "location": "CALLE REDEMPTORIST COR GG CRUZ ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{003,004}",
+      "location": "CALLE REDEMPTORIST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{017,019,021,023,036}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{024}",
+      "location": "GG CRUZ ST COR DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{026}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{027}",
+      "location": "J GABRIEL ST COR DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{(028 TO 035),(037 TO 041)}",
+      "location": "J GABRIELS T",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{(043 TO 049)}",
+      "location": "J GABRIELS T",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{051,054}",
+      "location": "CALLE REDEMPTORIST COR J GABRIEL ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{053}",
+      "location": "CALLE REDEMPTORIST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{(055 TO 059),061,062}",
+      "location": "J GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{064,067,082}",
+      "location": "INT J GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{(068 TO 073)}",
+      "location": "J GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{074}",
+      "location": "J GABRIEL ST COR DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "011-{077}",
+      "location": "QUIRINO AVE COR DIMASALANG ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "011-{086}",
+      "location": "QUIRINO AVE COR CALLE REDEMPTORIST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "011-{087}",
+      "location": "CALLE REDEMPTORIST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{088}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{089,101,102,103}",
+      "location": "J GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{090,093,094,100}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "011-{098,099}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{104,105}",
+      "location": "CALLE REDEMPTORIST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{106,107}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{108,109,110}",
+      "location": "J GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "011-{111,112}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "012-{002}",
+      "location": "BAGONG ILOG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{004}",
+      "location": "BAGONG ILOG ST COR BAGONG BUHAY ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{005}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{006}",
+      "location": "MABUHAY ST COR BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{(009 TO 013)}",
+      "location": "MABUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{014,016}",
+      "location": "QUIRINO AVE COR MABUHAY ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "012-{015,017}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "012-{(018 TO 025)}",
+      "location": "MABUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{026}",
+      "location": "MABUHAY ST COR BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{027,029}",
+      "location": "MABUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{028,030}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{031}",
+      "location": "12 DE JUNIO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{032}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{034}",
+      "location": "MABUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{035,114}",
+      "location": "INT 12 DE JUNIO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{036,037,038,041}",
+      "location": "12 DE JUNIO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{043,045}",
+      "location": "QUIRINO AVE COR 12 DE JUNIO ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "012-{046,047,049}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "012-{048,(050 TO 056)}",
+      "location": "12 DE JUNIO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{057}",
+      "location": "12 DE JUNIO ST COR BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{061}",
+      "location": "DIMASALNG ST COR BAGONG BUHAY ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "012-{062,063,066}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "012-{065}",
+      "location": "INT DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "012",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "012-{(097 TO 102)}",
+      "location": "12 DE JUNIO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{103}",
+      "location": "QUIRINO AVE COR BAGONG ILOG ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "012-{104,105,106}",
+      "location": "BAGONG ILOG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{107,108,109}",
+      "location": "12 DE JUNIO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{110,112}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "012-{111,115}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "012-{116,117,118}",
+      "location": "BAGONG ILOG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "012-{119,120,121,122}",
+      "location": "MABUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{(123 TO 127)}",
+      "location": "12 DE JUNIO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "012-{(128 TO 131)}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{(001 TO 011)}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{013,014}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{016}",
+      "location": "BAGONG BUHAY ST COR DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{017}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{018}",
+      "location": "DIMASALANG ST COR BAGONG SILANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{(019 TO 031),034,035}",
+      "location": "BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{036,037}",
+      "location": "BAGONG SILANG ST COR BAGONG ILOG ST",
+      "unitValue": 28100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{(038 TO 040),042,043,(045 TO 050)}",
+      "location": "BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{051}",
+      "location": "BAGONG SILANG ST COR DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{052}",
+      "location": "DIMASALANG ST COR BAGONG ILOG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{(053 TO 059),(063 TO 067)}",
+      "location": "BAGONG ILOG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{068}",
+      "location": "BAGONG ILOG ST COR BAGONG SILANG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{(069 TO 074),(076 TO 085)}",
+      "location": "BAGONG ILOG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{086}",
+      "location": "BAGONG ILOG ST COR DIMASALANG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{087}",
+      "location": "DIMASALANG ST COR BAGONG PAG-ASA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{(088 TO 095),(099 TO 103)}",
+      "location": "BAGONG PAG-ASA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{104,105}",
+      "location": "BAGONG PAG-ASA ST COR BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013",
+      "location": "BAGONG PAG-ASA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{124}",
+      "location": "BAGONG PAG-ASA ST COR DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{125,126}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{127}",
+      "location": "DIMASALANG ST COR BAGONG SIKAT",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{128,(130 TO 132),(134 TO 148)}",
+      "location": "BAGONG SIKAT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{149}",
+      "location": "BAGONG SIKAT ST COR BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{(150 TO 155)}",
+      "location": "BAGONG SIKAT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{(156 TO 171)}",
+      "location": "BAGONG SIKAT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{172}",
+      "location": "BAGONG SIKAT ST COR DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "013-{173,182,185,186,187,189}",
+      "location": "BAGONG SIKAT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{(194 TO 196),198,199,200}",
+      "location": "BAGONG SIKAT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{201,202}",
+      "location": "BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{(203 TO 205)}",
+      "location": "BAGONG SIKAT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{206,207,214,215}",
+      "location": "BAGONG PAG-ASA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{208,209,212,213}",
+      "location": "BAGONG ILOG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{216,217,218,219}",
+      "location": "BAGONG ILOG ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{220,221,222,223}",
+      "location": "BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{224,225,226}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{227,228}",
+      "location": "BAGONG SIKAT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{229}",
+      "location": "BAGONG PAG-ASA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{(231 TO 234)}",
+      "location": "BAGONG BUHAY ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{235,236}",
+      "location": "BAGONG PAG-ASA ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "013-{237,238,239,240}",
+      "location": "BAGONG SILANG ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "014-{001}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "014-{006}",
+      "location": "DIMASALANG ST COR BAGONG SIKAT ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "014",
+      "location": "BAGONG SIKAT ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1600
+    },
+    {
+      "section": "014-{024}",
+      "location": "SANTIAGO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{001}",
+      "location": "QUIRINO AVE COR DIMASALANG ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "015-{002,005,006}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "015-{003,004,028,029}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{009,010,011,013}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "015-{014}",
+      "location": "QUIRINO AVE COR PINAGLABANAN ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "015-{015}",
+      "location": "PINAGLABANAN ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{016}",
+      "location": "PINAGLABANAN ST COR STA RITA EXT",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{(017 TO 025)}",
+      "location": "PINAGLABANAN ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{026}",
+      "location": "DIMASALANG ST COR PINAGLABANAN ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{(030 TO 046)}",
+      "location": "STA RITA EXT",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{047}",
+      "location": "STA RITA EXT COR PINAGLABANAN ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{048,049}",
+      "location": "PINAGLABANAN ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{050}",
+      "location": "PINAGLABANAN ST COR SANCHEZ ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{051,052,(054 TO 066),068}",
+      "location": "SANCHEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{067,070,071}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{069}",
+      "location": "DIMASALANG ST COR SANCHEZ ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{072}",
+      "location": "DIMASALANG ST COR STA RITA EXT",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{073,075}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{074}",
+      "location": "DIMASALANG ST COR SANCHEZ ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{076}",
+      "location": "SANCHEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{077,078,079}",
+      "location": "INT SANCHEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{080,(084 TO 088)}",
+      "location": "SANCHEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{089}",
+      "location": "PINAGLABANAN ST COR SANCHEZ ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{090,091}",
+      "location": "PINAGLABANAN ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{092}",
+      "location": "PINAGLABANAN ST COR ESPIRITU ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015",
+      "location": "ESPIRITU ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{110,113,114}",
+      "location": "ESPIRITU ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{112}",
+      "location": "INT ESPIRITU ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{116}",
+      "location": "INT DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{117,121,122}",
+      "location": "ESPIRITU ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{118,119,120,123,124}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{126}",
+      "location": "DIMASALANG ST COR ESPIRITU ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{(127 TO 140)}",
+      "location": "ESPIRITU ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{141}",
+      "location": "ESPIRITU ST COR PINAGLABANAN ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{142}",
+      "location": "PINAGLABANAN ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "015-{143,144}",
+      "location": "ESPIRITU ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{146}",
+      "location": "INT SANCHEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{148,149,152,154}",
+      "location": "ESPIRITU ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{150}",
+      "location": "STA RITA EXT",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{153,155}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "015-{(156 TO 159)}",
+      "location": "SANCHEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "015-{160}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "015-{161,162}",
+      "location": "SANCHEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "016-{001}",
+      "location": "DIMASALANG ST COR GG CRUZ ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{002}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{003,(010 TO 018)}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{019}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{020,021,022}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{023}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{042,046}",
+      "location": "J.GABRIEL ST COR DIMASALANG ST",
+      "unitValue": 33900,
+      "deferredUnitValue": 0
+    },
+    {
+      "section": "016-{043,044}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{045,048,049}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{(060 TO 065),(068 TO 071)}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{072}",
+      "location": "J.GABRIEL ST COR C.RIVERA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{073,074}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{076,078,082}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{080}",
+      "location": "INT QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{081}",
+      "location": "INT J GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{083,084,085,088,089}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{090}",
+      "location": "QUIRINO AVE COR DIMASALANG ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{091,092,093,095}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{094}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{096,097}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{099}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{101,102,103,104,107}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{105,106}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{108}",
+      "location": "INT QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{109,110,111}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{112}",
+      "location": "QUIRINO AVE COR C.RIVERA ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{113}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{114}",
+      "location": "INT QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{115}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "016-{116,117}",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{118}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "016-{119,120}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{001}",
+      "location": "DIMASALANG ST COR LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{(002 TO 008),010,014}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{013}",
+      "location": "LT.GARCIA ST COR C.RIVERA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{015,016}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{017}",
+      "location": "C.RIVERA ST COR UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{(018 TO 027)}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{028,031}",
+      "location": "DIMASALANG ST COR UNIDA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{046}",
+      "location": "C.RIVERA ST COR UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{047,048}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{(053 TO 063)}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{069}",
+      "location": "DIMASALANG ST COR LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{(071 TO 077)}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{079}",
+      "location": "LAPU-LAPU ST COR C.RIVERA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{080}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{082,083,(085 TO 091),101}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{065,092,100}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{099}",
+      "location": "DIMASALANG ST COR GG CRUZ ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{106,107,109,110}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{(113 TO 118)}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{119}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{120,121}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{123,126}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{124,125}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{127}",
+      "location": "C.RIVERA ST COR GG.CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{128}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{129,130}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{131}",
+      "location": "C.RIVERA ST COR LAPU-LAPU ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{132}",
+      "location": "DIMASALANG ST COR LAPU-LAPU ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{133}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{134,135}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{136,137,138}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "017-{139,140}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{001}",
+      "location": "DIMASALANG ST COR L.GABRIELS ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{(003 TO 006),010}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{011}",
+      "location": "L.GABRIEL ST COR C.RIVERA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{012}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{013}",
+      "location": "C.RIVERA ST COR MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{016,(019 TO 022),024}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{025,027}",
+      "location": "MACTAN ST COR DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{026}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{042}",
+      "location": "MACTAN ST COR C.RIVERA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{043}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{044}",
+      "location": "C.RIVERA ST COR LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{(045 TO 054),(057 TO 061)}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{062}",
+      "location": "LT.GARCIA ST COR DIMASALANG ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{063,064}",
+      "location": "DIMASALANG ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{(065 TO 068)}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "018-{069,081}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{071}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{072}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{082,083,084}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{087,088,089,090}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{091,092,093,094,(097 TO 109)}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{(110 TO 116)}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "018-{117}",
+      "location": "ROXAS BLVD COR C.RIVERA ST",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "019-{001}",
+      "location": "C.RIVERA ST COR L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{(002 TO 009)}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{011}",
+      "location": "C.RIVERA ST COR J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{010}",
+      "location": "J.CORREA ST COR MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{012,014,016,017}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{018,020}",
+      "location": "MACTAN ST COR C.RIVERA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{019}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{(021 TO 029)}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{032,033}",
+      "location": "J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{034}",
+      "location": "J.CORREA ST COR LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{045}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{047}",
+      "location": "ROXAS BLVD COR C.RIVERA ST",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "019-{048}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{049,050,052,053}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "019-{058}",
+      "location": "L.GABRIEL ST COR J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{060,061,065}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{063}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "019-{072,073}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{074}",
+      "location": "C.RIVERA ST COR LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{075}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{076,077,086}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{(078 TO 085)}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{087}",
+      "location": "MACTAN ST COR C.RIVERA ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{088,089}",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "019-{090}",
+      "location": "ROXAS BLVD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "019-{091}",
+      "location": "L.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{001}",
+      "location": "C.RIVERA ST COR LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{002,003,005,006,008,009,(012 TO 017)}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{018}",
+      "location": "LT.GARCIA ST COR J.CORREA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{019}",
+      "location": "J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{021,023,024,025,(027 TO 031)}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{032,034}",
+      "location": "UNIDA ST COR C.RIVERA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{033}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{(036 TO 040),043}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{045}",
+      "location": "UNIDA ST COR J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{(046 TO 050)}",
+      "location": "J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{053}",
+      "location": "J.CORREA ST COR LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{068,069}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{070}",
+      "location": "INT LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{067,071}",
+      "location": "C.RIVERA ST COR LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{072,074 TO 077,079}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{(082 TO 085)}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{086}",
+      "location": "LAPU-LAPU ST COR J.CORREA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{087,088}",
+      "location": "J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{091,093,(095 TO 097)}",
+      "location": "G.G. CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{094}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{100,101,102,104}",
+      "location": "G.G. CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{105}",
+      "location": "G.G. CRUZ COR C.RIVERA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{106}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{(113 TO 116)}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{(117 TO 119)}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{120,121}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{122}",
+      "location": "UNIDA ST COR J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{128,129,130}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{131 TO 133}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{(133 TO 139)}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{(140 TO 142),144}",
+      "location": "G.G. CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{145}",
+      "location": "G.G. CRUZ ST COR J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{146}",
+      "location": "J.CORREA ST COR UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{147}",
+      "location": "J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{148}",
+      "location": "C.RIVERA ST COR UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{149}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "020-{150,151}",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{001}",
+      "location": "C.RIVERA ST COR GG.CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{(002 TO 008),086,087}",
+      "location": "GG CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{010}",
+      "location": "GG CRUZ ST COR J. CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{011,012,050,051,053,054,(093 TO 095)}",
+      "location": "J.CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{015,049}",
+      "location": "J.GABRIEL ST COR J. CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{028,026}",
+      "location": "C.RIVERA ST COR J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{071}",
+      "location": "C.RIVERA ST COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "021-{056}",
+      "location": "J.CORREA ST COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "021-{027,068,072,073}",
+      "location": "C.RIVERA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "021-{(057 TO 059),(061 TO 064),(066 TO 068),070,096}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "021",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "022-{014,015}",
+      "location": "PINAGLABANAN ST COR STA. RITA EXT.",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "022-{027,028}",
+      "location": "PINAGLABANAN ST COR SANCHEZ ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "022-{316}",
+      "location": "SANTIAGO ST COR STA. RITA EXT.",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "022-{020,050}",
+      "location": "SANTIAGO ST COR SANCHEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "022-{016,017,029,044,046,047,055,081}",
+      "location": "PINAGLABANAN ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "022-{(010 TO 013),018,315}",
+      "location": "STA. RITA EXT",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "022-{(023 TO 025),031,032,(051 TO 053)}",
+      "location": "SANCHEZ ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "022-{034,087}",
+      "location": "SANTIAGO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "022-{001}",
+      "location": "PINAGLABANAN ST COR QUIRINO AVE",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "022-{009}",
+      "location": "STA. RITA EXT COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "022-{(002 TO 008),049,073,111}",
+      "location": "STA. RITA EXT COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "022",
+      "location": "ESPIRITU ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "023",
+      "location": "STA. RITA EXT",
+      "unitValue": 23800,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "023-{001}",
+      "location": "STA. RITA EXT COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "023-{005}",
+      "location": "DE JULIO ST COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "023-{007,020,022,027}",
+      "location": "DE JULIO ST COR STA. RITA EXT",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "023-{(002 TO 004)}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "023-{021,024,133,134}",
+      "location": "DE JULIO ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "023-{(057 TO 059),061,(063 TO 069),(078 TO 080),(117 TO 123)}",
+      "location": "SANTIAGO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "024-{001}",
+      "location": "DE JULIO ST COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "024-{031,038}",
+      "location": "ARAGON ST COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "024-{055}",
+      "location": "AIRPORT AVE COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "024-{(002 TO 007),046,056,093,094}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "024-{039,040,(043 TO 045),086}",
+      "location": "AIRPORT AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "024",
+      "location": "DE JULIO ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "025-{001}",
+      "location": "CORREA ST COR GG CRUZ",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "025-{041,043}",
+      "location": "CORREA ST COR J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "025-{093}",
+      "location": "CORREA ST COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "025-{133}",
+      "location": "M. ROXAS ST COR QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "025-{025,058}",
+      "location": "M. ROXAS ST COR J.GABRIEL ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "025-{020}",
+      "location": "M. ROXAS ST COR GG CRUZ",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "025-{002,005,042,092,094,108,109,124,125,129}",
+      "location": "CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "025-{067,068,071,072,(077 TO 079),(083 TO 085),(089 TO 092),126,127,136,137,151}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "025-{022,023,062,065,118,132}",
+      "location": "M. ROXAS ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "025-{003,008,(010 TO 012),014,(017 TO 019),028,029,034,038,100}",
+      "location": "GG CRUZ",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "025",
+      "location": "J.GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "026-{002}",
+      "location": "CORREA ST COR LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "026-{102,026}",
+      "location": "CORREA ST COR UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "026-{055,058}",
+      "location": "CORREA ST COR LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "026-{092}",
+      "location": "CORREA ST COR GG CRUZ",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "026-{009}",
+      "location": "AIRPORT ROAD COR LT.GARCIA ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "026-{014,037}",
+      "location": "AIRPORT ROAD COR UNIDA ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "026-{040,069}",
+      "location": "AIRPORT ROAD COR LAPU-LAPU ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "026-{072}",
+      "location": "AIRPORT ROAD COR GG CRUZ",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "026-{(003 TO 008),010,011,025}",
+      "location": "LT. GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "026-{012,038,039,110,111}",
+      "location": "AIRPORT ROAD",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "026-{073,074,077,079,080,083,089,090,093,(097 TO 099),(103 TO 109)}",
+      "location": "GG CRUZ",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "026-{(016 TO 022),(027 TO 036),050}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "026-{001,024,059,094,101}",
+      "location": "CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "026",
+      "location": "LAPU-LAPU ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "027-{004}",
+      "location": "L. GABRIEL ST COR CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "027-{026,028}",
+      "location": "CORREA ST COR MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "027-{088}",
+      "location": "AIRPORT ROAD COR L. GABRIEL ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "027-{042}",
+      "location": "AIRPORT ROAD COR MACTAN ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "027-{049}",
+      "location": "LT.GARCIA ST COR AIRPORT ROAD",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "027-{006}",
+      "location": "CORREA ST COR LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "027-{027,062,077,080}",
+      "location": "CORREA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "027-{002,003,(005 TO 008),010,012}",
+      "location": "L. GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "027-{045,048,050,(055 TO 060),078,079,089,080}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "027-{001,013,043}",
+      "location": "AIRPORT ROAD",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "027",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "028-{003,102}",
+      "location": "AIRPORT ROAD COR L. GABRIEL ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "028-{033,035}",
+      "location": "AIRPORT ROAD COR MACTAN ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "028-{079}",
+      "location": "AIRPORT ROAD COR LT.GARCIA ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "028-{060}",
+      "location": "T. CLAUDIO ST COR LT.GARCIA ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "028-{015,059}",
+      "location": "T. CLAUDIO ST COR MACTAN ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "028-{014,098}",
+      "location": "T. CLAUDIO ST COR L. GABRIEL ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "028-{001,002,(004 TO 013),(084 TO 087),111,118}",
+      "location": "L. GABRIEL ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "028-{051,(060 TO 066),068,(074 TO 076),078,083,097,107,110,123,124,129}",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "028-{034,080}",
+      "location": "AIRPORT ROAD",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "028",
+      "location": "MACTAN ST",
+      "unitValue": 39300,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "029-{001}",
+      "location": "AIRPORT ROAD COR LT.GARCIA ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "029-{027}",
+      "location": "T. CLAUDIO ST COR LT.GARCIA ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "029-{028}",
+      "location": "T. CLAUDIO ST COR UNIDA ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "029-{067}",
+      "location": "AIRPORT ROAD COR UNIDA ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "029-{050,068}",
+      "location": "AIRPORT ROAD",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "029-{(029 TO 039),041,046,047,049,054,055,057,065,066,074,075}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "029",
+      "location": "LT.GARCIA ST",
+      "unitValue": 45800,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "030-{003,017,019}",
+      "location": "AIRPORT ROAD COR UNIDA ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "030-{009}",
+      "location": "AIRPORT ROAD COR G.G. CRUZ ST",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "030-{048}",
+      "location": "UNIDA ST COR J. VIZCARRA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "030-{041,(043 TO 047),063,064}",
+      "location": "J. VIZCARRA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "030-{004,018,(050 TO 053),058}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "030-{011,075}",
+      "location": "G.G. CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "030",
+      "location": "AIRPORT ROAD",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "031-{001}",
+      "location": "J. VIZCARRA ST COR UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "031-{016}",
+      "location": "J. VIZCARRA ST COR G.G. CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "031-{017,043}",
+      "location": "G.G. CRUZ ST COR ST. JOSEPH ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "031-{024}",
+      "location": "UNIDA ST COR ST. JOSEPH ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "031-{036}",
+      "location": "UNIDA ST COR ST. JOSEPH ST COR T. CLAUDIO ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "031-{044}",
+      "location": "T. CLAUDIO ST COR G.G. CRUZ ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "031-{041,(053 TO 056)}",
+      "location": "T. CLAUDIO ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "031-{015}",
+      "location": "G.G. CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "031-{023,025,026,059,060}",
+      "location": "UNIDA ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "031-{(003 TO 011),013,014,061,063}",
+      "location": "J. VIZCARRA ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "031",
+      "location": "ST. JOSEPH ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "032-{013,014,093,(095 TO 097),(101 TO 104),(106 TO 115),130,136,(139 TO 140)}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "032-{001,002,(004 TO 008),011,012,015,017,(065 TO 067),118,119,128,129,142}",
+      "location": "AIRPORT ROAD",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "032-{(118 TO 020),022,(024 TO 028),030,032,033,035,(037 TO 041),134,141,143}",
+      "location": "G.G. CRUZ ST",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "032",
+      "location": "J GABRIEL",
+      "unitValue": 33700,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "033-{002,003,025,026,084,086,087,089,138,(145 TO 147)}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "033-{001,(004 TO 006),(008 TO 010),123,150,155,159}",
+      "location": "AIRPORT ROAD",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "033-{(060 TO 071),(076 TO 083),(090 TO 093),(095 TO 112),(134 TO 137),140,141,148,(156 TO 158),160}",
+      "location": "17 DE MARZO ST",
+      "unitValue": 28900,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "033",
+      "location": "22 DE MAYO ST",
+      "unitValue": 23100,
+      "deferredUnitValue": 1800
+    },
+    {
+      "section": "035-{(001 TO 005),(042 TO 047),080}",
+      "location": "R. CUSTODIO ST (KALIWANAGAN)",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "035-{(048 TO 056),058,(060 TO 063),065}",
+      "location": "T. ALONZO ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "035-{032,(034 TO 038),040,061,066}",
+      "location": "QUIRINO AVE",
+      "unitValue": 130900,
+      "deferredUnitValue": 10000
+    },
+    {
+      "section": "035",
+      "location": "T. CLAUDIO ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "036-{009}",
+      "location": "R. CUSTODIO ST (KALIWANAGAN)",
+      "unitValue": 28900,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "036-{015,029}",
+      "location": "ROXAS BOULEVARD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "036-{001,016}",
+      "location": "T. CLAUDIO ST",
+      "unitValue": 85200,
+      "deferredUnitValue": 3000
+    },
+    {
+      "section": "036",
+      "location": "T. ALONZO ST",
+      "unitValue": 53400,
+      "deferredUnitValue": 2000
+    },
+    {
+      "section": "037-{004,007,008,041,046,(059 TO 062),094,150,152}",
+      "location": "D. MACAPAGAL BLVD.",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "037-{003,020,022,(041 TO 044),(046 TO 049),052,053,056,(066 TO 069),096,097,104,105,161}",
+      "location": "BRADCO AVENUE, ASEANA BUSINESS PARK",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "037-{045,050,087,095,098,101,110,125,127,146}",
+      "location": "ROXAS BOULEVARD",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "037-{021,023}",
+      "location": "PROMENADE, ASEANA BUSINESS PARK",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "037-{017,018,148}",
+      "location": "BAY BLVD, ASEANA BUSINESS PARK",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "037-{024,085,089,095}",
+      "location": "ASEAN AVE, ASEANA BUSINESS PARK",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    },
+    {
+      "section": "037",
+      "location": "ASEANA BUSINESS PARK",
+      "unitValue": 228900,
+      "deferredUnitValue": 20000
+    }
   ]
 }

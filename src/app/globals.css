@@ -10,10 +10,10 @@
     --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 10%;
-    --primary: 142 71% 45%;
-    --primary-foreground: 142 71% 95%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 142 20% 96%;
-    --secondary-foreground: 142 71% 45%;
+    --secondary-foreground: 142 76% 36%;
     --muted: 0 0% 92%;
     --muted-foreground: 0 0% 40%;
     --accent: 0 0% 92%;
@@ -22,7 +22,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 85%;
     --input: 0 0% 85%;
-    --ring: 142 71% 45%;
+    --ring: 142 76% 36%;
     --radius: 0.75rem;
   }
 
@@ -77,30 +77,78 @@
   }
 }
 
-/* Custom prominent horizontal scrollbar for data tables */
+/* Custom refined gray scrollbars for data tables */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.dark .scrollbar-custom {
+  scrollbar-color: #3f3f46 #18181b;
+}
+
 .scrollbar-custom::-webkit-scrollbar {
-  height: 16px;
+  width: 10px;
+  height: 10px;
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.8);
-  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar-track {
+  background: #18181b;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary));
-  border-radius: 8px;
-  border: 3px solid hsl(var(--muted) / 0.8);
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid #f8fafc;
   background-clip: content-box;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.8);
+  background-color: #94a3b8;
 }
 
-/* Custom vertical scrollbar for settings panel */
+.scrollbar-custom::-webkit-scrollbar-thumb:active {
+  background-color: #64748b;
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: #3f3f46;
+  border: 2px solid #18181b;
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: #52525b;
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar-thumb:active {
+  background-color: #71717a;
+}
+
+.scrollbar-custom::-webkit-scrollbar-corner {
+  background: #f8fafc;
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar-corner {
+  background: #18181b;
+}
+
+/* Custom vertical gray scrollbar for panels and modals */
+.scrollbar-vertical-custom {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.dark .scrollbar-vertical-custom {
+  scrollbar-color: #3f3f46 transparent;
+}
+
 .scrollbar-vertical-custom::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 .scrollbar-vertical-custom::-webkit-scrollbar-track {
@@ -109,16 +157,45 @@
 }
 
 .scrollbar-vertical-custom::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary));
-  border-radius: 10px;
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 .scrollbar-vertical-custom::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.8);
+  background-color: #94a3b8;
+}
+
+.scrollbar-vertical-custom::-webkit-scrollbar-thumb:active {
+  background-color: #64748b;
+}
+
+.dark .scrollbar-vertical-custom::-webkit-scrollbar-thumb {
+  background-color: #3f3f46;
+}
+
+.dark .scrollbar-vertical-custom::-webkit-scrollbar-thumb:hover {
+  background-color: #52525b;
+}
+
+.dark .scrollbar-vertical-custom::-webkit-scrollbar-thumb:active {
+  background-color: #71717a;
 }
 
 .select-none {
   user-select: none;
+}
+
+@keyframes logoIntroPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.75) translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes floatLogo {
